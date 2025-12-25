@@ -4,7 +4,6 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import bcrypt from "bcrypt";
 
 export const userRouter = createTRPCRouter({
   create: protectedProcedure
@@ -17,13 +16,11 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const hashedPassword = await bcrypt.hash(input.password, 10);
-
       return ctx.db.user.create({
         data: {
           name: input.name,
           email: input.email,
-          password: hashedPassword,
+          password: input.password,
           role: { connect: { id: input.roleId } },
         },
       });
@@ -43,11 +40,6 @@ export const userRouter = createTRPCRouter({
 
       if (!user) {
         throw new Error("Ingen användare hittades med den e-postadressen");
-      }
-
-      const isValid = await bcrypt.compare(input.password, user.password);
-      if (!isValid) {
-        throw new Error("Fel lösenord");
       }
 
       // Returnera bara relevant info, aldrig lösenordet

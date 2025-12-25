@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { getSession } from "~/server/better-auth/server";
-import { api, HydrateClient } from "~/trpc/server";
-import { FaBell, FaLaptop } from "react-icons/fa";
-import { CreateTicket } from "../_components/createTicket";
-import { MdArrowBack } from "react-icons/md";
+import { HydrateClient } from "~/trpc/server";
+import { FaBell } from "react-icons/fa";
 import { redirect } from "next/navigation";
 
 export default async function Admin() {

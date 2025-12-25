@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSession } from "~/server/better-auth/server";
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient } from "~/trpc/server";
 import {
   FaBell,
   FaHandHoldingHeart,
