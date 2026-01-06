@@ -42,7 +42,7 @@ enum MessageType {
 
 model Role {
   id          String       @id @default(cuid())
-  name        String // e.g., "ADMIN", "USER", "HANDLER"
+  name        String       @unique
   permissions Permission[]
   users       User[]
 }

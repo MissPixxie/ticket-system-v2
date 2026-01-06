@@ -7,7 +7,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
   title: "Ticket System",
-  description: "I dislike my workplace system, therefore I made this. Enjoy!",
+  description: "I dislike my workplace bug handling system, therefore I made this. Enjoy!",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

@@ -9,15 +9,15 @@ import {
   FaShoppingCart,
   FaUsers,
 } from "react-icons/fa";
-import { CreateTicket } from "../_components/createTicket";
+import { CreateTicket } from "../../_components/createTicket";
 import { MdArrowBack } from "react-icons/md";
 import { redirect } from "next/navigation";
 
 export default async function Handler() {
   const session = await getSession();
 
-  if (!session) {
-    redirect("/login");
+  if (!session || session.user.role !== "HANDLER") {
+    redirect("/");
   }
 
   return (
@@ -29,7 +29,7 @@ export default async function Handler() {
             {session && <span>Logged in as {session.user?.name}</span>}
           </p>
           <Link
-            href={session ? "/api/auth/signout" : "/api/auth/signin"}
+            href={session ? "/" : "/"}
             className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
           >
             {session ? "Sign out" : "Sign in"}

@@ -7,10 +7,13 @@ import { redirect } from "next/navigation";
 export default async function Admin() {
   const session = await getSession();
 
-  if (!session) {
-    redirect("/login");
-  }
+  // if (!session || session.user.role !== "ADMIN") {
+  //   redirect("/");
+  // }
 
+  if (!session) {
+    redirect("/");
+  }
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-row flex-wrap items-center justify-center bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
@@ -20,7 +23,7 @@ export default async function Admin() {
             {session && <span>Logged in as {session.user?.name}</span>}
           </p>
           <Link
-            href={session ? "/api/auth/signout" : "/api/auth/signin"}
+            href={session ? "/" : "/"}
             className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
           >
             {session ? "Sign out" : "Sign in"}

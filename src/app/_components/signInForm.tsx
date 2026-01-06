@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { authClient } from "~/server/better-auth/client";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+    const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -23,8 +25,12 @@ export default function SignInForm() {
 
     if (res.error) {
       setError(res.error.message || "Something went wrong.");
-    } else {
-      redirect("/user");
+
+      return;
+
+    }
+    else {
+          router.push("/dashboard");
     }
   }
 

@@ -3,6 +3,7 @@ import { db } from "~/server/db";
 
 async function main() {
 
+
     await db.permission.createMany({
     data: [
       { name: "CREATE_TICKET"},
@@ -41,41 +42,121 @@ async function main() {
   });
 
 
-  const users = [
-    {
-      email: "admin@example.com",
-      name: "Admin",
-      password: "StrongP@ssw0rd123!",
-    },
-    {
-      email: "handler@example.com",
-      name: "Handler",
-      password: "StrongP@ssw0rd123!",
-    },
-    {
-      email: "user@example.com",
-      name: "Regular User",
-      password: "StrongP@ssw0rd123!",
-    },
-  ];
+  const userOne = {
+    email: "admin@example.com",
+    name: "Admin",
+    password: "StrongP@ssw0rd123!",
+    role: adminRole.name,
+  }
+
+  const userTwo = {
+    email: "handler@example.com",
+    name: "Handler",
+    password: "StrongP@ssw0rd123!",
+    role: handlerRole.name,
+  }
+
+  const userThree = {
+    email: "user@example.com",
+    name: "Regular User",
+    password: "StrongP@ssw0rd123!",
+    role: userRole.name,
+  }
 
 
-  for (const user of users) {
-    const created = await auth.api.signUpEmail({
+  // const users = [
+  //   {
+  //     email: "admin@example.com",
+  //     name: "Admin",
+  //     password: "StrongP@ssw0rd123!",
+  //     role: adminRole.name,
+  //   },
+  //   {
+  //     email: "handler@example.com",
+  //     name: "Handler",
+  //     password: "StrongP@ssw0rd123!",
+  //     role: handlerRole.name,
+  //   },
+  //   {
+  //     email: "user@example.com",
+  //     name: "Regular User",
+  //     password: "StrongP@ssw0rd123!",
+  //     role: userRole.name,
+  //   },
+  // ];
+
+
+   const createdUserOne = await auth.api.signUpEmail({
       body: {
-        email: user.email,
-        password: user.password,
-        name: user.name,
+        email: userOne.email,
+        password: userOne.password,
+        name: userOne.name,
       },
     });
+
+      await db.user.update({
+      where: { id: createdUserOne.user.id },
+      data: {
+        role: {
+          connect: { name: "ADMIN" }
+       },
+      }
+    });
+
+  const createdUserTwo = await auth.api.signUpEmail({
+      body: {
+        email: userTwo.email,
+        password: userTwo.password,
+        name: userTwo.name,
+      },
+    });
+
+    await db.user.update({
+      where: { id: createdUserTwo.user.id },
+      data: {
+        role: {
+          connect: { name: "HANDLER" }
+       },
+      }
+    });
+
+    const createdUserThree = await auth.api.signUpEmail({
+      body: {
+        email: userThree.email,
+        password: userThree.password,
+        name: userThree.name,
+      },
+    });
+
+    await db.user.update({
+      where: { id: createdUserThree.user.id },
+      data: {
+        role: {
+          connect: {
+            name: "USER"
+        }}
+      }
+    });
+
+
+  // for (const user of users) {
+  //   const created = await auth.api.signUpEmail({
+  //     body: {
+  //       email: user.email,
+  //       password: user.password,
+  //       name: user.name,
+  //     },
+  //   });
 
     // await db.user.update({
     //   where: { id: created.user.id },
     //   data: {
-    //     roleId: user.roleId
+    //     role: {
+    //       connect: { name: user.role }
     //    },
+    //   }
     // });
- }
+ //}
 
   console.log("✅ Seed klar!");
 }

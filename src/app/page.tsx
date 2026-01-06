@@ -4,6 +4,7 @@ import SignInForm from "./_components/signInForm";
 
 export default async function Home() {
   const session = await getSession();
+console.log(session?.user.role)
 
   return (
     <HydrateClient>
