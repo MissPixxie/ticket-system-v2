@@ -80,10 +80,6 @@ export default async function User() {
             <FaHandHoldingHeart size={42} />
           </Link>
         </div>
-        <div className="flex w-full max-w-xs grow flex-row justify-center gap-4 rounded-xl bg-white/10">
-          <h3 className="text-8xl font-bold">IT</h3>
-          <FaLaptop size={92} />
-        </div>
         <div className="mt-15 flex h-full w-full grow place-content-center">
           <CreateTicket />
         </div>
