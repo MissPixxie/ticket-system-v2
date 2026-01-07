@@ -7,6 +7,10 @@ import {
 } from "~/server/api/trpc";
 
 export const ticketRouter = createTRPCRouter({
+  listAllTickets: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.ticket.findMany();
+  }),
+
   create: protectedProcedure
     .input(
       z.object({

@@ -4,3 +4,15 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
+@keyframes hide {
+  from {opacity: 1;}
+  to {opacity: 0;}
+}
+
+
+.notSelected {
+  animation-name: hide;
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+}

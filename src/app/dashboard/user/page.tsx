@@ -25,11 +25,11 @@ export default async function User() {
   }
   return (
     <HydrateClient>
-      <main className="flex min-h-screen flex-row flex-wrap items-center justify-center bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="flex w-full grow flex-row place-content-end items-center gap-4">
+      <main className="flex min-h-screen flex-row flex-wrap bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
+        <div className="flex h-fit w-full grow flex-row place-content-end items-center gap-4">
           <FaBell />
           <p className="text-center text-2xl text-white">
-            {session && <span>Logged in as {session.user?.email}</span>}
+            {session && <span>Logged in as {session.user?.name}</span>}
           </p>
           <Link
             href={session ? "/" : "/"}
@@ -38,52 +38,9 @@ export default async function User() {
             {session ? "Sign out" : "Sign in"}
           </Link>
         </div>
-        <div className="grid grid-cols-5 gap-4 sm:grid-cols-5 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col items-center gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="http://localhost:3000/it"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">IT</h3>
-            <FaLaptop size={42} />
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col items-center gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">HR</h3>
-            <FaUsers size={42} />
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col items-center gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Kampanj</h3>
-            <FaShopify size={42} />
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col items-center gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Produkt</h3>
-            <FaShoppingCart size={42} />
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col items-center gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Kundklubb</h3>
-            <FaHandHoldingHeart size={42} />
-          </Link>
-        </div>
-        <div className="mt-15 flex h-full w-full grow place-content-center">
+        <div className="flex h-screen w-full justify-items-center">
           <CreateTicket />
         </div>
-        <MdArrowBack size={32} className="text-white" />
       </main>
     </HydrateClient>
   );
