@@ -7,12 +7,31 @@
 
 @keyframes hide {
   from {opacity: 1;}
-  to {opacity: 0;}
+  to {opacity: 0.2;}
 }
 
 
 .notSelected {
   animation-name: hide;
-  animation-duration: 2s;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+
+@keyframes messageAnimation {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+
+.popUpMessage {
+  animation-name: messageAnimation;
+  animation-duration: 1s;
+  animation-delay: 2s;
   animation-fill-mode: forwards;
 }

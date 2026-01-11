@@ -10,6 +10,7 @@ import {
   FaShoppingCart,
   FaUsers,
 } from "react-icons/fa";
+import { Toast } from "./toast";
 
 export function CreateTicket() {
   const utils = api.useUtils();
@@ -18,48 +19,82 @@ export function CreateTicket() {
   const [department, setDepartment] = useState<
     "IT" | "HR" | "CAMPAIGN" | "PRODUCT" | "CUSTOMERCLUB"
   >("IT");
-  // const [clicked, setClicked] = useState(false);
   const [isSelected, setIsSelected] = useState<null | number>(null);
+  const [message, setMessage] = useState<string>();
+  const [success, setSuccess] = useState<boolean>();
 
+  console.log(department);
   const createTicket = api.ticket.create.useMutation({
     onSuccess: async () => {
+      setSuccess(true);
       await utils.ticket.invalidate();
       setTitle("");
       setIssue("");
       setDepartment("IT");
       setIsSelected(null);
-      // setClicked(false);
+    },
+    onError(error) {
+      setSuccess(false);
     },
   });
 
   const departments = [
-    { id: 1, name: "IT", icon: <FaLaptop size={42} />, isSelected: false },
-    { id: 2, name: "HR", icon: <FaUsers size={42} />, isSelected: false },
+    {
+      id: 1,
+      name: "IT",
+      icon: <FaLaptop size={42} />,
+      isSelected: false,
+      order: "order-1",
+    },
+    {
+      id: 2,
+      name: "HR",
+      icon: <FaUsers size={42} />,
+      isSelected: false,
+      order: "order-2",
+    },
     {
       id: 3,
       name: "CAMPAIGN",
       icon: <FaShopify size={42} />,
       isSelected: false,
+      order: "order-3",
     },
     {
       id: 4,
       name: "PRODUCT",
       icon: <FaShoppingCart size={42} />,
       isSelected: false,
+      order: "order-4",
     },
     {
       id: 5,
       name: "CUSTOMERCLUB",
       icon: <FaHandHoldingHeart size={42} />,
       isSelected: false,
+      order: "order-5",
     },
   ];
 
+  const orderedDepartments = [...departments];
+
+  if (isSelected !== null) {
+    const index = orderedDepartments.findIndex((dep) => dep.id === isSelected);
+
+    if (index !== -1) {
+      const [selected] = orderedDepartments.splice(index, 1);
+
+      if (selected) {
+        orderedDepartments.splice(2, 0, selected);
+      }
+    }
+  }
+
   return (
-    <div className="flex h-full w-full flex-col items-center gap-15">
+    <div className="z-0 flex h-full w-full flex-col items-center gap-15">
       <h1 className="text-4xl">Välj avdelning</h1>
       <div className="grid grid-cols-5 gap-4 sm:grid-cols-5 md:gap-8">
-        {departments.map((dep) => {
+        {orderedDepartments.map((dep) => {
           return (
             <button
               key={dep.id}
@@ -75,6 +110,7 @@ export function CreateTicket() {
           );
         })}
       </div>
+      {success && <Toast data={success} />}
       <form
         onSubmit={(e) => {
           e.preventDefault();
