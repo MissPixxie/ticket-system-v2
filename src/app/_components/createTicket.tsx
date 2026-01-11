@@ -20,7 +20,6 @@ export function CreateTicket() {
     "IT" | "HR" | "CAMPAIGN" | "PRODUCT" | "CUSTOMERCLUB"
   >("IT");
   const [isSelected, setIsSelected] = useState<null | number>(null);
-  const [message, setMessage] = useState<string>();
   const [success, setSuccess] = useState<boolean>();
 
   console.log(department);

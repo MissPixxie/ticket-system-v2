@@ -33,7 +33,7 @@ export default async function Handler() {
             {session ? "Sign out" : "Sign in"}
           </Link>
         </div>
-        <div className="flex w-full flex-col place-items-center">
+        <div className="flex w-full flex-col place-items-center gap-y-20">
           <h3 className="text-8xl font-bold">Handler Dashboard</h3>
           <ListAllTickets />
         </div>

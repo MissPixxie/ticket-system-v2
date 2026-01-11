@@ -16,7 +16,8 @@ export function ListAllTickets() {
         <tr>
           <th className="border border-gray-300/50 px-4 py-2">Namn</th>
           <th className="border border-gray-300/50 px-4 py-2">Email</th>
-          <th className="border border-gray-300/50 px-4 py-2">Roll</th>
+          <th className="border border-gray-300/50 px-4 py-2">Status</th>
+          <th className="border border-gray-300/50 px-4 py-2">Priority</th>
           <th className="border border-gray-300/50 px-4 py-2"></th>
         </tr>
       </thead>
@@ -34,6 +35,14 @@ export function ListAllTickets() {
             </td>
             <td className="border border-gray-300/50 px-4 py-2">
               {ticket.priority}
+            </td>
+            <td className="flex flex-row justify-center gap-x-5 gap-y-5">
+              <div className="rounded bg-green-600 p-1">
+                <RiEdit2Fill size={26} />
+              </div>
+              <div className="rounded bg-red-600 p-2">
+                <FaTrashAlt size={26} />
+              </div>
             </td>
           </tr>
         ))}
