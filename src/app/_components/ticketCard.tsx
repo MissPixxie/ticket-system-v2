@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { getSession } from "~/server/better-auth/server";
+import { api } from "~/trpc/react";
 
 type TicketProps = {
   id: string;
@@ -26,13 +28,26 @@ type TicketProps = {
 
 export default function TicketCard(ticketProps: TicketProps) {
   const [newMessage, setNewMessage] = useState("");
+  const utils = api.useUtils();
+  const { data: message, isLoading } = api.message.listAllMessages.useQuery({
+    ticketId: ticketProps.id,
+  });
 
-  const messages = ticketProps.messages ?? [];
+  const createMessage = api.message.createMessage.useMutation({
+    onSuccess: () => {
+      void utils.message.listAllMessages.invalidate({
+        ticketId: ticketProps.id,
+      });
+      setNewMessage("");
+    },
+  });
 
   const handleSend = () => {
     if (!newMessage.trim()) return;
-
-    console.log("Send message:", newMessage);
+    createMessage.mutate({
+      ticketId: ticketProps.id,
+      message: newMessage,
+    });
 
     setNewMessage("");
   };
@@ -52,28 +67,36 @@ export default function TicketCard(ticketProps: TicketProps) {
         <h3 className="text-lg font-semibold">Meddelanden</h3>
 
         <div className="flex max-h-64 flex-col gap-3 overflow-y-auto rounded-lg bg-black/30 p-4">
-          {messages.length === 0 && (
-            <p className="text-sm opacity-60">Inga meddelanden ännu</p>
-          )}
+          {isLoading ? (
+            <p className="animate-pulse text-sm opacity-60">
+              Laddar meddelanden...
+            </p>
+          ) : (
+            <>
+              {(!message || message.length === 0) && (
+                <p className="text-sm opacity-60">Inga meddelanden ännu</p>
+              )}
 
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className="max-w-[80%] rounded-lg bg-white/10 p-3 text-sm"
-            >
-              <div className="mb-1 text-xs opacity-60">
-                {msg.createdBy} · {msg.createdAt.toLocaleDateString()}
-              </div>
-              {msg.message}
-            </div>
-          ))}
+              {message?.map((msg, index) => (
+                <div
+                  key={index}
+                  className="max-w-[80%] rounded-lg bg-white/10 p-3 text-sm"
+                >
+                  <div className="mb-1 text-xs opacity-60">
+                    {msg.createdBy?.name} · {msg.createdAt.toLocaleDateString()}
+                  </div>
+                  {msg.message}
+                </div>
+              ))}
+            </>
+          )}
         </div>
         <div className="flex gap-2">
           <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Skriv ett meddelande..."
-            rows={2}
+            rows={3}
             className="flex-1 resize-none rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button

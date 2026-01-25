@@ -20,6 +20,7 @@ export function TicketTable() {
   const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery();
   const utils = api.useContext();
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+
   const updateTicket = api.ticket.updateTicket.useMutation({
     onSuccess: (updatedTicket) => {
       utils.ticket.listAllTickets.setData(undefined, (oldData) => {
@@ -52,7 +53,7 @@ export function TicketTable() {
 
   return (
     <div className="mx-auto w-full bg-linear-to-b from-[#3b0e7a] to-[#282a53] shadow-xl/50">
-      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_auto_auto] bg-black/20 p-5 px-2">
+      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] bg-black/20 p-5 px-2">
         <div>
           <h2 className="text-xl font-bold">Titel</h2>
         </div>
@@ -69,34 +70,51 @@ export function TicketTable() {
           <h2 className="text-xl font-bold">Skapad</h2>
         </div>
       </div>
+
       {tickets.map((ticket) => (
-        <div
-          key={ticket.id}
-          onClick={() =>
-            setSelectedTicketId(
-              selectedTicketId === ticket.id ? null : ticket.id,
-            )
-          }
-          className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center border-t p-4 hover:bg-gray-50/5"
-        >
-          <div>{ticket.title}</div>
-          <div>{ticket.department}</div>
+        <div key={ticket.id} className="border-t">
           <div
-            className={`flex max-w-20 justify-center rounded-md shadow-md/30 ${statusClasses[ticket.status] ?? "text-gray-400"}`}
+            className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center p-4 hover:bg-gray-50/5"
+            onClick={() =>
+              setSelectedTicketId(
+                selectedTicketId === ticket.id ? null : ticket.id,
+              )
+            }
           >
-            {ticket.status}
+            <div>{ticket.title}</div>
+            <div>{ticket.department}</div>
+            <div
+              className={`flex max-w-20 justify-center rounded-md shadow-md/30 ${
+                statusClasses[ticket.status] ?? "text-gray-400"
+              }`}
+            >
+              {ticket.status}
+            </div>
+            <div
+              className={`flex max-w-20 justify-center rounded-md shadow-md/30 ${
+                priorityClasses[ticket.priority] ?? "text-gray-400"
+              }`}
+            >
+              {ticket.priority}
+            </div>
+            <div>{ticket.createdAt.toLocaleDateString()}</div>
           </div>
-          <div
-            className={`flex max-w-20 justify-center rounded-md shadow-md/30 ${priorityClasses[ticket.priority] ?? "text-gray-400"}`}
-          >
-            {ticket.priority}
-          </div>
-          <div>{ticket.createdAt.toLocaleDateString()}</div>
 
           {selectedTicketId === ticket.id && (
             <div className="col-span-full mt-3 transition-opacity duration-200">
-              <div className="rounded bg-black/30 p-4">
+              <div className="relative rounded bg-black/30 p-4">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedTicketId(null);
+                  }}
+                  className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded bg-red-600 text-white hover:bg-red-700"
+                >
+                  ✕
+                </button>
+
                 <TicketCard {...ticket} />
+
                 <div className="mt-4 flex gap-4">
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-semibold">Status</label>
@@ -113,6 +131,7 @@ export function TicketTable() {
                       <option>CLOSED</option>
                     </select>
                   </div>
+
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-semibold">Prioritet</label>
                     <select

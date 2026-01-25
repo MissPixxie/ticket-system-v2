@@ -8,7 +8,11 @@ import {
 
 export const ticketRouter = createTRPCRouter({
   listAllTickets: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.ticket.findMany();
+    return ctx.db.ticket.findMany({
+      include: {
+        messages: true,
+      },
+    });
   }),
 
   create: protectedProcedure
