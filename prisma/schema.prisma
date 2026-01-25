@@ -34,10 +34,31 @@ enum Priority {
   URGENT
 }
 
+enum ActionType {
+  CREATED
+  UPDATED
+  STATUS_CHANGED
+  ASSIGNED
+  UNASSIGNED
+  NOTE_ADDED
+}
+
 enum MessageType {
   USER_MESSAGE
   HANDLER_MESSAGE
   SYSTEM_MESSAGE
+}
+
+model Action {
+  id              String         @id @default(cuid())
+  user            User           @relation(fields: [userId], references: [id])
+  userId          String
+  actionType      ActionType
+  timestamp       DateTime       @default(now())
+  ticketHistory   TicketHistory? @relation(fields: [ticketHistoryId], references: [id])
+  ticketHistoryId String?
+
+  @@unique([id])
 }
 
 model Role {
@@ -85,10 +106,7 @@ model TicketHistory {
   id        String   @id @default(cuid())
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
   ticketId  String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  status    Status
-  note      String?
+  actions   Action[]
   timestamp DateTime @default(now())
 
   @@unique([id])
@@ -188,24 +206,24 @@ model Session {
 }
 
 model User {
-  id             String          @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String?
-  email          String?         @unique
+  email          String?   @unique
   password       String?
-  emailVerified  Boolean?        @default(false)
+  emailVerified  Boolean?  @default(false)
   image          String?
-  role           Role?           @relation(fields: [roleId], references: [id])
+  role           Role?     @relation(fields: [roleId], references: [id])
   roleId         String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @default(now()) @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
   sessions       Session[]
   accounts       Account[]
-  ticketsCreated Ticket[]        @relation("TicketsCreated")
-  ticketsHandled Ticket[]        @relation("TicketsHandled")
+  ticketsCreated Ticket[]  @relation("TicketsCreated")
+  ticketsHandled Ticket[]  @relation("TicketsHandled")
   messages       Message[]
-  ticketHistory  TicketHistory[]
   tickets        Ticket[]
   posts          Post[]
+  actions        Action[]
 }
 
 // model VerificationToken {

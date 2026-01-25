@@ -30,12 +30,21 @@ export const ticketRouter = createTRPCRouter({
       });
     }),
 
-  //   getLatest: protectedProcedure.query(async ({ ctx }) => {
-  //     const post = await ctx.db.post.findFirst({
-  //       orderBy: { createdAt: "desc" },
-  //       where: { createdBy: { id: ctx.session.user.id } },
-  //     });
-
-  //     return post ?? null;
-  //   }),
+  updateTicket: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().min(1),
+        status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]).optional(),
+        priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.ticket.update({
+        where: { id: input.id },
+        data: {
+          status: input.status,
+          priority: input.priority,
+        },
+      });
+    }),
 });

@@ -5,7 +5,7 @@ import { FaBell } from "react-icons/fa";
 import { CreateTicket } from "../../_components/createTicket";
 import { MdArrowBack } from "react-icons/md";
 import { redirect } from "next/navigation";
-import { ListAllTickets } from "~/app/_components/listAllTickets";
+import { TicketTable } from "../../_components/ticketTable";
 
 export default async function Handler() {
   const session = await getSession();
@@ -20,22 +20,27 @@ export default async function Handler() {
 
   return (
     <HydrateClient>
-      <main className="flex min-h-screen flex-row flex-wrap bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="flex h-fit w-full grow flex-row place-content-end items-center gap-4">
+      <main className="flex min-h-screen flex-col bg-linear-to-b from-[#2e026d] to-[#15162c] p-8 text-white">
+        {/* Header */}
+        <div className="mb-10 flex h-fit w-full flex-row items-center justify-end gap-4">
           <FaBell />
-          <p className="text-center text-2xl text-white">
+          <p className="text-center text-xl">
             {session && <span>Logged in as {session.user?.name}</span>}
           </p>
           <Link
-            href={session ? "/" : "/"}
-            className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
+            href="/"
+            className="rounded-full bg-white/10 px-6 py-2 font-semibold no-underline transition hover:bg-white/20"
           >
-            {session ? "Sign out" : "Sign in"}
+            Sign out
           </Link>
         </div>
-        <div className="flex w-full flex-col place-items-center gap-y-20">
-          <h3 className="text-8xl font-bold">Handler Dashboard</h3>
-          <ListAllTickets />
+        {/* Content */}
+        <div className="flex w-full flex-col items-center gap-y-10">
+          <h1 className="text-6xl font-bold">Handler Dashboard</h1>
+
+          <div className="w-full px-16">
+            <TicketTable />
+          </div>
         </div>
       </main>
     </HydrateClient>
