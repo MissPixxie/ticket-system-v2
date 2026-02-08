@@ -101,7 +101,7 @@ export function CreateTicket() {
                 setDepartment(dep.name as typeof department);
                 setIsSelected(dep.id);
               }}
-              className={`flex max-w-xs flex-col items-center gap-4 rounded-xl p-4 transition-all duration-300 ${isSelected === dep.id ? "scale-110 bg-blue-500 text-white" : isSelected !== null ? "notSelected" : "bg-white/10 hover:bg-white/20"}`}
+              className={`flex max-w-xs flex-col items-center gap-4 rounded-xl p-4 shadow-lg/40 transition-all duration-300 ${isSelected === dep.id ? "scale-110 bg-blue-500 text-white" : isSelected !== null ? "notSelected" : "bg-white/10 hover:bg-white/20"}`}
             >
               <h3 className="text-2xl font-bold">{dep.name}</h3>
               {dep.icon}

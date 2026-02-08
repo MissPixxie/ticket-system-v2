@@ -11,6 +11,8 @@ export const ticketRouter = createTRPCRouter({
     return ctx.db.ticket.findMany({
       include: {
         messages: true,
+        ticketHistories: true,
+        createdBy: true,
       },
     });
   }),
@@ -43,11 +45,46 @@ export const ticketRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { id, ...data } = input;
+
       return ctx.db.ticket.update({
-        where: { id: input.id },
+        where: { id },
         data: {
+          ...data,
+          ticketHistories: {
+            create: {
+              actionType: input.status ? "CHANGED_STATUS" : "CHANGED_PRIORITY",
+              userId: ctx.session.user.id,
+            },
+          },
           status: input.status,
           priority: input.priority,
+        },
+      });
+    }),
+
+  recordAction: protectedProcedure
+    .input(
+      z.object({
+        ticketId: z.string().min(1),
+        actionType: z.enum([
+          "CREATED",
+          "UPDATED",
+          "CHANGED_STATUS",
+          "CHANGED_PRIORITY",
+          "ASSIGNED",
+          "UNASSIGNED",
+          "SENT",
+          "ADDED_NOTE",
+        ]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.action.create({
+        data: {
+          actionType: input.actionType,
+          ticketId: input.ticketId,
+          userId: ctx.session.user.id,
         },
       });
     }),
