@@ -15,7 +15,7 @@ import { CreateTicket } from "../../_components/createTicket";
 import { MdArrowBack } from "react-icons/md";
 import { redirect } from "next/navigation";
 import { SuggestionBox } from "~/app/_components/suggestionBox";
-import { NotificationClient } from "~/app/_components/notificationClient";
+import { NotificationBell } from "~/app/_components/notificationBell";
 
 export default async function User() {
   const session = await getSession();
@@ -40,7 +40,7 @@ export default async function User() {
           <div>
             <FaRegLightbulb size={22} />
           </div>
-          <NotificationClient userId={session.user.id} />
+          <NotificationBell userId={session.user.id} />
           <p className="text-center text-2xl text-white">
             {session && <span>Logged in as {session.user?.name}</span>}
           </p>

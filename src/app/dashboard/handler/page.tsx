@@ -7,7 +7,7 @@ import { MdArrowBack } from "react-icons/md";
 import { redirect } from "next/navigation";
 import { TicketTable } from "../../_components/ticketTable";
 import { SuggestionBox } from "~/app/_components/suggestionBox";
-import { NotificationClient } from "~/app/_components/notificationClient";
+import { NotificationBell } from "~/app/_components/notificationBell";
 
 export default async function Handler() {
   const session = await getSession();
@@ -30,7 +30,7 @@ export default async function Handler() {
         <main className="flex-1 bg-linear-to-b from-[#2e026d] to-[#15162c] p-8 text-white">
           {/* Header */}
           <div className="mb-10 flex h-fit w-full flex-row items-center justify-end gap-4">
-            <NotificationClient userId={session.user.id} />
+            <NotificationBell userId={session.user.id} />
             <p className="text-center text-xl">
               {session && <span>Logged in as {session.user?.name}</span>}
             </p>

@@ -50,7 +50,11 @@ export default function ChatBox(ticketProps: TicketCardProps) {
     });
 
     socket?.emit("chat:message", {
-      ticketId: ticketProps.id,
+      // ticketId: ticketProps.id,
+      message: newMessage,
+    });
+
+    socket?.emit("notification", {
       message: newMessage,
     });
 
