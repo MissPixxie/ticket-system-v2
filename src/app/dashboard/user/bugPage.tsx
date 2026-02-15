@@ -3,7 +3,6 @@ import { getSession } from "~/server/better-auth/server";
 import { HydrateClient } from "~/trpc/server";
 import {
   FaBell,
-  FaRegLightbulb,
   FaHandHoldingHeart,
   FaLaptop,
   FaShopify,
@@ -15,12 +14,10 @@ import { CreateTicket } from "../../_components/createTicket";
 import { MdArrowBack } from "react-icons/md";
 import { redirect } from "next/navigation";
 import { SuggestionBox } from "~/app/_components/suggestionBox";
-import { NotificationClient } from "~/app/_components/notificationClient";
 
-export default async function User() {
+export default async function BugPage() {
   const session = await getSession();
   console.log(session);
-
   // if (!session || session.user.role !== "USER") {
   //   redirect("/");
   // }
@@ -33,14 +30,10 @@ export default async function User() {
       <main className="flex min-h-screen flex-row flex-wrap bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="flex h-fit w-full grow flex-row place-content-end items-center gap-4">
           <div>
-            <Link href="/dashboard/user/bug">
-              <GrBug size={22} />
-            </Link>
+            <GrBug size={32} />
           </div>
-          <div>
-            <FaRegLightbulb size={22} />
-          </div>
-          <NotificationClient userId={session.user.id} />
+          <FaBell />
+
           <p className="text-center text-2xl text-white">
             {session && <span>Logged in as {session.user?.name}</span>}
           </p>
@@ -55,7 +48,7 @@ export default async function User() {
           <CreateTicket />
         </div>
       </main>
-      <aside>
+      <aside className="fixed top-0 left-0 h-full w-64 bg-linear-to-b from-[#502986] to-[#32345c] p-4 text-white">
         <SuggestionBox />
       </aside>
     </HydrateClient>

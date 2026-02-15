@@ -10,6 +10,7 @@ import {
   FaShoppingCart,
   FaUsers,
 } from "react-icons/fa";
+import { MdOutlinePhotoCamera } from "react-icons/md";
 import { Toast } from "./toast";
 
 export function CreateTicket() {
@@ -139,6 +140,9 @@ export function CreateTicket() {
           Submit
         </button>
       </form>
+      <div className="flex h-50 w-50 items-center justify-center rounded-2xl border bg-white/40 p-7 px-4 py-2 text-white">
+        <MdOutlinePhotoCamera />
+      </div>
     </div>
   );
 }

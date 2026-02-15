@@ -1,5 +1,5 @@
 import { z } from "zod";
-
+import { observable } from "@trpc/server/observable";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -46,8 +46,7 @@ export const ticketRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
-
-      return ctx.db.ticket.update({
+      const updatedTicket = await ctx.db.ticket.update({
         where: { id },
         data: {
           ...data,
@@ -61,6 +60,8 @@ export const ticketRouter = createTRPCRouter({
           priority: input.priority,
         },
       });
+
+      return updatedTicket;
     }),
 
   recordAction: protectedProcedure

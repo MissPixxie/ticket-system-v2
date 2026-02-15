@@ -130,7 +130,13 @@ async function main() {
     },
   });
 
-  const createSuggestionBox = await db.suggestionBox.create({});
+  const existingBox = await db.suggestionBox.findFirst();
+  if (!existingBox) {
+    const box = await db.suggestionBox.create({});
+    console.log("Created default SuggestionBox with id:", box.id);
+  } else {
+    console.log("SuggestionBox already exists with id:", existingBox.id);
+  }
 
   // for (const user of users) {
   //   const created = await auth.api.signUpEmail({

@@ -27,6 +27,14 @@ enum Status {
   CLOSED
 }
 
+enum SuggestionStatus {
+  SENT
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  IMPLEMENTED
+}
+
 enum Priority {
   LOW
   MEDIUM
@@ -57,12 +65,13 @@ model SuggestionBox {
 }
 
 model Suggestion {
-  id              String        @id @default(cuid())
+  id              String           @id @default(cuid())
   content         String
-  createdAt       DateTime      @default(now())
-  user            User          @relation(fields: [userId], references: [id])
+  createdAt       DateTime         @default(now())
+  status          SuggestionStatus @default(SENT)
+  user            User             @relation(fields: [userId], references: [id])
   userId          String
-  suggestionBox   SuggestionBox @relation(fields: [suggestionBoxId], references: [id])
+  suggestionBox   SuggestionBox    @relation(fields: [suggestionBoxId], references: [id])
   suggestionBoxId String
   votes           Vote[]
 }
