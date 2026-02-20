@@ -1,4 +1,5 @@
 "use client";
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -8,17 +9,38 @@ interface SocketContextValue {
 
 const SocketContext = createContext<SocketContextValue>({ socket: null });
 
-export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
+export const SocketProvider = ({
+  children,
+  userId,
+}: {
+  children: React.ReactNode;
+  userId: string | null;
+}) => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const s = io();
-    setSocket(s);
+    if (!userId) return;
+
+    let isMounted = true;
+
+    const initSocket = async () => {
+      const socketInstance = io("http://localhost:3001", {
+        query: { userId },
+      });
+
+      setSocket(socketInstance);
+
+      return () => {
+        socketInstance.disconnect();
+      };
+    };
+
+    initSocket();
 
     return () => {
-      s.disconnect();
+      isMounted = false;
     };
-  }, []);
+  }, [userId]);
 
   return (
     <SocketContext.Provider value={{ socket }}>

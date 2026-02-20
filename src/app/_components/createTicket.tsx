@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
+import { getSession } from "~/server/better-auth/server";
 import { api } from "~/trpc/react";
 import {
   FaBell,
@@ -12,9 +13,11 @@ import {
 } from "react-icons/fa";
 import { MdOutlinePhotoCamera } from "react-icons/md";
 import { Toast } from "./toast";
+import { useSocket } from "../socketProvider";
 
 export function CreateTicket() {
   const utils = api.useUtils();
+  const { socket } = useSocket();
   const [title, setTitle] = useState("");
   const [issue, setIssue] = useState("");
   const [department, setDepartment] = useState<
@@ -23,15 +26,16 @@ export function CreateTicket() {
   const [isSelected, setIsSelected] = useState<null | number>(null);
   const [success, setSuccess] = useState<boolean>();
 
-  console.log(department);
   const createTicket = api.ticket.create.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (ticket) => {
       setSuccess(true);
       await utils.ticket.invalidate();
       setTitle("");
       setIssue("");
       setDepartment("IT");
       setIsSelected(null);
+      if (!socket) return;
+      socket.emit("create:room", ticket.id);
     },
     onError(error) {
       setSuccess(false);

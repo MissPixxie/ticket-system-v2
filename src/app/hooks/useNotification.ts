@@ -8,7 +8,6 @@ type NotificationType = "message" | "ticket" | "suggestion" | "notification";
 
 export function useNotification(
   notificationType: NotificationType,
-  msg: string,
   userId?: string,
 ) {
   const { socket } = useSocket();
@@ -28,5 +27,9 @@ export function useNotification(
     return () => {
       socket.off(notificationType, handler);
     };
-  }, [socket, userId, notificationType]);
+  }, [socket]);
+
+  const clearNotifications = () => setNotifications([]);
+
+  return { notifications, clearNotifications };
 }

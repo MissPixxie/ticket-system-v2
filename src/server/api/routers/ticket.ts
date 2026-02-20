@@ -26,7 +26,7 @@ export const ticketRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.ticket.create({
+      const ticket = await ctx.db.ticket.create({
         data: {
           title: input.title,
           issue: input.issue,
@@ -34,6 +34,8 @@ export const ticketRouter = createTRPCRouter({
           createdBy: { connect: { id: ctx.session.user.id } },
         },
       });
+
+      return ticket;
     }),
 
   updateTicket: protectedProcedure

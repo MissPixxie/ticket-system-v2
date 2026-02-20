@@ -11,7 +11,7 @@ import { BsExclamationCircle } from "react-icons/bs";
 type FilterType = "latest" | "popular" | "status";
 
 export function SuggestionBox() {
-  const id = "cmlnkbw6q0007hcu93wrnr6h3";
+  const id = "cmlnru61k0007i0u9mp4bsrfs";
   const [filter, setFilter] = useState<FilterType>("latest");
   const {
     data: suggestions,

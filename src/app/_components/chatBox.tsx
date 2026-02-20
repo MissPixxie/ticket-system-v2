@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { api, type RouterOutputs } from "~/trpc/react";
 import { useSocket } from "../socketProvider";
+import { useNotification } from "../hooks/useNotification";
 
 type Ticket = RouterOutputs["ticket"]["listAllTickets"][number];
 
@@ -13,6 +14,8 @@ export default function ChatBox(ticketProps: TicketCardProps) {
   const { data: message, isLoading } = api.message.listAllMessages.useQuery({
     ticketId: ticketProps.id,
   });
+
+  const { notifications } = useNotification("notification", ticketProps.id);
 
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {
@@ -50,11 +53,12 @@ export default function ChatBox(ticketProps: TicketCardProps) {
     });
 
     socket?.emit("chat:message", {
-      // ticketId: ticketProps.id,
+      ticketId: ticketProps.id,
       message: newMessage,
     });
 
     socket?.emit("notification", {
+      userId: ticketProps.id,
       message: newMessage,
     });
 

@@ -64,6 +64,16 @@ model SuggestionBox {
   suggestion Suggestion[]
 }
 
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  text      String
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
 model Suggestion {
   id              String           @id @default(cuid())
   content         String
@@ -207,26 +217,27 @@ model Session {
 }
 
 model User {
-  id             String       @id @default(cuid())
+  id             String         @id @default(cuid())
   name           String?
-  email          String?      @unique
+  email          String?        @unique
   password       String?
-  emailVerified  Boolean?     @default(false)
+  emailVerified  Boolean?       @default(false)
   image          String?
-  role           Role?        @relation(fields: [roleId], references: [id])
+  role           Role?          @relation(fields: [roleId], references: [id])
   roleId         String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @default(now()) @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now()) @updatedAt
   sessions       Session[]
   accounts       Account[]
-  ticketsCreated Ticket[]     @relation("TicketsCreated")
-  ticketsHandled Ticket[]     @relation("TicketsHandled")
+  ticketsCreated Ticket[]       @relation("TicketsCreated")
+  ticketsHandled Ticket[]       @relation("TicketsHandled")
   messages       Message[]
   tickets        Ticket[]
   posts          Post[]
   actions        Action[]
   suggestions    Suggestion[]
   votes          Vote[]
+  notifications  Notification[]
 }
 
 // model VerificationToken {
