@@ -7,6 +7,7 @@ import { RiArrowUpDoubleFill } from "react-icons/ri";
 import { FaRegClock } from "react-icons/fa";
 import { GoTrophy } from "react-icons/go";
 import { BsExclamationCircle } from "react-icons/bs";
+import { useSocket } from "../socketProvider";
 
 type FilterType = "latest" | "popular" | "status";
 
@@ -23,6 +24,7 @@ export function SuggestionBox() {
   const [issue, setIssue] = useState("");
   const [success, setSuccess] = useState<boolean>();
   const utils = api.useUtils();
+  const { socket } = useSocket();
 
   const vote = api.suggestionBox.updateSuggestion.useMutation({
     onSuccess: () => utils.suggestionBox.invalidate(),
@@ -51,10 +53,13 @@ export function SuggestionBox() {
   });
 
   const createSuggestion = api.suggestionBox.createSuggestion.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (suggestion) => {
       setSuccess(true);
       await utils.suggestionBox.invalidate();
       setIssue("");
+      if (!socket) return;
+      socket.emit("create:room", suggestion.id);
+      socket.emit("join:room", suggestion.id);
     },
     onError(error) {
       setSuccess(false);

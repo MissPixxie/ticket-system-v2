@@ -8,18 +8,22 @@ import { redirect } from "next/navigation";
 import { TicketTable } from "../../_components/ticketTable";
 import { SuggestionBox } from "~/app/_components/suggestionBox";
 import { NotificationBell } from "~/app/_components/notificationBell";
+import { db } from "~/server/db";
 
 export default async function Handler() {
   const session = await getSession();
 
-  // if (!session || session.user.role !== "HANDLER") {
-  //   redirect("/");
-  // }
-
   if (!session) {
     redirect("/");
   }
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    include: { role: true },
+  });
 
+  if (!user || user?.role?.name !== "HANDLER") {
+    redirect("/");
+  }
   return (
     <HydrateClient>
       <div className="flex min-h-screen">
@@ -32,7 +36,7 @@ export default async function Handler() {
           <div className="mb-10 flex h-fit w-full flex-row items-center justify-end gap-4">
             <NotificationBell userId={session.user.id} />
             <p className="text-center text-xl">
-              {session && <span>Logged in as {session.user?.name}</span>}
+              <span>Logged in as {user?.name}</span>
             </p>
             <Link
               href="/"

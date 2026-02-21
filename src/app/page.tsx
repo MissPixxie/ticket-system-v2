@@ -1,11 +1,7 @@
-import { getSession } from "~/server/better-auth/server";
 import { HydrateClient } from "~/trpc/server";
 import SignInForm from "./_components/signInForm";
 
 export default async function Home() {
-  const session = await getSession();
-console.log(session?.user.role)
-
   return (
     <HydrateClient>
       <main className="flex min-h-screen min-w-screen flex-col flex-wrap items-center justify-evenly bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">

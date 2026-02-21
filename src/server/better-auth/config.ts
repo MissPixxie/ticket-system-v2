@@ -17,11 +17,35 @@ export const auth = betterAuth({
   },
   user: {
     additionalFields: {
-      role: {
+      roleId: {
         type: "string",
         required: false,
-      }
-    }
+      },
+    },
+  },
+  callbacks: {
+    session: async ({
+      session,
+      user,
+    }: {
+      session: typeof auth.$Infer.Session;
+      user: typeof auth.$Infer.Session["user"];
+    }) => {
+      const dbUser = await db.user.findUnique({
+        where: { id: user.id },
+        include: {
+          role: true,
+        },
+      });
+
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          role: dbUser?.role ?? null,
+        },
+      };
+    },
   },
   databaseHooks: {
     account: {
@@ -32,12 +56,12 @@ export const auth = betterAuth({
           await db.account.update({
             where: { id: account.id },
             data: {
-              providerId: account.providerId ?? "missing"
-            }
-          })
-        }
-      }
-    }
+              providerId: account.providerId ?? "missing",
+            },
+          });
+        },
+      },
+    },
   },
   socialProviders: {
     github: {

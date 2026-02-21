@@ -16,18 +16,23 @@ import { MdArrowBack } from "react-icons/md";
 import { redirect } from "next/navigation";
 import { SuggestionBox } from "~/app/_components/suggestionBox";
 import { NotificationBell } from "~/app/_components/notificationBell";
+import { db } from "~/server/db";
 
 export default async function User() {
   const session = await getSession();
-  console.log(session);
-
-  // if (!session || session.user.role !== "USER") {
-  //   redirect("/");
-  // }
 
   if (!session) {
     redirect("/");
   }
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    include: { role: true },
+  });
+
+  if (!user || user?.role?.name !== "USER") {
+    redirect("/");
+  }
+
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-row flex-wrap bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
@@ -42,13 +47,13 @@ export default async function User() {
           </div>
           <NotificationBell userId={session.user.id} />
           <p className="text-center text-2xl text-white">
-            {session && <span>Logged in as {session.user?.name}</span>}
+            <span>Logged in as {user?.name}</span>
           </p>
           <Link
-            href={session ? "/" : "/"}
+            href={"/"}
             className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
           >
-            {session ? "Sign out" : "Sign in"}
+            Sign out
           </Link>
         </div>
         <div className="flex h-screen w-full justify-items-center">

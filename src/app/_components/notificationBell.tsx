@@ -6,11 +6,7 @@ import { useSocket } from "../socketProvider";
 import { useNotification } from "../hooks/useNotification";
 
 export function NotificationBell({ userId }: { userId: string }) {
-  // const notifications = useNotification("notification", userId);
-  const { notifications, clearNotifications } = useNotification(
-    "notification",
-    userId,
-  );
+  const { notifications, clearNotifications } = useNotification();
 
   return (
     <div className="relative" onClick={clearNotifications}>

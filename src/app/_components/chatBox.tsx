@@ -15,7 +15,7 @@ export default function ChatBox(ticketProps: TicketCardProps) {
     ticketId: ticketProps.id,
   });
 
-  const { notifications } = useNotification("notification", ticketProps.id);
+  const { notifications } = useNotification();
 
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {

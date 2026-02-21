@@ -21,6 +21,9 @@ io.on("connection", (socket) => {
   socket.on("join:room", (roomId) => {
     socket.join(roomId);
     console.log(`${socket.id} gick med i ${roomId}`);
+    socket
+      .to(roomId)
+      .emit("notification", `User ${userId} has joined the room ${roomId}`);
   });
 
   socket.on("disconnect", () => {

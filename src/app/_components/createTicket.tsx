@@ -36,6 +36,7 @@ export function CreateTicket() {
       setIsSelected(null);
       if (!socket) return;
       socket.emit("create:room", ticket.id);
+      socket.emit("join:room", ticket.id);
     },
     onError(error) {
       setSuccess(false);
