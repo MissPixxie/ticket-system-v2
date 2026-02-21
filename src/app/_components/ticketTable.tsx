@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import TicketCard from "./ticketCard";
+import { useSocket } from "../socketProvider";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -19,13 +20,29 @@ const statusClasses: Record<string, string> = {
 export function TicketTable() {
   const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery();
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const { socket } = useSocket();
+  const utils = api.useUtils();
+
+  const updateTicket = api.ticket.updateTicket.useMutation({
+    onSuccess: async (ticket) => {
+      await utils.ticket.invalidate();
+      if (!socket) return;
+      socket.emit("join:room", ticket.id);
+    },
+  });
+
+  const handleSetStatus = (ticketId: string) => {
+    updateTicket.mutate({
+      id: ticketId,
+    });
+  };
 
   if (isLoading) return <p>Laddar tickets...</p>;
   if (!tickets || tickets.length === 0) return <p>Inga tickets hittades</p>;
 
   return (
     <div className="mx-auto w-full bg-linear-to-b from-[#3b0e7a] to-[#282a53] shadow-xl/50">
-      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] bg-black/20 p-5 px-2">
+      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] bg-black/20 p-5 px-2">
         <div>
           <h2 className="text-xl font-bold">Titel</h2>
         </div>
@@ -41,12 +58,15 @@ export function TicketTable() {
         <div>
           <h2 className="text-xl font-bold">Skapad</h2>
         </div>
+        <div>
+          <h2 className="text-xl font-bold">Hanteras av</h2>
+        </div>
       </div>
 
       {tickets.map((ticket) => (
         <div key={ticket.id} className="border-t">
           <div
-            className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center p-4 hover:bg-gray-50/5"
+            className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center p-4 hover:bg-gray-50/5"
             onClick={() =>
               setSelectedTicketId(
                 selectedTicketId === ticket.id ? null : ticket.id,
@@ -70,6 +90,19 @@ export function TicketTable() {
               {ticket.priority}
             </div>
             <div>{ticket.createdAt.toLocaleDateString()}</div>
+            <div>
+              {ticket.assignedTo?.name ?? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSetStatus(ticket.id);
+                  }}
+                  className="rounded-lg border-2 border-blue-500 bg-blue-200/30 px-10 py-3 text-white shadow-md hover:bg-blue-500"
+                >
+                  Acceptera
+                </button>
+              )}
+            </div>
           </div>
 
           {selectedTicketId === ticket.id && (

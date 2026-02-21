@@ -13,6 +13,7 @@ export const ticketRouter = createTRPCRouter({
         messages: true,
         ticketHistories: true,
         createdBy: true,
+        assignedTo: true,
       },
     });
   }),
@@ -44,6 +45,7 @@ export const ticketRouter = createTRPCRouter({
         id: z.string().min(1),
         status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]).optional(),
         priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+        assignedToId: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -60,6 +62,10 @@ export const ticketRouter = createTRPCRouter({
           },
           status: input.status,
           priority: input.priority,
+          assignedToId: ctx.session.user.id,
+        },
+        include: {
+          assignedTo: true,
         },
       });
 
