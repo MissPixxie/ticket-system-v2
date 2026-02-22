@@ -5,9 +5,13 @@ import { io, Socket } from "socket.io-client";
 
 interface SocketContextValue {
   socket: Socket | null;
+  isConnected: boolean;
 }
 
-const SocketContext = createContext<SocketContextValue>({ socket: null });
+const SocketContext = createContext<SocketContextValue>({
+  socket: null,
+  isConnected: false,
+});
 
 export const SocketProvider = ({
   children,
@@ -17,33 +21,29 @@ export const SocketProvider = ({
   userId: string | null;
 }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
 
-    let isMounted = true;
+    const socketInstance = io("http://localhost:3001", {
+      query: { userId },
+      transports: ["websocket"],
+    });
 
-    const initSocket = async () => {
-      const socketInstance = io("http://localhost:3001", {
-        query: { userId },
-      });
+    socketInstance.on("connect", () => setIsConnected(true));
+    socketInstance.on("disconnect", () => setIsConnected(false));
 
-      setSocket(socketInstance);
-
-      return () => {
-        socketInstance.disconnect();
-      };
-    };
-
-    initSocket();
+    setSocket(socketInstance);
 
     return () => {
-      isMounted = false;
+      socketInstance.disconnect();
+      setSocket(null);
     };
   }, [userId]);
 
   return (
-    <SocketContext.Provider value={{ socket }}>
+    <SocketContext.Provider value={{ socket, isConnected }}>
       {children}
     </SocketContext.Provider>
   );

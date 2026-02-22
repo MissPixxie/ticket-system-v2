@@ -34,6 +34,7 @@ export function TicketTable() {
   const handleSetStatus = (ticketId: string) => {
     updateTicket.mutate({
       id: ticketId,
+      status: "IN_PROGRESS",
     });
   };
 

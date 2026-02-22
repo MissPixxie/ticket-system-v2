@@ -13,17 +13,20 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId as string;
 
-  socket.on("create:room", (roomId) => {
-    socket.join(roomId);
-    console.log(`${socket.id} gick med i ${roomId}`);
-  });
-
   socket.on("join:room", (roomId) => {
+    const room = io.sockets.adapter.rooms.get(roomId);
+    const isCreator = !room || room.size === 0; // Om rummet inte finns är du skaparen
+
     socket.join(roomId);
-    console.log(`${socket.id} gick med i ${roomId}`);
-    socket
-      .to(roomId)
-      .emit("notification", `User ${userId} has joined the room ${roomId}`);
+
+    if (isCreator) {
+      console.log(`${userId} skapade och gick med i ${roomId}`);
+    } else {
+      console.log(`${userId} gick med i befintligt rum ${roomId}`);
+    }
+
+    // Meddela andra i rummet
+    socket.to(roomId).emit("notification", `User ${userId} has joined`);
   });
 
   socket.on("disconnect", () => {
