@@ -20,6 +20,7 @@ const statusClasses: Record<string, string> = {
 export function TicketTable() {
   const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery();
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>("ALL");
   const { socket } = useSocket();
   const utils = api.useUtils();
 
@@ -38,11 +39,40 @@ export function TicketTable() {
     });
   };
 
+  const handleSetFilter = (filter: string) => {
+    // Logik för att uppdatera filter och hämta nya data baserat på det
+  };
+
   if (isLoading) return <p>Laddar tickets...</p>;
   if (!tickets || tickets.length === 0) return <p>Inga tickets hittades</p>;
 
   return (
     <div className="mx-auto w-full bg-linear-to-b from-[#3b0e7a] to-[#282a53] shadow-xl/50">
+      <div className="flex flex-row gap-7 p-2">
+        <div className="flex flex-row items-center justify-center gap-3">
+          <h2 className="text-xl font-bold">Filter</h2>
+          <select
+            value={filter}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => handleSetFilter(e.target.value)}
+            className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+          >
+            <option value="ALL">Alla</option>
+            <option value="MINA">Mina tickets</option>
+            <option value="OPEN">Öppna</option>
+            <option value="IN_PROGRESS">Pågående</option>
+            <option value="CLOSED">Stängda</option>
+          </select>
+        </div>
+        <div className="flex flex-row items-center justify-center gap-3">
+          <h2 className="text-xl font-bold">Sök</h2>
+          <input
+            type="text"
+            placeholder="Sök tickets..."
+            className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+          />
+        </div>
+      </div>
       <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] bg-black/20 p-5 px-2">
         <div>
           <h2 className="text-xl font-bold">Titel</h2>

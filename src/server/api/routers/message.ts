@@ -26,7 +26,20 @@ export const messageRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.message.create({
+      const ticket = await ctx.db.ticket.findUnique({
+        where: { id: input.ticketId },
+        select: {
+          id: true,
+          createdById: true,
+          assignedToId: true,
+        },
+      });
+
+      if (!ticket) {
+        throw new Error("Ticket hittades inte");
+      }
+
+      const newMessage = await ctx.db.message.create({
         data: {
           ticketId: input.ticketId,
           message: input.message,
@@ -34,5 +47,21 @@ export const messageRouter = createTRPCRouter({
           type: input.type || "USER_MESSAGE",
         },
       });
+
+      const otherUserId =
+        ticket.createdById === ctx.session.user.id
+          ? ticket.assignedToId
+          : ticket.createdById;
+
+      if (otherUserId) {
+        await ctx.db.notification.create({
+          data: {
+            userId: otherUserId,
+            text: `Nytt meddelande i din ticket`,
+          },
+        });
+      }
+
+      return newMessage;
     }),
 });

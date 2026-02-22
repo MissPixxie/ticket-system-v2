@@ -14,6 +14,8 @@ type FilterType = "latest" | "popular" | "status";
 export function SuggestionBox() {
   const id = "cmlnru61k0007i0u9mp4bsrfs";
   const [filter, setFilter] = useState<FilterType>("latest");
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  console.log(isAnonymous);
   const {
     data: suggestions,
     isLoading,
@@ -75,32 +77,34 @@ export function SuggestionBox() {
             (sortedSuggestions.length === 0 && <p>Inga förslag än</p>)}
           {sortedSuggestions &&
             sortedSuggestions.map((suggestion) => (
-              <div
-                key={suggestion.id}
-                className="flex-rowrounded borde flex justify-between bg-white/20 p-4 shadow-md/40"
-              >
-                <div>
-                  <h3>{suggestion.content}</h3>
+              <div key={suggestion.id} className="flex flex-col">
+                <div className="flex-rowrounded borde flex justify-between bg-white/20 p-4 shadow-md/40">
+                  <div className="flex-1">
+                    <h3>{suggestion.content}</h3>
 
-                  <span className="text-xs text-gray-700">
-                    {new Date(suggestion.createdAt).toLocaleString()}
-                  </span>
-                </div>
-                <button
-                  onClick={() => vote.mutate({ id: suggestion.id, vote: "UP" })}
-                  className="flex items-center gap-1 text-sm"
-                >
-                  <RiArrowUpDoubleFill
-                    size={26}
-                    className={
-                      suggestion.hasVoted
-                        ? "cursor-pointer text-green-600"
-                        : "cursor-pointer text-gray-500 hover:text-green-600"
+                    <span className="text-xs text-gray-700">
+                      {new Date(suggestion.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() =>
+                      vote.mutate({ id: suggestion.id, vote: "UP" })
                     }
-                  />
-                  {""}
-                  {suggestion.votes.length}
-                </button>
+                    className="flex items-center gap-1 text-sm"
+                  >
+                    <RiArrowUpDoubleFill
+                      size={26}
+                      className={
+                        suggestion.hasVoted
+                          ? "cursor-pointer text-green-600"
+                          : "cursor-pointer text-gray-500 hover:text-green-600"
+                      }
+                    />
+                    {""}
+                    {suggestion.votes.length}
+                  </button>
+                </div>
+                <span className="text-sm">{suggestion.user?.name}</span>
               </div>
             ))}
         </div>
@@ -108,10 +112,23 @@ export function SuggestionBox() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              createSuggestion.mutate({ content: issue, suggestionBoxId: id });
+              createSuggestion.mutate({
+                content: issue,
+                suggestionBoxId: id,
+                isAnonymous,
+              });
             }}
             className="flex flex-col gap-2"
           >
+            <div className="flex items-center gap-2 text-sm text-white">
+              <input
+                type="checkbox"
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <label>Skicka anonymt</label>
+            </div>
             {success && <Toast data={success} />}
             <textarea
               placeholder="Beskriv ditt förslag"

@@ -14,11 +14,14 @@ export const suggestionBoxRouter = createTRPCRouter({
         },
         include: {
           votes: true,
+          user: true,
         },
       });
+
       return suggestions.map((s) => ({
         ...s,
         hasVoted: s.votes.some((v) => v.userId === userId),
+        user: s.isAnonymous ? { name: "Anonym" } : s.user,
       }));
     }),
 
@@ -27,6 +30,7 @@ export const suggestionBoxRouter = createTRPCRouter({
       z.object({
         content: z.string().min(1),
         suggestionBoxId: z.string().min(1),
+        isAnonymous: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -35,6 +39,7 @@ export const suggestionBoxRouter = createTRPCRouter({
           content: input.content,
           suggestionBoxId: input.suggestionBoxId,
           userId: ctx.session.user.id,
+          isAnonymous: input.isAnonymous ?? false,
         },
       });
     }),
