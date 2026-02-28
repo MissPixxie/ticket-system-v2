@@ -108,6 +108,7 @@ export function SuggestionBox() {
               </div>
             ))}
         </div>
+
         <div>
           <form
             onSubmit={(e) => {

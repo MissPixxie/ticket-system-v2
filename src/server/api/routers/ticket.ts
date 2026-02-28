@@ -18,12 +18,27 @@ export const ticketRouter = createTRPCRouter({
     });
   }),
 
+  listMyTickets: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.ticket.findMany({
+      where: {
+        createdById: ctx.session.user.id,
+      },
+      include: {
+        messages: true,
+        ticketHistories: true,
+        createdBy: true,
+        assignedTo: true,
+      },
+    });
+  }),
+
   create: protectedProcedure
     .input(
       z.object({
         title: z.string().min(1),
         issue: z.string().min(1),
         department: z.enum(["IT", "HR", "CAMPAIGN", "PRODUCT", "CUSTOMERCLUB"]),
+        isAnonymous: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -33,6 +48,7 @@ export const ticketRouter = createTRPCRouter({
           issue: input.issue,
           department: input.department,
           createdBy: { connect: { id: ctx.session.user.id } },
+          isAnonymous: input.isAnonymous ?? false,
         },
       });
 

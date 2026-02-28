@@ -11,12 +11,14 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { GrBug } from "react-icons/gr";
-import { CreateTicket } from "../../_components/createTicket";
 import { MdArrowBack } from "react-icons/md";
 import { redirect } from "next/navigation";
 import { SuggestionBox } from "~/app/_components/suggestionBox";
 import { NotificationBell } from "~/app/_components/notificationBell";
 import { db } from "~/server/db";
+import { MyTicketsTable } from "~/app/_components/myTicketsTable";
+import CreateTicketModal from "~/app/_components/create-ticket/createTicketModal";
+import { TicketSection } from "~/app/_components/create-ticket/ticketSection";
 
 export default async function User() {
   const session = await getSession();
@@ -57,7 +59,8 @@ export default async function User() {
           </Link>
         </div>
         <div className="flex h-screen w-full justify-items-center">
-          <CreateTicket />
+          <MyTicketsTable />
+          <TicketSection />
         </div>
       </main>
       <aside>

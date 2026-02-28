@@ -127,16 +127,17 @@ model Permission {
 }
 
 model Ticket {
-  id         String     @id @default(cuid())
-  title      String
-  issue      String
-  image      String?
-  department Department
-  status     Status     @default(OPEN)
-  priority   Priority   @default(LOW)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  solvedAt   DateTime?
+  id          String     @id @default(cuid())
+  title       String
+  issue       String
+  image       String?
+  isAnonymous Boolean    @default(false)
+  department  Department
+  status      Status     @default(OPEN)
+  priority    Priority   @default(LOW)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  solvedAt    DateTime?
 
   createdBy    User    @relation("TicketsCreated", fields: [createdById], references: [id])
   createdById  String

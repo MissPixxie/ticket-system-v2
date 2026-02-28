@@ -23,6 +23,14 @@ export default async function Admin() {
     redirect("/");
   }
 
+  const menuItems = [
+    { id: "tickets", label: "Tickets" },
+    { id: "settings", label: "Inställningar" },
+    { id: "employees", label: "Anställda" },
+    { id: "logs", label: "Loggar" },
+    { id: "createUser", label: "Skapa användare" },
+  ];
+
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-row flex-wrap bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
@@ -42,7 +50,31 @@ export default async function Admin() {
           <h3 className="text-8xl font-bold">Admin Dashboard</h3>
           <ListAllUsers />
           <CreateUser />
+          <div className="flex flex-row items-center justify-center gap-10">
+            <div className="h-50 w-50 rounded-lg bg-blue-200">
+              Totala tickets
+            </div>
+            <div className="h-50 w-50 rounded-lg bg-green-200">Nya tickets</div>
+            <div className="h-50 w-50 rounded-lg bg-amber-200">
+              Pågående tickets
+            </div>
+            <div className="h-50 w-50 rounded bg-red-200">Stängda tickets</div>
+          </div>
         </div>
+        <aside>
+          <div className="fixed top-0 left-0 h-full w-74 bg-linear-to-b from-[#655e6d] to-[#2c2c33]">
+            <div className="flex cursor-pointer flex-col items-center">
+              {menuItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex w-full items-center justify-center pt-5 pb-5 hover:bg-gray-50/5"
+                >
+                  {item.label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
       </main>
     </HydrateClient>
   );

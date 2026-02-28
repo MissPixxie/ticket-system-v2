@@ -17,8 +17,8 @@ const statusClasses: Record<string, string> = {
   CLOSED: "bg-gray-600 text-white",
 };
 
-export function TicketTable() {
-  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery();
+export function MyTicketsTable() {
+  const { data: tickets, isLoading } = api.ticket.listMyTickets.useQuery();
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
@@ -32,13 +32,6 @@ export function TicketTable() {
       socket.emit("join:room", ticket.id);
     },
   });
-
-  const handleSetStatus = (ticketId: string) => {
-    updateTicket.mutate({
-      id: ticketId,
-      status: "IN_PROGRESS",
-    });
-  };
 
   const handleSetFilter = (value: string) => {
     setFilter(value);
@@ -145,17 +138,7 @@ export function TicketTable() {
               </div>
               <div>{ticket.createdAt.toLocaleDateString()}</div>
               <div>
-                {ticket.assignedTo?.name ?? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSetStatus(ticket.id);
-                    }}
-                    className="rounded-lg border-2 border-blue-500 bg-blue-200/30 px-10 py-3 text-white shadow-md hover:bg-blue-500"
-                  >
-                    Acceptera
-                  </button>
-                )}
+                {ticket.assignedTo?.name ?? "Ingen"}
               </div>
             </div>
 
