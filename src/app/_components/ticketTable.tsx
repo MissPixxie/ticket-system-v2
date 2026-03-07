@@ -17,7 +17,11 @@ const statusClasses: Record<string, string> = {
   CLOSED: "bg-gray-600 text-white",
 };
 
-export function TicketTable() {
+interface TicketTableProps {
+  currentUserId: string | null;
+}
+
+export function TicketTable({ currentUserId }: TicketTableProps) {
   const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery();
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
@@ -68,7 +72,7 @@ export function TicketTable() {
   if (!tickets || tickets.length === 0) return <p>Inga tickets hittades</p>;
 
   return (
-    <div className="mx-auto w-full bg-linear-to-b from-[#3b0e7a] to-[#282a53] shadow-xl/50">
+    <div className="mt-15 mr-15 grow rounded-xl bg-linear-to-b from-[#3b0e7a] to-[#282a53] shadow-xl/50">
       <div className="flex flex-row gap-7 p-2">
         <div className="flex flex-row items-center justify-center gap-3">
           <h2 className="text-xl font-bold">Filter</h2>
@@ -172,7 +176,7 @@ export function TicketTable() {
                     ✕
                   </button>
 
-                  <TicketCard {...ticket} />
+                  <TicketCard {...ticket} currentUserId={currentUserId} />
                 </div>
               </div>
             )}

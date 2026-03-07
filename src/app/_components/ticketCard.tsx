@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { TiDocumentText } from "react-icons/ti";
@@ -7,9 +9,12 @@ import ChatBox from "./chatBox";
 
 type Ticket = RouterOutputs["ticket"]["listAllTickets"][number];
 
-type TicketCardProps = Ticket;
+type TicketCardProps = Ticket & { currentUserId: string | null };
 
-export default function TicketCard(ticketProps: TicketCardProps) {
+export default function TicketCard({
+  currentUserId,
+  ...ticketProps
+}: TicketCardProps) {
   const [showHistory, setShowHistory] = useState(false);
   const utils = api.useUtils();
 
@@ -52,7 +57,9 @@ export default function TicketCard(ticketProps: TicketCardProps) {
         </p>
       </div>
       <div className="flex flex-col gap-4">
-        <ChatBox {...ticketProps} />
+        {currentUserId && (
+          <ChatBox {...ticketProps} currentUserId={currentUserId} />
+        )}
         <div className="mt-4 flex flex-row gap-4">
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold">Status</label>

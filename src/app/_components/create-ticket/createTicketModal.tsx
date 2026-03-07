@@ -10,12 +10,14 @@ import {
 } from "react-icons/fa";
 
 export type Department = "IT" | "HR" | "CAMPAIGN" | "PRODUCT" | "CUSTOMERCLUB";
+export type Priority = "LOW" | "MEDIUM" | "URGENT";
 
 export interface CreateTicketData {
   title: string;
   issue: string;
   department: Department;
   isAnonymous?: boolean;
+  priority?: Priority;
 }
 
 interface CreateTicketModalProps {
@@ -32,6 +34,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [title, setTitle] = useState("");
   const [issue, setIssue] = useState("");
+  const [priority, setPriority] = useState<Priority>("LOW");
   const [department, setDepartment] = useState<Department>("IT");
   const [isSelected, setIsSelected] = useState<null | number>(null);
 
@@ -73,7 +76,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ title, issue, department, isAnonymous });
+    onSubmit({ title, issue, department, isAnonymous, priority });
     setTitle("");
     setIssue("");
     setDepartment("IT");
@@ -83,11 +86,11 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center dark:bg-black/60"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-lg bg-linear-to-b from-[#3b0e7a] to-[#282a53] p-6 shadow-lg"
+        className="w-full max-w-xl rounded-lg bg-linear-to-b p-6 shadow-lg dark:from-[#3b0e7a] dark:to-[#282a53]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="grid grid-cols-5 gap-4 sm:grid-cols-5 md:gap-8">
@@ -140,6 +143,19 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               className="h-4 w-4"
             />
             <label>Skicka anonymt</label>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold">Prioritet</label>
+            <select
+              value={priority}
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => setPriority(e.target.value as Priority)}
+              className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+            >
+              <option value="LOW">Låg</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="URGENT">Hög</option>
+            </select>
           </div>
           <div className="flex justify-end space-x-2 pt-4">
             <button

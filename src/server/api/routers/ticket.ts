@@ -39,6 +39,7 @@ export const ticketRouter = createTRPCRouter({
         issue: z.string().min(1),
         department: z.enum(["IT", "HR", "CAMPAIGN", "PRODUCT", "CUSTOMERCLUB"]),
         isAnonymous: z.boolean().optional(),
+        priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -49,6 +50,7 @@ export const ticketRouter = createTRPCRouter({
           department: input.department,
           createdBy: { connect: { id: ctx.session.user.id } },
           isAnonymous: input.isAnonymous ?? false,
+          priority: input.priority ?? "LOW",
         },
       });
 

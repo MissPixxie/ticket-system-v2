@@ -1,10 +1,7 @@
 import "~/styles/globals.css";
-
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
-
 import { TRPCReactProvider } from "~/trpc/react";
-import { Socket } from "socket.io";
 import { SocketProvider } from "./socketProvider";
 import { getSession } from "~/server/better-auth/server";
 
@@ -25,10 +22,12 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await getSession();
   return (
-    <html lang="en" className={`${geist.variable}`}>
+    <html lang="en" className={`${geist.variable} font-sans`}>
       <body>
         <TRPCReactProvider>
-          <SocketProvider userId={session?.user?.id ?? null}>{children}</SocketProvider>
+          <SocketProvider userId={session?.user?.id ?? null}>
+            {children}
+          </SocketProvider>
         </TRPCReactProvider>
       </body>
     </html>

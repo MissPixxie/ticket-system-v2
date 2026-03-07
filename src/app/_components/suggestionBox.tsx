@@ -16,13 +16,18 @@ export function SuggestionBox() {
   const [filter, setFilter] = useState<FilterType>("latest");
   const [isAnonymous, setIsAnonymous] = useState(false);
   console.log(isAnonymous);
+
   const {
     data: suggestions,
     isLoading,
     error,
-  } = api.suggestionBox.listSuggestions.useQuery({
-    suggestionBoxId: id,
-  });
+  } = api.suggestionBox.listSuggestions.useQuery(
+    { suggestionBoxId: id },
+    {
+      staleTime: 1000 * 60,
+      refetchOnWindowFocus: false,
+    },
+  );
   const [issue, setIssue] = useState("");
   const [success, setSuccess] = useState<boolean>();
   const utils = api.useUtils();
@@ -69,7 +74,7 @@ export function SuggestionBox() {
   });
 
   return (
-    <div className="fixed top-0 left-0 grid h-full w-74 grid-cols-6 bg-linear-to-b from-[#2e026d] to-[#15162c]">
+    <div className="grid h-full w-74 grid-cols-6 bg-linear-to-b from-[#2e026d] to-[#15162c]">
       <div className="item col-span-5 flex h-full flex-col place-content-between bg-linear-to-b from-[#7b6794] to-[#424368]">
         <div className="space-y-4 p-1">
           {isLoading && <p>Laddar förslag...</p>}

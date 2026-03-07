@@ -1,27 +1,29 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { api, type RouterOutputs } from "~/trpc/react";
 import { useSocket } from "../socketProvider";
-import { useNotification } from "../hooks/useNotification";
+import { getCurrentUserId } from "./getCurrentUserId";
 
 type Ticket = RouterOutputs["ticket"]["listAllTickets"][number];
 
-type TicketCardProps = Ticket;
+interface ChatBoxProps extends Ticket {
+  currentUserId: string | undefined;
+}
 
-export default function ChatBox(ticketProps: TicketCardProps) {
+export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
   const { socket } = useSocket();
   const [newMessage, setNewMessage] = useState("");
-  const utils = api.useUtils();
-  const { data: message, isLoading } = api.message.listAllMessages.useQuery({
-    ticketId: ticketProps.id,
-  });
 
-  const { notifications } = useNotification();
+  const utils = api.useUtils();
+
+  const { data: messages, isLoading } = api.message.listAllMessages.useQuery({
+    ticketId,
+  });
 
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {
-      void utils.message.listAllMessages.invalidate({
-        ticketId: ticketProps.id,
-      });
+      utils.message.listAllMessages.invalidate({ ticketId });
       setNewMessage("");
     },
   });
@@ -29,33 +31,24 @@ export default function ChatBox(ticketProps: TicketCardProps) {
   useEffect(() => {
     if (!socket) return;
 
-    const handler = (msg: { ticketId: string; message: string }) => {
-      if (msg.ticketId === ticketProps.id) {
-        void utils.message.listAllMessages.invalidate({
-          ticketId: ticketProps.id,
-        });
+    const handler = (msg: { ticketId: string }) => {
+      if (msg.ticketId === ticketId) {
+        utils.message.listAllMessages.invalidate({ ticketId });
       }
     };
 
     socket.on("chat:message", handler);
-
     return () => {
       socket.off("chat:message", handler);
     };
-  }, [socket, ticketProps.id, utils.message.listAllMessages]);
+  }, [socket, ticketId, utils.message.listAllMessages]);
 
   const handleSend = () => {
     if (!newMessage.trim()) return;
 
-    createMessage.mutate({
-      ticketId: ticketProps.id,
-      message: newMessage,
-    });
+    createMessage.mutate({ ticketId, message: newMessage });
 
-    socket?.emit("chat:message", {
-      ticketId: ticketProps.id,
-    });
-
+    socket?.emit("chat:message", { ticketId });
     setNewMessage("");
   };
 
@@ -63,31 +56,41 @@ export default function ChatBox(ticketProps: TicketCardProps) {
     <div className="flex flex-col gap-4">
       <h3 className="text-lg font-semibold">Meddelanden</h3>
 
-      <div className="flex max-h-64 flex-col gap-3 overflow-y-auto rounded-lg bg-black/30 p-4">
+      <div className="flex max-h-64 flex-col-reverse gap-3 overflow-y-auto rounded-lg bg-black/30 p-4">
         {isLoading ? (
           <p className="animate-pulse text-sm opacity-60">
             Laddar meddelanden...
           </p>
         ) : (
           <>
-            {(!message || message.length === 0) && (
+            {(!messages || messages.length === 0) && (
               <p className="text-sm opacity-60">Inga meddelanden ännu</p>
             )}
 
-            {message?.map((msg, index) => (
-              <div
-                key={index}
-                className="max-w-[80%] rounded-lg bg-white/10 p-3 text-sm"
-              >
-                <div className="mb-1 text-xs opacity-60">
-                  {msg.createdBy?.name} · {msg.createdAt.toLocaleDateString()}
+            {messages?.map((msg) => {
+              const isMine = msg.createdBy?.id === currentUserId;
+
+              return (
+                <div
+                  key={msg.id}
+                  className={`flex min-w-50 flex-col rounded-lg p-3 text-sm ${
+                    isMine
+                      ? "ml-auto bg-blue-600 text-white"
+                      : "mr-auto bg-white/10 text-white"
+                  }`}
+                >
+                  <div className="mb-1 text-xs opacity-60">
+                    {msg.createdAt.toLocaleDateString()}{" "}
+                    · {msg.createdAt.toLocaleTimeString()}
+                  </div>
+                  {msg.message}
                 </div>
-                {msg.message}
-              </div>
-            ))}
+              );
+            })}
           </>
         )}
       </div>
+
       <div className="flex gap-2">
         <textarea
           value={newMessage}

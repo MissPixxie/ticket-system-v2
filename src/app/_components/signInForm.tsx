@@ -57,11 +57,11 @@ export default function SignInForm() {
 
   return (
     <div
-      className="lg:h-xl flex flex-col gap-2 rounded-lg bg-white/10 p-10 lg:w-xl"
+      className="lg:h-xl flex flex-col gap-2 rounded-lg p-10 lg:w-xl dark:bg-white/10"
       suppressHydrationWarning={true}
     >
       {error && (
-        <div className="mb-4 rounded bg-red-500/20 p-3 text-red-200">
+        <div className="mb-4 rounded p-3 dark:bg-red-500/20 dark:text-red-200">
           {error}
         </div>
       )}
@@ -77,7 +77,7 @@ export default function SignInForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-black required:border-red-500 required:text-red-500"
+          className="rounded-lg border p-7 px-4 py-2 text-black required:border-red-500 required:text-red-500 dark:border-black/50 dark:bg-white/10"
         />
 
         <label htmlFor="password">Lösenord</label>

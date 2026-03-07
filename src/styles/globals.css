@@ -5,6 +5,12 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+@layer components {
+  .basic-backround {
+    background-image: linear-gradient(to bottom, #2e026d, #15162c);
+  }
+}
+
 @keyframes hide {
   from {opacity: 1;}
   to {opacity: 0.2;}
