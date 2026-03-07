@@ -49,7 +49,7 @@ export function TicketTable({ currentUserId }: TicketTableProps) {
   };
 
   const filteredTickets = tickets?.filter((ticket) => {
-    const userId = "idPåInloggadUser"; // här kan du använda session.user.id
+    const userId = currentUserId;
     switch (filter) {
       case "MINA":
         return ticket.assignedTo?.id === userId;
@@ -64,9 +64,14 @@ export function TicketTable({ currentUserId }: TicketTableProps) {
     }
   });
 
-  const visibleTickets = filteredTickets?.filter((ticket) =>
-    ticket.title.toLowerCase().includes(search.toLowerCase()),
-  );
+  const visibleTickets = filteredTickets?.filter((ticket) => {
+    const searchLower = search.toLowerCase();
+    return ticket.title.toLowerCase().includes(searchLower) ||
+    ticket.status.toLowerCase().includes(searchLower) ||
+    ticket.priority.toLowerCase().includes(searchLower) ||
+    ticket.department.toLowerCase().includes(searchLower) ||
+    ticket.assignedTo?.name?.toLowerCase().includes(searchLower);
+  });
 
   if (isLoading) return <p>Laddar tickets...</p>;
   if (!tickets || tickets.length === 0) return <p>Inga tickets hittades</p>;
@@ -120,8 +125,8 @@ export function TicketTable({ currentUserId }: TicketTableProps) {
         </div>
       </div>
 
-      {filteredTickets &&
-        filteredTickets.map((ticket) => (
+      {visibleTickets &&
+        visibleTickets.map((ticket) => (
           <div key={ticket.id} className="border-t">
             <div
               className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center p-4 hover:bg-gray-50/5"

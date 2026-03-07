@@ -21,6 +21,8 @@ export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
     ticketId,
   });
 
+  const sortedMessages = messages ? [...messages].reverse() : [];
+
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {
       utils.message.listAllMessages.invalidate({ ticketId });
@@ -67,7 +69,7 @@ export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
               <p className="text-sm opacity-60">Inga meddelanden ännu</p>
             )}
 
-            {messages?.map((msg) => {
+            {sortedMessages.map((msg) => {
               const isMine = msg.createdBy?.id === currentUserId;
 
               return (
@@ -80,8 +82,8 @@ export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
                   }`}
                 >
                   <div className="mb-1 text-xs opacity-60">
-                    {msg.createdAt.toLocaleDateString()}{" "}
-                    · {msg.createdAt.toLocaleTimeString()}
+                    {msg.createdAt.toLocaleDateString()} ·{" "}
+                    {msg.createdAt.toLocaleTimeString()}
                   </div>
                   {msg.message}
                 </div>

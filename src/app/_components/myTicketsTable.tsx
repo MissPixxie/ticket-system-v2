@@ -43,7 +43,7 @@ export function MyTicketsTable({ currentUserId }: TicketTableProps) {
   };
 
   const filteredTickets = tickets?.filter((ticket) => {
-    const userId = "idPåInloggadUser";
+    const userId = currentUserId;
     switch (filter) {
       case "MINA":
         return ticket.assignedTo?.id === userId;
@@ -58,118 +58,125 @@ export function MyTicketsTable({ currentUserId }: TicketTableProps) {
     }
   });
 
-  const visibleTickets = filteredTickets?.filter((ticket) =>
-    ticket.title.toLowerCase().includes(search.toLowerCase()),
-  );
+  const visibleTickets = filteredTickets?.filter((ticket) => {
+    const searchLower = search.toLowerCase();
+    return (
+      ticket.title.toLowerCase().includes(searchLower) ||
+      ticket.status.toLowerCase().includes(searchLower) ||
+      ticket.priority.toLowerCase().includes(searchLower) ||
+      ticket.department.toLowerCase().includes(searchLower) ||
+      ticket.assignedTo?.name?.toLowerCase().includes(searchLower)
+    );
+  });
 
   if (isLoading) return <p>Laddar tickets...</p>;
 
   return (
-      <div className="grow mr-15 mt-15 rounded-xl bg-linear-to-b from-[#3b0e7a] to-[#282a53] shadow-xl/50">
-        <div className="flex flex-row gap-7 p-2">
-          <div className="flex flex-row items-center justify-center gap-3">
-            <h2 className="text-xl font-bold">Filter</h2>
-            <select
-              value={filter}
-              onChange={(e) => handleSetFilter(e.target.value)}
-              className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
-            >
-              <option value="ALL">Alla</option>
-              <option value="MINA">Mina tickets</option>
-              <option value="OPEN">Öppna</option>
-              <option value="IN_PROGRESS">Pågående</option>
-              <option value="CLOSED">Stängda</option>
-            </select>
-          </div>
-          <div className="flex flex-row items-center justify-center gap-3">
-            <h2 className="text-xl font-bold">Sök</h2>
-            <input
-              type="text"
-              placeholder="Sök tickets..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
-            />
-          </div>
-          <TicketSection />
+    <div className="mt-15 mr-15 grow rounded-xl bg-linear-to-b from-[#3b0e7a] to-[#282a53] shadow-xl/50">
+      <div className="flex flex-row gap-7 p-2">
+        <div className="flex flex-row items-center justify-center gap-3">
+          <h2 className="text-xl font-bold">Filter</h2>
+          <select
+            value={filter}
+            onChange={(e) => handleSetFilter(e.target.value)}
+            className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+          >
+            <option value="ALL">Alla</option>
+            <option value="MINA">Mina tickets</option>
+            <option value="OPEN">Öppna</option>
+            <option value="IN_PROGRESS">Pågående</option>
+            <option value="CLOSED">Stängda</option>
+          </select>
         </div>
-
-        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] bg-black/20 p-5 px-2">
-          <div>
-            <h2 className="text-xl font-bold">Titel</h2>
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Avdelning</h2>
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Status</h2>
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Prioritet</h2>
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Skapad</h2>
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Hanteras av</h2>
-          </div>
+        <div className="flex flex-row items-center justify-center gap-3">
+          <h2 className="text-xl font-bold">Sök</h2>
+          <input
+            type="text"
+            placeholder="Sök tickets..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+          />
         </div>
-
-        {visibleTickets && visibleTickets.length > 0 ? (
-          visibleTickets.map((ticket) => (
-            <div key={ticket.id} className="border-t">
-              <div
-                className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center p-4 hover:bg-gray-50/5"
-                onClick={() =>
-                  setSelectedTicketId(
-                    selectedTicketId === ticket.id ? null : ticket.id,
-                  )
-                }
-              >
-                <div>{ticket.title}</div>
-                <div>{ticket.department}</div>
-                <div
-                  className={`flex max-w-28 justify-center rounded-md shadow-md/30 ${
-                    statusClasses[ticket.status] ?? "text-gray-400"
-                  }`}
-                >
-                  {ticket.status.replace("_", " ")}
-                </div>
-                <div
-                  className={`flex max-w-20 justify-center rounded-md shadow-md/30 ${
-                    priorityClasses[ticket.priority] ?? "text-gray-400"
-                  }`}
-                >
-                  {ticket.priority}
-                </div>
-                <div>{ticket.createdAt.toLocaleDateString()}</div>
-                <div>{ticket.assignedTo?.name ?? "Ingen"}</div>
-              </div>
-
-              {selectedTicketId === ticket.id && (
-                <div className="col-span-full mt-3 transition-opacity duration-200">
-                  <div className="relative rounded bg-black/30 p-4">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedTicketId(null);
-                      }}
-                      className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded bg-red-600 text-white hover:bg-red-700"
-                    >
-                      ✕
-                    </button>
-
-                    <TicketCard {...ticket} currentUserId={currentUserId} />
-                  </div>
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <div className="p-6 text-center text-white">
-            <p>Inga tickets hittades</p>
-          </div>
-        )}
+        <TicketSection />
       </div>
+
+      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] bg-black/20 p-5 px-2">
+        <div>
+          <h2 className="text-xl font-bold">Titel</h2>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold">Avdelning</h2>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold">Status</h2>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold">Prioritet</h2>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold">Skapad</h2>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold">Hanteras av</h2>
+        </div>
+      </div>
+
+      {visibleTickets && visibleTickets.length > 0 ? (
+        visibleTickets.map((ticket) => (
+          <div key={ticket.id} className="border-t">
+            <div
+              className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center p-4 hover:bg-gray-50/5"
+              onClick={() =>
+                setSelectedTicketId(
+                  selectedTicketId === ticket.id ? null : ticket.id,
+                )
+              }
+            >
+              <div>{ticket.title}</div>
+              <div>{ticket.department}</div>
+              <div
+                className={`flex max-w-28 justify-center rounded-md shadow-md/30 ${
+                  statusClasses[ticket.status] ?? "text-gray-400"
+                }`}
+              >
+                {ticket.status.replace("_", " ")}
+              </div>
+              <div
+                className={`flex max-w-20 justify-center rounded-md shadow-md/30 ${
+                  priorityClasses[ticket.priority] ?? "text-gray-400"
+                }`}
+              >
+                {ticket.priority}
+              </div>
+              <div>{ticket.createdAt.toLocaleDateString()}</div>
+              <div>{ticket.assignedTo?.name ?? "Ingen"}</div>
+            </div>
+
+            {selectedTicketId === ticket.id && (
+              <div className="col-span-full mt-3 transition-opacity duration-200">
+                <div className="relative rounded bg-black/30 p-4">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTicketId(null);
+                    }}
+                    className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded bg-red-600 text-white hover:bg-red-700"
+                  >
+                    ✕
+                  </button>
+
+                  <TicketCard {...ticket} currentUserId={currentUserId} />
+                </div>
+              </div>
+            )}
+          </div>
+        ))
+      ) : (
+        <div className="p-6 text-center text-white">
+          <p>Inga tickets hittades</p>
+        </div>
+      )}
+    </div>
   );
 }
