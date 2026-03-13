@@ -38,6 +38,10 @@ export function TicketTable({ currentUserId }: TicketTableProps) {
   });
 
   const handleSetStatus = (ticketId: string) => {
+    console.log(
+      "Updating ticket status to IN_PROGRESS for ticket ID:",
+      ticketId,
+    );
     updateTicket.mutate({
       id: ticketId,
       status: "IN_PROGRESS",
@@ -66,11 +70,13 @@ export function TicketTable({ currentUserId }: TicketTableProps) {
 
   const visibleTickets = filteredTickets?.filter((ticket) => {
     const searchLower = search.toLowerCase();
-    return ticket.title.toLowerCase().includes(searchLower) ||
-    ticket.status.toLowerCase().includes(searchLower) ||
-    ticket.priority.toLowerCase().includes(searchLower) ||
-    ticket.department.toLowerCase().includes(searchLower) ||
-    ticket.assignedTo?.name?.toLowerCase().includes(searchLower);
+    return (
+      ticket.title.toLowerCase().includes(searchLower) ||
+      ticket.status.toLowerCase().includes(searchLower) ||
+      ticket.priority.toLowerCase().includes(searchLower) ||
+      ticket.department.toLowerCase().includes(searchLower) ||
+      ticket.assignedTo?.name?.toLowerCase().includes(searchLower)
+    );
   });
 
   if (isLoading) return <p>Laddar tickets...</p>;

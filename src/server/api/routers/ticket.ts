@@ -63,12 +63,23 @@ export const ticketRouter = createTRPCRouter({
       });
       if (!ticket) throw new Error("Ticket hittades inte");
 
+      if (ticket.assignedToId === null) {
+        const updatedTicket = await ctx.db.ticket.update({
+          where: { id: input.id },
+          data: {
+            status: input.status,
+            priority: input.priority,
+            assignedToId: ctx.session.user.id,
+          },
+          include: { assignedTo: true },
+        });
+      }
+
       const updatedTicket = await ctx.db.ticket.update({
         where: { id: input.id },
         data: {
           status: input.status,
           priority: input.priority,
-          assignedToId: input.assignedToId,
         },
         include: { assignedTo: true },
       });

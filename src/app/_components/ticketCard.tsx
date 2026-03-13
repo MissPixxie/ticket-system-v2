@@ -6,6 +6,7 @@ import { TiDocumentText } from "react-icons/ti";
 import type { RouterOutputs } from "~/trpc/react";
 import { TicketHistory } from "./ticketHistory";
 import ChatBox from "./chatBox";
+import { InviteSection } from "./invite-user/inviteSection";
 
 type Ticket = RouterOutputs["ticket"]["listAllTickets"][number];
 
@@ -90,7 +91,8 @@ export default function TicketCard({
               <option>URGENT</option>
             </select>
           </div>
-          <div className="ml-auto self-end">
+          <div className="ml-auto flex flex-row gap-5 self-end">
+            <InviteSection ticketId={ticketProps.id} />
             <button
               className="flex flex-row rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
               title="Ticket History"
