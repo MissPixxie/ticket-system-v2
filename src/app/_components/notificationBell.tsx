@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaBell } from "react-icons/fa";
 import { api } from "~/trpc/react";
+import { formatNotification } from "../utils/formatNotification";
 
 interface NotificationBellProps {
   userId: string;
@@ -89,7 +90,9 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                     !notification.seen ? "bg-blue-50/50" : ""
                   }`}
                 >
-                  <p className="text-sm text-gray-800">{notification.text}</p>
+                  <p className="text-sm text-gray-800">
+                    {formatNotification(notification)}
+                  </p>
                   <span className="mt-1 block text-[10px] text-gray-400">
                     {new Date(notification.createdAt).toLocaleString()}
                   </span>

@@ -174,6 +174,28 @@ export function SuggestionBox() {
           <p className="text-lg">Mest röster</p>
           <GoTrophy />
         </button>
+        <button
+          className="z-0 flex cursor-pointer flex-row items-center justify-center gap-2 rounded bg-linear-to-b from-[#7b6794]/90 to-[#4c366b] pt-4 pr-1 pb-4 pl-1 shadow-md/50 hover:from-[#9c85b8]/90 hover:to-[#5b447c]/90"
+          style={{
+            writingMode: "vertical-rl",
+            textOrientation: "mixed",
+          }}
+          onClick={() => setFilter("popular")}
+        >
+          <p className="text-lg">Kunder önskar</p>
+          <GoTrophy />
+        </button>
+        <button
+          className="z-0 flex cursor-pointer flex-row items-center justify-center gap-2 rounded bg-linear-to-b from-[#7b6794]/90 to-[#4c366b] pt-4 pr-1 pb-4 pl-1 shadow-md/50 hover:from-[#9c85b8]/90 hover:to-[#5b447c]/90"
+          style={{
+            writingMode: "vertical-rl",
+            textOrientation: "mixed",
+          }}
+          onClick={() => setFilter("popular")}
+        >
+          <p className="text-lg">Personalen önskar</p>
+          <GoTrophy />
+        </button>
       </div>
     </div>
   );

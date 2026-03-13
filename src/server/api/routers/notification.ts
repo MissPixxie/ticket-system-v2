@@ -5,6 +5,11 @@ export const notificationRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.notification.findMany({
       where: { userId: ctx.session.user.id },
+      include: {
+        event: {
+          include: { actor: true },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
   }),
