@@ -1,34 +1,18 @@
 import { z } from "zod";
-import { observable } from "@trpc/server/observable";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { prismaEventService } from "../services/eventService";
 
 export const ticketRouter = createTRPCRouter({
-  listAllTickets: protectedProcedure.query(async ({ ctx }) => {
+  listAllTickets: protectedProcedure.query(({ ctx }) => {
     return ctx.db.ticket.findMany({
-      include: {
-        messages: true,
-        ticketHistories: true,
-        createdBy: true,
-        assignedTo: true,
-      },
+      include: { messages: true, createdBy: true, assignedTo: true },
     });
   }),
 
-  listMyTickets: protectedProcedure.query(async ({ ctx }) => {
+  listMyTickets: protectedProcedure.query(({ ctx }) => {
     return ctx.db.ticket.findMany({
-      where: {
-        createdById: ctx.session.user.id,
-      },
-      include: {
-        messages: true,
-        ticketHistories: true,
-        createdBy: true,
-        assignedTo: true,
-      },
+      where: { createdById: ctx.session.user.id },
+      include: { messages: true, createdBy: true, assignedTo: true },
     });
   }),
 
@@ -48,10 +32,17 @@ export const ticketRouter = createTRPCRouter({
           title: input.title,
           issue: input.issue,
           department: input.department,
-          createdBy: { connect: { id: ctx.session.user.id } },
+          createdById: ctx.session.user.id,
           isAnonymous: input.isAnonymous ?? false,
           priority: input.priority ?? "LOW",
         },
+      });
+
+      await prismaEventService.createEvent({
+        type: "TICKET_CREATED",
+        originId: ticket.id,
+        originType: "TICKET",
+        actorId: ctx.session.user.id,
       });
 
       return ticket;
@@ -67,52 +58,92 @@ export const ticketRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input;
+      const ticket = await ctx.db.ticket.findUnique({
+        where: { id: input.id },
+      });
+      if (!ticket) throw new Error("Ticket hittades inte");
+
       const updatedTicket = await ctx.db.ticket.update({
-        where: { id },
+        where: { id: input.id },
         data: {
-          ...data,
-          ticketHistories: {
-            create: {
-              actionType: input.status ? "CHANGED_STATUS" : "CHANGED_PRIORITY",
-              userId: ctx.session.user.id,
-            },
-          },
           status: input.status,
           priority: input.priority,
-          assignedToId: ctx.session.user.id,
+          assignedToId: input.assignedToId,
         },
-        include: {
-          assignedTo: true,
-        },
+        include: { assignedTo: true },
       });
+
+      if (input.status && input.status !== ticket.status) {
+        await prismaEventService.createEvent({
+          type: "TICKET_STATUS_CHANGED",
+          originId: ticket.id,
+          originType: "TICKET",
+          actorId: ctx.session.user.id,
+          metadata: { oldStatus: ticket.status, newStatus: input.status },
+        });
+      }
+
+      if (input.priority && input.priority !== ticket.priority) {
+        await prismaEventService.createEvent({
+          type: "TICKET_CHANGED_PRIORITY",
+          originId: ticket.id,
+          originType: "TICKET",
+          actorId: ctx.session.user.id,
+          metadata: {
+            oldPriority: ticket.priority,
+            newPriority: input.priority,
+          },
+        });
+      }
+
+      if (input.assignedToId && input.assignedToId !== ticket.assignedToId) {
+        await prismaEventService.createEvent({
+          type: "TICKET_ASSIGNED",
+          originId: ticket.id,
+          originType: "TICKET",
+          actorId: ctx.session.user.id,
+          metadata: {
+            oldAssignee: ticket.assignedToId,
+            newAssignee: input.assignedToId,
+          },
+        });
+      }
 
       return updatedTicket;
     }),
 
-  recordAction: protectedProcedure
-    .input(
-      z.object({
-        ticketId: z.string().min(1),
-        actionType: z.enum([
-          "CREATED",
-          "UPDATED",
-          "CHANGED_STATUS",
-          "CHANGED_PRIORITY",
-          "ASSIGNED",
-          "UNASSIGNED",
-          "SENT",
-          "ADDED_NOTE",
-        ]),
-      }),
-    )
+  inviteUserToTicket: protectedProcedure
+    .input(z.object({ ticketId: z.string(), userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.action.create({
-        data: {
-          actionType: input.actionType,
-          ticketId: input.ticketId,
-          userId: ctx.session.user.id,
-        },
+      const updatedTicket = await ctx.db.ticket.update({
+        where: { id: input.ticketId },
+        data: { participants: { connect: { id: input.userId } } },
       });
+
+      await ctx.db.subscription.upsert({
+        where: {
+          userId_type_originId: {
+            userId: input.userId,
+            type: "TICKET",
+            originId: input.ticketId,
+          },
+        },
+        create: {
+          userId: input.userId,
+          type: "TICKET",
+          originId: input.ticketId,
+        },
+        update: {},
+      });
+
+      await prismaEventService.createEvent({
+        type: "TICKET_ASSIGNED",
+        originId: input.ticketId,
+        originType: "TICKET",
+        actorId: ctx.session.user.id,
+        metadata: { addedUserId: input.userId },
+      });
+
+      return updatedTicket;
     }),
 });

@@ -50,14 +50,14 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={toggleDropdown}
-        className="relative rounded-full p-2 transition hover:bg-gray-100"
-      >
-        <FaBell size={22} className="text-gray-600" />
+      <button onClick={toggleDropdown}>
+        <FaBell
+          size={22}
+          className="text-gray-600 transition-colors duration-300 ease-in-out hover:text-gray-300"
+        />
 
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#cc0e0e] text-[12px] font-bold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}

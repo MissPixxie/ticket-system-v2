@@ -12,10 +12,9 @@ import { useSocket } from "../socketProvider";
 type FilterType = "latest" | "popular" | "status";
 
 export function SuggestionBox() {
-  const id = "cmlnru61k0007i0u9mp4bsrfs";
+  const id = "cmmp3b1wd00071ku9m9ozi39a";
   const [filter, setFilter] = useState<FilterType>("latest");
   const [isAnonymous, setIsAnonymous] = useState(false);
-  console.log(isAnonymous);
 
   const {
     data: suggestions,
@@ -28,12 +27,13 @@ export function SuggestionBox() {
       refetchOnWindowFocus: false,
     },
   );
+
   const [issue, setIssue] = useState("");
   const [success, setSuccess] = useState<boolean>();
   const utils = api.useUtils();
   const { socket } = useSocket();
 
-  const vote = api.suggestionBox.updateSuggestion.useMutation({
+  const vote = api.suggestionBox.voteSuggestion.useMutation({
     onSuccess: () => utils.suggestionBox.invalidate(),
   });
 
@@ -92,9 +92,9 @@ export function SuggestionBox() {
                     </span>
                   </div>
                   <button
-                    onClick={() =>
-                      vote.mutate({ id: suggestion.id, vote: "UP" })
-                    }
+                    onClick={() => {
+                      vote.mutate({ id: suggestion.id, vote: "UP" });
+                    }}
                     className="flex items-center gap-1 text-sm"
                   >
                     <RiArrowUpDoubleFill

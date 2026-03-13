@@ -17,7 +17,7 @@ export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
 
   const utils = api.useUtils();
 
-  const { data: messages, isLoading } = api.message.listAllMessages.useQuery({
+  const { data: messages, isLoading } = api.message.listMessages.useQuery({
     ticketId,
   });
 
@@ -25,7 +25,7 @@ export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
 
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {
-      utils.message.listAllMessages.invalidate({ ticketId });
+      utils.message.listMessages.invalidate({ ticketId });
       setNewMessage("");
     },
   });
@@ -35,7 +35,7 @@ export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
 
     const handler = (msg: { ticketId: string }) => {
       if (msg.ticketId === ticketId) {
-        utils.message.listAllMessages.invalidate({ ticketId });
+        utils.message.listMessages.invalidate({ ticketId });
       }
     };
 
@@ -43,7 +43,7 @@ export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
     return () => {
       socket.off("chat:message", handler);
     };
-  }, [socket, ticketId, utils.message.listAllMessages]);
+  }, [socket, ticketId, utils.message.listMessages]);
 
   const handleSend = () => {
     if (!newMessage.trim()) return;

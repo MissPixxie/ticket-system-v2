@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaBell } from "react-icons/fa";
 import { useSocket } from "../socketProvider";
-
 
 export function useNotification() {
   const { socket } = useSocket();

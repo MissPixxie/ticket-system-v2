@@ -13,6 +13,116 @@ datasource db {
   // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
 }
 
+enum EventType {
+  TICKET_CREATED
+  TICKET_STATUS_CHANGED
+  TICKET_ASSIGNED
+  TICKET_CHANGED_PRIORITY
+  MESSAGE_ADDED
+  SUGGESTION_CREATED
+  SUGGESTION_STATUS_CHANGED
+}
+
+enum EventOrigin {
+  TICKET
+  SUGGESTION
+}
+
+model Event {
+  id         String      @id @default(cuid())
+  type       EventType
+  actorId    String
+  originId   String
+  originType EventOrigin
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+
+  actor         User           @relation(fields: [actorId], references: [id])
+  notifications Notification[]
+
+  @@index([originId, originType])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+enum SubscriptionType {
+  TICKET
+  SUGGESTION
+}
+
+model Subscription {
+  id        String           @id @default(cuid())
+  userId    String
+  type      SubscriptionType
+  originId  String
+  createdAt DateTime         @default(now())
+
+  user         User        @relation(fields: [userId], references: [id])
+  suggestion   Suggestion? @relation(fields: [suggestionId], references: [id])
+  suggestionId String?
+
+  @@unique([userId, type, originId])
+  @@index([originId, type])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@index([userId, seen])
+  @@index([createdAt])
+}
+
+// SUGGESTION BOX MODELS
+enum SuggestionStatus {
+  SENT
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  IMPLEMENTED
+}
+
+model SuggestionBox {
+  id          String       @id @default(cuid())
+  suggestions Suggestion[]
+}
+
+model Suggestion {
+  id          String           @id @default(cuid())
+  content     String
+  createdAt   DateTime         @default(now())
+  status      SuggestionStatus @default(SENT)
+  isAnonymous Boolean          @default(false)
+  user        User             @relation("SuggestionOwner", fields: [userId], references: [id])
+  userId      String
+
+  suggestionBox   SuggestionBox @relation(fields: [suggestionBoxId], references: [id])
+  suggestionBoxId String
+
+  votes       Vote[]
+  subscribers Subscription[]
+
+  @@index([status])
+}
+
+model Vote {
+  id           String     @id @default(cuid())
+  type         String
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  suggestion   Suggestion @relation(fields: [suggestionId], references: [id])
+  suggestionId String
+
+  @@unique([userId, suggestionId])
+}
+
+// TICKET ENUMS & MODEL
 enum Department {
   IT
   HR
@@ -27,14 +137,6 @@ enum Status {
   CLOSED
 }
 
-enum SuggestionStatus {
-  SENT
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  IMPLEMENTED
-}
-
 enum Priority {
   LOW
   MEDIUM
@@ -42,74 +144,69 @@ enum Priority {
   URGENT
 }
 
-enum ActionType {
-  CREATED
-  UPDATED
-  CHANGED_STATUS
-  CHANGED_PRIORITY
-  ASSIGNED
-  UNASSIGNED
-  SENT
-  ADDED_NOTE
+model Ticket {
+  id          String     @id @default(cuid())
+  title       String
+  issue       String
+  image       String?
+  isAnonymous Boolean    @default(false)
+  department  Department
+  status      Status     @default(OPEN)
+  priority    Priority   @default(LOW)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  solvedAt    DateTime?
+
+  createdBy    User      @relation("TicketsCreated", fields: [createdById], references: [id])
+  createdById  String
+  assignedTo   User?     @relation("TicketsHandled", fields: [assignedToId], references: [id])
+  assignedToId String?
+  participants User[]    @relation("TicketParticipants")
+  messages     Message[]
+
+  @@unique([id])
+  @@index([createdById])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([department])
 }
 
+// MESSAGE ENUMS & MODEL
 enum MessageType {
   USER_MESSAGE
   HANDLER_MESSAGE
   SYSTEM_MESSAGE
 }
 
-model SuggestionBox {
-  id         String       @id @default(cuid())
-  suggestion Suggestion[]
-}
+model Message {
+  id        String      @id @default(cuid())
+  message   String
+  type      MessageType @default(USER_MESSAGE)
+  createdAt DateTime    @default(now())
 
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  text      String
-  seen      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
 
-  user User @relation(fields: [userId], references: [id])
-}
-
-model Suggestion {
-  id              String           @id @default(cuid())
-  content         String
-  createdAt       DateTime         @default(now())
-  status          SuggestionStatus @default(SENT)
-  isAnonymous     Boolean          @default(false)
-  user            User             @relation(fields: [userId], references: [id])
-  userId          String
-  suggestionBox   SuggestionBox    @relation(fields: [suggestionBoxId], references: [id])
-  suggestionBoxId String
-  votes           Vote[]
-}
-
-model Vote {
-  id           String     @id @default(cuid())
-  type         String
-  user         User       @relation(fields: [userId], references: [id])
-  userId       String
-  suggestion   Suggestion @relation(fields: [suggestionId], references: [id])
-  suggestionId String
-
-  @@unique([userId, suggestionId])
-}
-
-model Action {
-  id         String     @id @default(cuid())
-  user       User       @relation(fields: [userId], references: [id])
-  userId     String
-  actionType ActionType
-  timestamp  DateTime   @default(now())
-  ticket     Ticket     @relation(fields: [ticketId], references: [id])
-  ticketId   String
+  ticket   Ticket @relation(fields: [ticketId], references: [id])
+  ticketId String
 
   @@unique([id])
+  @@index([ticketId])
 }
 
+model Post {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+
+  @@index([name])
+}
+
+// USER & ROLES
 model Role {
   id          String       @id @default(cuid())
   name        String       @unique
@@ -126,60 +223,35 @@ model Permission {
   @@unique([name])
 }
 
-model Ticket {
-  id          String     @id @default(cuid())
-  title       String
-  issue       String
-  image       String?
-  isAnonymous Boolean    @default(false)
-  department  Department
-  status      Status     @default(OPEN)
-  priority    Priority   @default(LOW)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  solvedAt    DateTime?
+model User {
+  id             String         @id @default(cuid())
+  name           String?
+  email          String?        @unique
+  password       String?
+  emailVerified  Boolean?       @default(false)
+  image          String?
+  role           Role?          @relation(fields: [roleId], references: [id])
+  roleId         String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now()) @updatedAt
+  sessions       Session[]
+  accounts       Account[]
+  ticketsCreated Ticket[]       @relation("TicketsCreated")
+  ticketsHandled Ticket[]       @relation("TicketsHandled")
+  messages       Message[]
+  posts          Post[]
+  votes          Vote[]
+  notifications  Notification[]
 
-  createdBy    User    @relation("TicketsCreated", fields: [createdById], references: [id])
-  createdById  String
-  assignedTo   User?   @relation("TicketsHandled", fields: [assignedToId], references: [id])
-  assignedToId String?
+  events        Event[]
+  subscriptions Subscription[]
+  suggestionId  String?
 
-  ticketHistories Action[]
-  messages        Message[]
-  user            User?     @relation(fields: [userId], references: [id])
-  userId          String?
-
-  @@unique([id])
+  suggestions          Suggestion[] @relation("SuggestionOwner")
+  ticketsParticipating Ticket[]     @relation("TicketParticipants")
 }
 
-model Message {
-  id        String      @id @default(cuid())
-  message   String
-  type      MessageType @default(USER_MESSAGE)
-  createdAt DateTime    @default(now())
-
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
-
-  ticket   Ticket @relation(fields: [ticketId], references: [id])
-  ticketId String
-
-  @@unique([id])
-}
-
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
-
-  @@index([name])
-}
-
-// Necessary for Next auth
+// NEXT-AUTH MODELS
 model Account {
   id                       String   @id @default(cuid())
   accountId                String   @unique
@@ -217,38 +289,6 @@ model Session {
 
   @@index([userId])
 }
-
-model User {
-  id             String         @id @default(cuid())
-  name           String?
-  email          String?        @unique
-  password       String?
-  emailVerified  Boolean?       @default(false)
-  image          String?
-  role           Role?          @relation(fields: [roleId], references: [id])
-  roleId         String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @default(now()) @updatedAt
-  sessions       Session[]
-  accounts       Account[]
-  ticketsCreated Ticket[]       @relation("TicketsCreated")
-  ticketsHandled Ticket[]       @relation("TicketsHandled")
-  messages       Message[]
-  tickets        Ticket[]
-  posts          Post[]
-  actions        Action[]
-  suggestions    Suggestion[]
-  votes          Vote[]
-  notifications  Notification[]
-}
-
-// model VerificationToken {
-//   identifier String
-//   token      String   @unique
-//   expires    DateTime
-
-//   @@unique([identifier, token])
-// }
 
 model Verification {
   id         String   @id
