@@ -3,7 +3,6 @@ import Link from "next/link";
 import Header from "~/app/_components/header";
 import { IoMdHome } from "react-icons/io";
 import { TiTicket } from "react-icons/ti";
-import { FaUserPlus } from "react-icons/fa6";
 import { LuLogs } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
@@ -24,14 +23,13 @@ export default async function AdminLayout({
       route: "/dashboard/admin/tickets",
       icon: <TiTicket />,
     },
-    { id: "users", label: "Användare", route: "/dashboard/admin/users-list", icon: <FaUser /> },
-    { id: "logs", label: "Loggar", icon: <LuLogs /> },
     {
-      id: "createUser",
-      label: "Skapa användare",
-      route: "/dashboard/admin/create-user",
-      icon: <FaUserPlus />,
+      id: "users",
+      label: "Användare",
+      route: "/dashboard/admin/users-list",
+      icon: <FaUser />,
     },
+    { id: "logs", label: "Loggar", icon: <LuLogs /> },
     { id: "settings", label: "Inställningar", icon: <IoSettingsOutline /> },
   ];
 

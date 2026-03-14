@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useCreateUser } from "./useCreateUser";
 import CreateUserModal from "./createUserModal";
+import { FaUserPlus } from "react-icons/fa6";
 
 const ROLE_MAP = {
   USER: "cmmqoth2d0006x0u9q91ogbrc",
@@ -17,9 +18,10 @@ export function UserSection() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="ml-auto cursor-pointer rounded-md bg-linear-to-r from-purple-700 to-indigo-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+        className="flex cursor-pointer flex-row items-center justify-center rounded-md bg-linear-to-r from-purple-700 to-indigo-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
       >
-        Ny användare
+        <span>Ny användare</span>
+        <FaUserPlus size={20} className="ml-2" />
       </button>
 
       <CreateUserModal

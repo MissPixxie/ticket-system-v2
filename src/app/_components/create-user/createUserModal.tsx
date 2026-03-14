@@ -176,12 +176,12 @@ export default function CreateUserModal({
                     type="button"
                     disabled={isDepartmentDisabled}
                     onClick={() => handleDepartmentChange(dep.value)}
-                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all duration-200 ${
+                    className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all duration-200 ${
                       isDepartmentDisabled
                         ? "cursor-not-allowed border-white/5 bg-white/5 text-white/30"
                         : isSelected
-                          ? "border-blue-500 bg-blue-500/20 text-blue-300 shadow-md"
-                          : "border-white/10 bg-white/5 hover:bg-white/10"
+                          ? "cursor-pointer border-blue-500 bg-blue-500/20 text-blue-300 shadow-md"
+                          : "cursor-pointer border-white/10 bg-white/5 hover:bg-white/10"
                     }`}
                   >
                     {dep.icon}

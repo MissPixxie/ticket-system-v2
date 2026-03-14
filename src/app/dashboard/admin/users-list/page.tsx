@@ -13,6 +13,12 @@ const ROLE_MAP = {
   ADMIN: "ADMIN_ROLE_ID_HÄR",
 } as const;
 
+const ROLE_PERMISSIONS: Record<RoleKey, string[]> = {
+  USER: ["Se egna ärenden", "Skapa ärenden", "Kommentera ärenden"],
+  HANDLER: ["Se alla ärenden", "Ändra ärenden", "Tilldela ärenden"],
+  ADMIN: ["Full åtkomst", "Hantera användare", "Alla rättigheter"],
+};
+
 type RoleKey = keyof typeof ROLE_MAP;
 
 export default function ListUsersPage() {
@@ -161,6 +167,26 @@ export default function ListUsersPage() {
                                 Admin
                               </option>
                             </select>
+                            {/* BEHÖRIGHETER */}
+                            <div className="rounded-lg bg-white/5 p-3">
+                              <p className="mb-2 text-xs text-center tracking-wide text-white/60 uppercase">
+                                Behörigheter
+                              </p>
+
+                              <ul className="space-y-1 text-sm text-white/80">
+                                {ROLE_PERMISSIONS[editRole].map(
+                                  (permission) => (
+                                    <li
+                                      key={permission}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                                      {permission}
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            </div>
 
                             <button
                               onClick={() =>
