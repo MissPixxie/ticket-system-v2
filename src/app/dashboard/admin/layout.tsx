@@ -24,7 +24,7 @@ export default async function AdminLayout({
       route: "/dashboard/admin/tickets",
       icon: <TiTicket />,
     },
-    { id: "users", label: "Användare", icon: <FaUser /> },
+    { id: "users", label: "Användare", route: "/dashboard/admin/users-list", icon: <FaUser /> },
     { id: "logs", label: "Loggar", icon: <LuLogs /> },
     {
       id: "createUser",
@@ -53,7 +53,7 @@ export default async function AdminLayout({
             ))}
           </div>
         </aside>
-        <main>{children}</main>
+        <main className="w-full">{children}</main>
       </div>
     </body>
   );

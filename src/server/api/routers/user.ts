@@ -90,6 +90,7 @@ export const userRouter = createTRPCRouter({
             email: input.email,
             password: input.password,
             role: { connect: { id: input.roleId } },
+
             departments: {
               create: input.departments.map((dept) => ({
                 department: dept,
@@ -98,6 +99,8 @@ export const userRouter = createTRPCRouter({
           },
         });
       } catch (error: any) {
+        console.error("CREATE USER ERROR:", error);
+
         if (error.code === "P2002") {
           throw new TRPCError({
             code: "CONFLICT",
@@ -105,11 +108,61 @@ export const userRouter = createTRPCRouter({
           });
         }
 
+        throw error; // 👈 tillfälligt för debugging
+      }
+    }),
+
+  updateUser: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1),
+        roleId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: { id: input.id },
+        include: { role: true },
+      });
+
+      if (!user) {
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Kunde inte skapa användaren",
+          code: "NOT_FOUND",
+          message: "Användaren finns inte",
         });
       }
+
+      if (user.role?.name === "ADMIN") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Det går inte att ändra en administratör",
+        });
+      }
+
+      return ctx.db.user.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          role: {
+            connect: { id: input.roleId },
+          },
+        },
+      });
+    }),
+
+  deleteUser: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.user.delete({
+        where: {
+          id: input.id,
+        },
+      });
     }),
 
   login: publicProcedure
