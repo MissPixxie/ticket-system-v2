@@ -12,7 +12,7 @@ import { useSocket } from "../socketProvider";
 type FilterType = "latest" | "popular" | "status";
 
 export function SuggestionBox() {
-  const id = "cmmp3b1wd00071ku9m9ozi39a";
+  const id = "cmmqothj10007x0u9q9rsrdwa";
   const [filter, setFilter] = useState<FilterType>("latest");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
@@ -83,6 +83,7 @@ export function SuggestionBox() {
           {sortedSuggestions &&
             sortedSuggestions.map((suggestion) => (
               <div key={suggestion.id} className="flex flex-col">
+                <span className="text-sm">{suggestion.user?.name}</span>
                 <div className="flex-rowrounded borde flex justify-between bg-white/20 p-4 shadow-md/40">
                   <div className="flex-1">
                     <h3>{suggestion.content}</h3>
@@ -109,7 +110,6 @@ export function SuggestionBox() {
                     {suggestion.votes.length}
                   </button>
                 </div>
-                <span className="text-sm">{suggestion.user?.name}</span>
               </div>
             ))}
         </div>

@@ -15,9 +15,6 @@ export default async function Header() {
   return (
     <HydrateClient>
       <header className="flex h-fit w-full grow flex-row place-content-end items-center gap-4 bg-linear-to-b from-[#2e026d] to-[#15162c] px-5 py-3 shadow-md/80">
-        <div>
-          <FaRegLightbulb size={22} />
-        </div>
         <NotificationBell userId={session.user.id} />
         <p className="text-center text-2xl text-white">
           <span>Logged in as {session.user.name}</span>

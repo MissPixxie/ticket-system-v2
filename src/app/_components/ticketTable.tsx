@@ -178,7 +178,7 @@ export function TicketTable({ currentUserId }: TicketTableProps) {
                       e.stopPropagation();
                       setSelectedTicketId(null);
                     }}
-                    className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded bg-red-600 text-white hover:bg-red-700"
+                    className="absolute top-2 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded bg-red-600 text-white hover:bg-red-700"
                   >
                     ✕
                   </button>

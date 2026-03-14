@@ -103,7 +103,7 @@ export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
         />
         <button
           onClick={handleSend}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium shadow-md/20 hover:bg-blue-700"
+          className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium shadow-md/20 hover:bg-blue-700"
         >
           Skicka
         </button>

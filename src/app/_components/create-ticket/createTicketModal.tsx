@@ -163,13 +163,13 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               onClick={onClose}
               className="rounded border px-4 py-2"
             >
-              Cancel
+              Avbryt
             </button>
             <button
               type="submit"
               className="rounded-full bg-blue-500 px-10 py-3 text-white"
             >
-              Submit
+              Skicka
             </button>
           </div>
         </form>

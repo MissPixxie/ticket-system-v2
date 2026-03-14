@@ -67,6 +67,9 @@ export const userRouter = createTRPCRouter({
         email: z.string().email(),
         password: z.string().min(6),
         roleId: z.string().min(1),
+        departments: z.array(
+          z.enum(["IT", "HR", "CAMPAIGN", "PRODUCT", "CUSTOMERCLUB"]),
+        ),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -87,6 +90,11 @@ export const userRouter = createTRPCRouter({
             email: input.email,
             password: input.password,
             role: { connect: { id: input.roleId } },
+            departments: {
+              create: input.departments.map((dept) => ({
+                department: dept,
+              })),
+            },
           },
         });
       } catch (error: any) {

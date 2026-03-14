@@ -3,7 +3,6 @@ import { getSession } from "~/server/better-auth/server";
 import { HydrateClient } from "~/trpc/server";
 import { FaBell } from "react-icons/fa";
 import { redirect } from "next/navigation";
-import { CreateUser } from "~/app/_components/createUser";
 import { ListAllUsers } from "~/app/_components/listAllUsers";
 import { db } from "~/server/db";
 
@@ -28,7 +27,11 @@ export default async function Admin() {
     { id: "settings", label: "Inställningar" },
     { id: "employees", label: "Anställda" },
     { id: "logs", label: "Loggar" },
-    { id: "createUser", label: "Skapa användare" },
+    {
+      id: "createUser",
+      label: "Skapa användare",
+      route: "/dashboard/admin/create-user",
+    },
   ];
 
   return (
@@ -49,7 +52,6 @@ export default async function Admin() {
         <div className="flex w-full flex-col place-items-center">
           <h3 className="text-8xl font-bold">Admin Dashboard</h3>
           <ListAllUsers />
-          <CreateUser />
           <div className="flex flex-row items-center justify-center gap-10">
             <div className="h-50 w-50 rounded-lg bg-blue-200">
               Totala tickets
@@ -65,12 +67,13 @@ export default async function Admin() {
           <div className="fixed top-0 left-0 h-full w-74 bg-linear-to-b from-[#655e6d] to-[#2c2c33]">
             <div className="flex cursor-pointer flex-col items-center">
               {menuItems.map((item) => (
-                <div
+                <Link
                   key={item.id}
+                  href={item.route ?? "#"}
                   className="flex w-full items-center justify-center pt-5 pb-5 hover:bg-gray-50/5"
                 >
                   {item.label}
-                </div>
+                </Link>
               ))}
             </div>
           </div>

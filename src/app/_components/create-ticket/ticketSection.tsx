@@ -12,9 +12,9 @@ export function TicketSection() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="ml-auto rounded-md bg-linear-to-r from-purple-700 to-indigo-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+        className="ml-auto cursor-pointer rounded-md bg-linear-to-r from-purple-700 to-indigo-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
       >
-        Create Ticket
+        Nytt ärende
       </button>
 
       <CreateTicketModal

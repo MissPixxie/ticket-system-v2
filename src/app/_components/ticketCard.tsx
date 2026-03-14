@@ -49,7 +49,10 @@ export default function TicketCard({
   return (
     <div className="space-y-6">
       <div>
-        <p> {ticketProps.createdAt.toLocaleDateString()}</p>
+        <p>
+          <strong>Skapad:</strong>
+          {ticketProps.createdAt.toLocaleDateString()}
+        </p>
         <p>
           <strong>Titel:</strong> {ticketProps.title}
         </p>
@@ -68,7 +71,7 @@ export default function TicketCard({
               value={ticketProps.status}
               onClick={(e) => e.stopPropagation()}
               onChange={(e) => handleSetStatus(ticketProps.id, e.target.value)}
-              className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+              className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
             >
               <option>OPEN</option>
               <option value="IN_PROGRESS">IN PROGRESS</option>
@@ -84,7 +87,7 @@ export default function TicketCard({
               onChange={(e) =>
                 handleSetPriority(ticketProps.id, e.target.value)
               }
-              className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+              className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
             >
               <option>LOW</option>
               <option>MEDIUM</option>
@@ -94,7 +97,7 @@ export default function TicketCard({
           <div className="ml-auto flex flex-row gap-5 self-end">
             <InviteSection ticketId={ticketProps.id} />
             <button
-              className="flex flex-row rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
+              className="flex cursor-pointer flex-row rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
               title="Ticket History"
             >
               Ticket History

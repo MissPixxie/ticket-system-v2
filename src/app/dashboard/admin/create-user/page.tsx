@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
+import { Department } from "@prisma/client";
 
 const ROLE_MAP = {
   USER: "cmjq6y3k90006xou99jnwazv2",
@@ -11,12 +12,21 @@ const ROLE_MAP = {
 
 type RoleKey = keyof typeof ROLE_MAP;
 
-export function CreateUserPage() {
+export default function CreateUserPage() {
   const utils = api.useUtils();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<RoleKey>("USER");
+  const [selectedDepartments, setSelectedDepartments] = useState<Department[]>(
+    [],
+  );
+
+  function handleDepartmentChange(dep: Department) {
+    setSelectedDepartments((prev) =>
+      prev.includes(dep) ? prev.filter((d) => d !== dep) : [...prev, dep],
+    );
+  }
 
   const createUser = api.user.create.useMutation({
     onSuccess: async () => {
@@ -25,6 +35,7 @@ export function CreateUserPage() {
       setName("");
       setPassword("");
       setRole("USER");
+      setSelectedDepartments([]);
       toast("Användaren skapades!");
     },
     onError: (error) => {
@@ -33,12 +44,18 @@ export function CreateUserPage() {
   });
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col text-white">
       <h1 className="text-center text-2xl">Skapa Användare</h1>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          createUser.mutate({ email, name, password, roleId: ROLE_MAP[role] });
+          createUser.mutate({
+            email,
+            name,
+            password,
+            roleId: ROLE_MAP[role],
+            departments: selectedDepartments,
+          });
         }}
         className="flex flex-col gap-2 lg:h-80 lg:w-xl"
       >
@@ -77,9 +94,33 @@ export function CreateUserPage() {
           <option value="USER">Vanlig användare</option>
           <option value="HANDLER">Handläggare</option>
         </select>
+        <div>
+          <p className="mb-2 font-semibold">Departments</p>
+
+          <div className="grid grid-cols-2 gap-3">
+            {Object.values(Department).map((dep) => {
+              const isSelected = selectedDepartments.includes(dep);
+
+              return (
+                <button
+                  type="button"
+                  key={dep}
+                  onClick={() => handleDepartmentChange(dep)}
+                  className={`cursor-pointer rounded-xl border p-4 text-sm font-medium transition ${
+                    isSelected
+                      ? "border-blue-500 bg-blue-500/20 text-blue-300"
+                      : "border-white/20 bg-white/5 hover:bg-white/10"
+                  } `}
+                >
+                  {dep}
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <button
           type="submit"
-          className="rounded-full bg-blue-500 px-10 py-3 text-white"
+          className="cursor-pointer rounded-full bg-blue-500 px-10 py-3 text-white"
         >
           Submit
         </button>

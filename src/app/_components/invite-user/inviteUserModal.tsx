@@ -26,7 +26,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
   const { data: users, isLoading } = api.user.searchUser.useQuery(
     { query: search },
     {
-      enabled: search.length > 1,
+      enabled: search.length >= 1,
     },
   );
 

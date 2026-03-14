@@ -16,7 +16,7 @@ export function InviteSection({ ticketId }: InviteSectionProps) {
   return (
     <>
       <button
-        className="flex flex-row gap-2 rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
+        className="flex cursor-pointer flex-row gap-2 rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
         onClick={() => setIsOpen(true)}
       >
         Bjud in användare
