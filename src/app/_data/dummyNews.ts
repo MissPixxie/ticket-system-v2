@@ -24,18 +24,18 @@ export const dummyNews: DummyNews[] = [
   },
   {
     id: "n2",
-    title: "Ny manual för kaffemaskiner",
+    title: "Ny rutin för fiskavdelningen",
     content:
-      "En uppdaterad manual för alla nya kaffemaskiner finns nu tillgänglig under Butiksmanual.",
+      "En rutin för fiskavdelningen finns nu tillgänglig under Butiksrutiner.",
     createdAt: new Date("2026-03-02T09:30:00"),
     category: "Butiksmanual",
     author: { id: "admin2", name: "Huvudkontoret" },
   },
   {
     id: "n3",
-    title: "Produktnyhet: Ekologisk choklad",
+    title: "Produktnyhet: Ekologisk tugg",
     content:
-      "Vi lanserar nu ekologisk choklad i alla butiker. Produktinformation och prislistor finns i systemet.",
+      "Vi lanserar nu ekologisk tugg i alla butiker. Produktinformation och prislistor finns i systemet.",
     createdAt: new Date("2026-03-03T14:20:00"),
     category: "Produktinformation",
     author: { id: "admin3", name: "Huvudkontoret" },

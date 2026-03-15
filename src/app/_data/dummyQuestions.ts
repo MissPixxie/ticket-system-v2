@@ -5,6 +5,7 @@ export interface DummyQuestion {
   title: string;
   content: string;
   createdAt: Date;
+  category: string;
   createdBy: {
     id: string;
     name: string;
@@ -29,6 +30,7 @@ export const dummyQuestions: DummyQuestion[] = [
       "Vi har fått frågor från flera butiker om hur man ska hantera trasiga produkter från kunder. Finns det ett standardförfarande?",
     createdAt: new Date("2026-03-01T10:00:00"),
     createdBy: { id: "u1", name: "Butik A" },
+    category: "Produkt",
     replies: [
       {
         id: "r1",
@@ -47,6 +49,7 @@ export const dummyQuestions: DummyQuestion[] = [
       "Flera butiker har efterfrågat fler färgade skyltar till kampanjbordet. Är det möjligt att beställa direkt?",
     createdAt: new Date("2026-03-02T09:30:00"),
     createdBy: { id: "u2", name: "Butik B" },
+    category: "Kampanj",
     replies: [],
     status: "OPEN",
   },
@@ -57,6 +60,7 @@ export const dummyQuestions: DummyQuestion[] = [
       "Kassaapparaten stannar ibland mitt under betalning. Någon mer som upplever samma problem?",
     createdAt: new Date("2026-03-03T14:20:00"),
     createdBy: { id: "u3", name: "Butik C" },
+    category: "Kassa",
     replies: [
       {
         id: "r2",
@@ -75,6 +79,7 @@ export const dummyQuestions: DummyQuestion[] = [
       "Vi behöver en uppdaterad manual för den nya kaffemaskinen som levererades förra veckan.",
     createdAt: new Date("2026-03-04T11:45:00"),
     createdBy: { id: "u4", name: "Butik D" },
+    category: "Allmänt",
     replies: [],
     status: "OPEN",
   },

@@ -9,7 +9,7 @@ export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false); // Ny state
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -31,76 +31,78 @@ export default function SignInForm() {
     }
   }
 
-  // const handleSubmit = async () => {
-  //   console.log(email, password);
-
-  //   await authClient.signIn.email(
-  //     {
-  //       email: "user@example.com",
-  //       password:
-  //         "$2b$10$iQkrNUSzqcPBEqwgLPvzTutz9giKhh6dFEaF/WFABKlMTyaKV754m",
-  //       callbackURL: "/user",
-  //       rememberMe: false,
-  //     },
-  //     {
-  //       onRequest: (ctx) => {},
-  //       onSuccess: (ctx) => {
-  //         redirect("/user");
-  //       },
-  //       onError: (ctx) => {
-  //         setError(ctx.error.message);
-  //         console.log(ctx);
-  //       },
-  //     },
-  //   );
-  // };
-
   return (
-    <div
-      className="lg:h-xl flex flex-col gap-2 rounded-lg p-10 lg:w-xl dark:bg-white/10"
-      suppressHydrationWarning={true}
-    >
-      {error && (
-        <div className="mb-4 rounded p-3 dark:bg-red-500/20 dark:text-red-200">
-          {error}
-        </div>
-      )}
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col justify-center gap-2"
-      >
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border p-7 px-4 py-2 text-black required:border-red-500 required:text-red-500 dark:border-black/50 dark:bg-white/10"
-        />
+    <div className="flex min-h-screen w-full flex-col items-center justify-center gap-10 bg-linear-to-b from-[#2e026d] to-[#15162c] px-4 text-white">
+      <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
+        Logga in
+      </h1>
 
-        <label htmlFor="password">Lösenord</label>
-        <input
-          type="password"
-          name="password"
-          required
-          placeholder="Lösenord"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-black required:border-red-500 required:text-red-500"
-        />
-        <button
-          disabled={loading}
-          className="mt-10 rounded-full bg-blue-500 px-10 py-3 text-white"
-          type="submit"
-        >
-          {loading ? "Loggar in..." : "Logga in"}
-        </button>
-      </form>
-      <h3 className="mb-10 self-center">
-        <Link href="/forgotPassword">Glömt lösenord</Link>
-      </h3>
+      <div className="w-full max-w-md rounded-3xl bg-white/5 p-10 shadow-xl backdrop-blur-lg transition hover:bg-white/10">
+        {error && (
+          <div className="mb-6 rounded-lg bg-red-500/20 p-3 text-center text-red-200">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="email"
+              className="text-sm font-medium text-white/80"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              placeholder="email@example.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-white/20 bg-white/10 p-4 text-white placeholder-white/50 transition outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-white/80"
+            >
+              Lösenord
+            </label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Ditt lösenord"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-white/20 bg-white/10 p-4 text-white placeholder-white/50 transition outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-4 w-full rounded-full bg-blue-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Loggar in..." : "Logga in"}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center text-sm text-white/60">
+          <Link
+            href="/forgotPassword"
+            className="transition hover:text-blue-400"
+          >
+            Glömt lösenord?
+          </Link>
+        </div>
+      </div>
+
+      <div className="text-center text-sm text-white/50">
+        © 2026 Företagsnamn
+      </div>
     </div>
   );
 }
