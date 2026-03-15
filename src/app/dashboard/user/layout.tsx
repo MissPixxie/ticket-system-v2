@@ -70,7 +70,7 @@ export default async function UserLayout({
   ];
 
   return (
-    <body>
+    <div>
       <Header />
       <div className="flex flex-row gap-10 bg-linear-to-b from-[#2e026d] to-[#15162c]">
         <aside className="h-screen w-72 border-r border-white/10 bg-white/5 backdrop-blur-xl">
@@ -100,6 +100,6 @@ export default async function UserLayout({
         </aside>
         <main className="w-full">{children}</main>
       </div>
-    </body>
+    </div>
   );
 }

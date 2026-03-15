@@ -13,6 +13,27 @@ datasource db {
   // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
 }
 
+model News {
+  newsId      String   @id @default(cuid())
+  title       String
+  category    Category @default(NEWS)
+  content     String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isPinned    Boolean  @default(false)
+  isPublished Boolean  @default(false)
+  priority    Priority @default(LOW)
+}
+
+enum Category {
+  NEWS
+  STORE_MANUAL
+  PRODUCT_INFORMATION
+  CAMPAIGN
+}
+
 model AuditLog {
   id         String   @id @default(cuid())
   type       String
@@ -44,11 +65,15 @@ enum EventType {
   SUGGESTION_STATUS_CHANGED
   SUGGESTION_VOTED
   ROLE_CHANGED
+  NEWS_CREATED
+  NEWS_CHANGED
+  NEWS_CHANGED_PRIORITY
 }
 
 enum EventOrigin {
   TICKET
   SUGGESTION
+  NEWS
 }
 
 model Event {
@@ -68,9 +93,36 @@ model Event {
   @@index([createdAt])
 }
 
+model Question {
+  questionId  String           @id @default(cuid())
+  title       String
+  content     String
+  createdBy   User             @relation(fields: [createdById], references: [id])
+  createdById String
+  category    QuestionCategory @default(GENERAL)
+  status      QuestionStatus   @default(PENDING)
+  messages    Message[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+enum QuestionCategory {
+  GENERAL
+  TECHNICAL
+  ACCOUNT
+  OTHER
+}
+
+enum QuestionStatus {
+  PENDING
+  ANSWERED
+  CLOSED
+}
+
 enum SubscriptionType {
   TICKET
   SUGGESTION
+  NEWS
 }
 
 model Subscription {
@@ -210,8 +262,10 @@ model Message {
   createdBy   User   @relation(fields: [createdById], references: [id])
   createdById String
 
-  ticket   Ticket @relation(fields: [ticketId], references: [id])
-  ticketId String
+  ticket     Ticket?   @relation(fields: [ticketId], references: [id])
+  ticketId   String?
+  question   Question? @relation(fields: [questionId], references: [questionId])
+  questionId String?
 
   @@unique([id])
   @@index([ticketId])
@@ -279,6 +333,10 @@ model User {
   ticketsParticipating Ticket[]     @relation("TicketParticipants")
 
   auditLogs AuditLog[]
+
+  news News[]
+
+  questions Question[]
 }
 
 model UserDepartment {

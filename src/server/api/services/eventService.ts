@@ -13,9 +13,13 @@ export class PrismaEventService extends EventEmitter {
       | "MESSAGE_ADDED"
       | "SUGGESTION_CREATED"
       | "SUGGESTION_STATUS_CHANGED"
-      | "SUGGESTION_VOTED" | "ROLE_CHANGED";
+      | "SUGGESTION_VOTED"
+      | "ROLE_CHANGED"
+      | "NEWS_CREATED"
+      | "NEWS_CHANGED"
+      | "NEWS_CHANGED_PRIORITY";
     originId: string;
-    originType: "TICKET" | "SUGGESTION";
+    originType: "TICKET" | "SUGGESTION" | "NEWS";
     actorId: string;
     metadata?: EventMetadata;
   }) {

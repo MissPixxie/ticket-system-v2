@@ -8,6 +8,7 @@ import { notificationRouter } from "./routers/notification";
 import { eventRouter } from "./routers/event";
 import { subscriptionRouter } from "./routers/subscription";
 import { auditLogRouter } from "./routers/auditLog";
+import { newsRouter } from "./routers/news";
 
 /**
  * This is the primary router for your server.
@@ -24,6 +25,7 @@ export const appRouter = createTRPCRouter({
   event: eventRouter,
   subscription: subscriptionRouter,
   auditLog: auditLogRouter,
+  news: newsRouter,
 });
 
 // export type definition of API
