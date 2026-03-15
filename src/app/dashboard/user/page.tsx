@@ -1,32 +1,170 @@
+"use client";
+
+import { api } from "~/trpc/react";
+import { FaLightbulb, FaTicketAlt } from "react-icons/fa";
+import { HiSpeakerphone } from "react-icons/hi";
+import { useCreateTicket } from "~/app/_components/create-ticket/useCreateTicket";
+import { useState } from "react";
+import CreateTicketModal from "~/app/_components/create-ticket/createTicketModal";
 import Link from "next/link";
-import { getSession } from "~/server/better-auth/server";
-import { HydrateClient } from "~/trpc/server";
-import { FaRegLightbulb } from "react-icons/fa";
-import { GrBug } from "react-icons/gr";
-import { redirect } from "next/navigation";
-import { NotificationBell } from "~/app/_components/notificationBell";
-import { db } from "~/server/db";
-import { TicketSection } from "~/app/_components/create-ticket/ticketSection";
-import Header from "~/app/_components/header";
 
-export default async function User() {
-  const session = await getSession();
-
-  if (!session) {
-    redirect("/");
-  }
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    include: { role: true },
+export default function UserHome() {
+  const { data: tickets } = api.ticket.listUserTickets.useQuery();
+  const { data: suggestions } = api.suggestionBox.listSuggestions.useQuery({
+    suggestionBoxId: "cmmqzjjn80007k0u9z3586u2k",
   });
+  const [isOpen, setIsOpen] = useState(false);
+  const { createTicket, isLoading } = useCreateTicket();
 
-  if (!user || user?.role?.name !== "USER") {
-    redirect("/");
-  }
+  const openTickets = tickets?.filter((t) => t.status === "OPEN").length ?? 0;
+
+  const inProgress =
+    tickets?.filter((t) => t.status === "IN_PROGRESS").length ?? 0;
+
+  const mySuggestions = suggestions?.length ?? 0;
 
   return (
-    <HydrateClient>
-      <Header />
-    </HydrateClient>
+    <main className="min-h-screen px-6 py-12 text-white">
+      <div className="mx-auto max-w-7xl space-y-10">
+        {/* HEADER */}
+
+        <div>
+          <h1 className="text-2xl font-bold tracking-wide">
+            Välkommen tillbaka
+          </h1>
+          <p className="text-sm text-white/60">
+            Här är en översikt över vad som händer i systemet.
+          </p>
+        </div>
+
+        {/* QUICK ACTIONS */}
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
+          >
+            <FaTicketAlt className="mb-3 text-blue-400" size={20} />
+            <p className="font-semibold">Skapa ticket</p>
+            <p className="text-sm text-white/60">
+              Rapportera problem eller fråga support.
+            </p>
+          </button>
+
+          <Link
+            href="/dashboard/user/suggestions"
+            className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
+          >
+            <FaLightbulb className="mb-3 text-yellow-400" size={20} />
+            <p className="font-semibold">Skicka förslag</p>
+            <p className="text-sm text-white/60">
+              Dela idéer eller produkter kunder efterfrågar.
+            </p>
+          </Link>
+
+          <Link
+            href="/dashboard/user/news"
+            className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
+          >
+            <HiSpeakerphone className="mb-3 text-purple-400" size={20} />
+            <p className="font-semibold">Se nyheter</p>
+            <p className="text-sm text-white/60">
+              Läs senaste uppdateringarna från HQ.
+            </p>
+          </Link>
+        </div>
+
+        {/* STATS */}
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+            <p className="text-sm text-white/60">Öppna tickets</p>
+            <p className="mt-2 text-3xl font-bold text-blue-400">
+              {openTickets}
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+            <p className="text-sm text-white/60">Pågående tickets</p>
+            <p className="mt-2 text-3xl font-bold text-amber-400">
+              {inProgress}
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+            <p className="text-sm text-white/60">Totala förslag</p>
+            <p className="mt-2 text-3xl font-bold text-green-400">
+              {mySuggestions}
+            </p>
+          </div>
+        </div>
+
+        {/* CONTENT GRID */}
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* RECENT TICKETS */}
+
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+            <h2 className="mb-4 font-semibold">Mina senaste tickets</h2>
+
+            <div className="space-y-3 text-sm">
+              {tickets?.slice(0, 5).map((ticket) => (
+                <div
+                  key={ticket.id}
+                  className="flex justify-between rounded-lg bg-white/5 px-3 py-2"
+                >
+                  <span>{ticket.title}</span>
+
+                  <span className="text-white/60">{ticket.status}</span>
+                </div>
+              ))}
+
+              {!tickets?.length && (
+                <p className="text-white/60">Inga tickets ännu</p>
+              )}
+            </div>
+          </div>
+
+          {/* POPULAR SUGGESTIONS */}
+
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+            <h2 className="mb-4 font-semibold">Populära förslag</h2>
+
+            <div className="space-y-3 text-sm">
+              {suggestions
+                ?.sort((a, b) => b.votes.length - a.votes.length)
+                .slice(0, 5)
+                .map((suggestion) => (
+                  <div
+                    key={suggestion.id}
+                    className="flex justify-between rounded-lg bg-white/5 px-3 py-2"
+                  >
+                    <span>{suggestion.content}</span>
+
+                    <span className="text-white/60">
+                      ▲ {suggestion.votes.length}
+                    </span>
+                  </div>
+                ))}
+
+              {!suggestions?.length && (
+                <p className="text-white/60">Inga förslag ännu</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <CreateTicketModal
+        isOpen={isOpen}
+        onClose={() => {
+          console.log("Closing modal!");
+          setIsOpen(false);
+        }}
+        onSubmit={(data) => {
+          createTicket(data);
+          setIsOpen(false);
+        }}
+      />
+    </main>
   );
 }

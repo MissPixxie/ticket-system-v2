@@ -5,10 +5,12 @@ import { IoMdHome } from "react-icons/io";
 import { TiTicket } from "react-icons/ti";
 import { LuLogs } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
-import { FaUser } from "react-icons/fa";
+import { FaRegQuestionCircle } from "react-icons/fa";
 import { getSession } from "~/server/better-auth/server";
 import { db } from "~/server/db";
 import { redirect } from "next/navigation";
+import { MdCampaign } from "react-icons/md";
+import { FaRegLightbulb } from "react-icons/fa6";
 
 export default async function UserLayout({
   children,
@@ -33,31 +35,31 @@ export default async function UserLayout({
       id: "home",
       label: "Hem",
       route: "/dashboard/user/",
-      icon: <IoMdHome />,
+      icon: <IoMdHome size={22} />,
     },
     {
       id: "tickets",
-      label: "Tickets",
+      label: "Mina Tickets",
       route: "/dashboard/user/my-tickets",
-      icon: <TiTicket />,
+      icon: <TiTicket size={20} />,
     },
     {
       id: "questions",
       label: "Frågor",
       route: "/dashboard/user/questions",
-      icon: <FaUser />,
+      icon: <FaRegQuestionCircle />,
     },
     {
       id: "news",
       label: "Nyheter",
       route: "/dashboard/user/news",
-      icon: <LuLogs />,
+      icon: <MdCampaign size={22} />,
     },
     {
       id: "suggestions",
       label: "Förslag",
       route: "/dashboard/user/suggestions",
-      icon: <LuLogs />,
+      icon: <FaRegLightbulb />,
     },
     {
       id: "settings",
