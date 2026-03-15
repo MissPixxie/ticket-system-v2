@@ -1,30 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import CreateTicketModal from "./editNewsModal";
-import { useCreateTicket } from "./useEditTicket";
+import EditNewsModal from "./editNewsModal";
+import { useEditNews } from "./useEditNews";
+import { RiEdit2Fill } from "react-icons/ri";
 
-export function TicketSection() {
+interface EditSectionProps {
+  newsId: string;
+}
+
+export function EditSection({ newsId }: EditSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { createTicket, isLoading } = useCreateTicket();
+  const { editNews, isLoading } = useEditNews();
 
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="ml-auto cursor-pointer rounded-md bg-linear-to-r from-purple-700 to-indigo-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+        className="cursor-pointer rounded-lg bg-white/10 p-2 hover:bg-green-500/30"
       >
-        Nytt ärende
+        <RiEdit2Fill size={18} />
       </button>
 
-      <CreateTicketModal
+      <EditNewsModal
+        newsId={newsId}
         isOpen={isOpen}
         onClose={() => {
           console.log("Closing modal!");
           setIsOpen(false);
         }}
         onSubmit={(data) => {
-          createTicket(data);
+          editNews(data);
           setIsOpen(false);
         }}
       />

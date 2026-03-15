@@ -9,6 +9,7 @@ import { eventRouter } from "./routers/event";
 import { subscriptionRouter } from "./routers/subscription";
 import { auditLogRouter } from "./routers/auditLog";
 import { newsRouter } from "./routers/news";
+import { questionRouter } from "./routers/question";
 
 /**
  * This is the primary router for your server.
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   subscription: subscriptionRouter,
   auditLog: auditLogRouter,
   news: newsRouter,
+  question: questionRouter,
 });
 
 // export type definition of API

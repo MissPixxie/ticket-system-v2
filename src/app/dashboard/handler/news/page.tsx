@@ -4,74 +4,40 @@ import { useState } from "react";
 import { dummyNews, type DummyNews } from "~/app/_data/dummyNews";
 import { RiEdit2Fill } from "react-icons/ri";
 import { FaTrashAlt } from "react-icons/fa";
+import { EditSection } from "~/app/_components/edit-news/editSection";
+import NewsCard from "~/app/_components/newsCard";
+import { api } from "~/trpc/react";
 
 export default function NewsPage() {
+  const utils = api.useUtils();
   const [news, setNews] = useState<DummyNews[]>(dummyNews);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-
-  // create inputs
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<DummyNews["category"]>("Nyheter");
+  const [category, setCategory] = useState<
+    "NEWS" | "STORE_MANUAL" | "PRODUCT_INFORMATION" | "CAMPAIGN"
+  >("NEWS");
   const [content, setContent] = useState("");
 
-  // edit inputs
-  const [editTitle, setEditTitle] = useState("");
-  const [editCategory, setEditCategory] =
-    useState<DummyNews["category"]>("Nyheter");
-  const [editContent, setEditContent] = useState("");
+  const createNews = api.news.createNews.useMutation({
+    onSuccess: (newNews) => {
+      utils.news.listNews.setData(undefined, (oldData) => {
+        if (!oldData) return [newNews];
+        return [newNews, ...oldData];
+      });
 
-  // CREATE
+      setTitle("");
+      setCategory("NEWS");
+      setContent("");
+    },
+  });
+
   const handleCreateNews = () => {
-    if (!title || !content) return;
+    if (!title.trim() || !content.trim()) return;
 
-    const newItem: DummyNews = {
-      id: `n${news.length + 1}`,
+    createNews.mutate({
       title,
-      category,
       content,
-      createdAt: new Date(),
-      author: { id: "handler1", name: "HK Support" },
-    };
-
-    setNews([newItem, ...news]);
-    setTitle("");
-    setCategory("Nyheter");
-    setContent("");
-  };
-
-  // EDIT
-  const startEdit = (item: DummyNews) => {
-    setEditingId(item.id);
-    setEditTitle(item.title);
-    setEditCategory(item.category);
-    setEditContent(item.content);
-  };
-
-  const handleUpdateNews = () => {
-    if (!editingId) return;
-
-    setNews((prev) =>
-      prev.map((n) =>
-        n.id === editingId
-          ? {
-              ...n,
-              title: editTitle,
-              category: editCategory,
-              content: editContent,
-            }
-          : n,
-      ),
-    );
-
-    setEditingId(null);
-  };
-
-  // DELETE
-  const handleDeleteNews = (id: string) => {
-    setNews((prev) => prev.filter((n) => n.id !== id));
-    if (expandedId === id) setExpandedId(null);
-    if (editingId === id) setEditingId(null);
+      category,
+    });
   };
 
   return (
@@ -128,123 +94,11 @@ export default function NewsPage() {
             </button>
           </div>
         </div>
-
-        {/* Nyhetskort */}
+        {/* Lista nyhetskort */}
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {news.map((item) => {
-            const isExpanded = expandedId === item.id;
-            const isEditing = editingId === item.id;
-
-            return (
-              <div
-                key={item.id}
-                className="cursor-pointer rounded-2xl bg-white/5 p-6 shadow-lg/15 transition hover:bg-white/10"
-                onClick={() => setExpandedId(isExpanded ? null : item.id)}
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-xl font-bold">{item.title}</h3>
-                  <span className="rounded-full bg-blue-500/20 px-2 py-1 text-xs text-blue-300">
-                    {item.category}
-                  </span>
-                </div>
-
-                <p className="mb-2 text-sm text-white/70">
-                  {item.createdAt.toLocaleDateString()} · {item.author.name}
-                </p>
-
-                <p className="line-clamp-3 text-white/80">{item.content}</p>
-
-                {/* Expanded panel */}
-                {isExpanded && (
-                  <div
-                    className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-3 text-white/90"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {!isEditing && (
-                      <div className="flex gap-2">
-                        {/* EDIT */}
-                        <button
-                          onClick={() => startEdit(item)}
-                          className="cursor-pointer rounded-lg bg-white/10 p-2 hover:bg-green-500/30"
-                        >
-                          <RiEdit2Fill size={18} />
-                        </button>
-
-                        {/* DELETE */}
-                        <button
-                          onClick={() => handleDeleteNews(item.id)}
-                          className="cursor-pointer rounded-lg bg-white/10 p-2 hover:bg-red-500/30"
-                        >
-                          <FaTrashAlt size={18} />
-                        </button>
-                      </div>
-                    )}
-
-                    {isEditing && (
-                      <div className="flex flex-col gap-3">
-                        <input
-                          value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
-                          className="rounded-lg bg-white/10 px-3 py-1 outline-none"
-                        />
-                        <select
-                          value={editCategory}
-                          onChange={(e) =>
-                            setEditCategory(
-                              e.target.value as DummyNews["category"],
-                            )
-                          }
-                          className="rounded-lg bg-white/10 px-3 py-1"
-                        >
-                          <option value="Nyheter" className="text-black">
-                            Nyheter
-                          </option>
-                          <option value="Butiksmanual" className="text-black">
-                            Butiksmanual
-                          </option>
-                          <option
-                            value="Produktinformation"
-                            className="text-black"
-                          >
-                            Produktinformation
-                          </option>
-                          <option value="Kampanjer" className="text-black">
-                            Kampanjer
-                          </option>
-                        </select>
-                        <textarea
-                          rows={4}
-                          value={editContent}
-                          onChange={(e) => setEditContent(e.target.value)}
-                          className="rounded-lg bg-white/10 px-3 py-1"
-                        />
-                        <div className="flex gap-3">
-                          <button
-                            onClick={handleUpdateNews}
-                            className="rounded-lg bg-green-600 px-4 py-1 text-sm hover:bg-green-500"
-                          >
-                            Spara
-                          </button>
-                          <button
-                            onClick={() => setEditingId(null)}
-                            className="rounded-lg bg-gray-600 px-4 py-1 text-sm hover:bg-gray-500"
-                          >
-                            Avbryt
-                          </button>
-                          <button
-                            onClick={() => handleDeleteNews(item.id)}
-                            className="rounded-lg bg-red-600 px-4 py-1 text-sm hover:bg-red-500"
-                          >
-                            Radera
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {news.map((item) => (
+            <NewsCard key={item.newsId} {...item} />
+          ))}
         </div>
       </div>
     </main>

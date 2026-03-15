@@ -5,15 +5,19 @@ import { createAuditLog } from "~/server/lib/audit";
 import { TRPCError } from "@trpc/server";
 
 export const newsRouter = createTRPCRouter({
-  listNews: protectedProcedure
-    .input(z.object({ newsId: z.string().min(1) }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.news.findMany({
-        where: { newsId: input.newsId },
-        include: { createdBy: true },
-        orderBy: { createdAt: "asc" },
-      });
-    }),
+  listNews: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.news.findMany({
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+  }),
 
   createNews: protectedProcedure
     .input(
@@ -35,6 +39,14 @@ export const newsRouter = createTRPCRouter({
           content: input.content,
           category: input.category,
           createdById: ctx.session.user.id,
+        },
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
 

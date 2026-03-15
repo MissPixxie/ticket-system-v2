@@ -22,7 +22,7 @@ export default function HandlerHome() {
   //   api.question.listAllQuestions.useQuery();
   // const { data: news, isLoading: newsLoading } = api.news.listNews.useQuery();
 
-  const generalNews = news.filter((n) => n.category === "Nyheter");
+  const generalNews = news.filter((n) => n.category === "NEWS");
 
   return (
     <main className="min-h-screen px-6 py-12 text-white">
