@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import { api } from "~/trpc/react";
-import TicketCard from "./ticketCard";
-import { useSocket } from "../socketProvider";
-import { TicketSection } from "./create-ticket/ticketSection";
+import { RiArrowUpDoubleFill } from "react-icons/ri";
+import { FaLightbulb } from "react-icons/fa";
+import { FaRegClock } from "react-icons/fa";
+import { GoTrophy } from "react-icons/go";
+import { toast } from "sonner";
+import { useSocket } from "~/app/socketProvider";
+import { TicketSection } from "~/app/_components/create-ticket/ticketSection";
+import TicketCard from "~/app/_components/ticketCard";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -22,8 +27,8 @@ interface TicketTableProps {
   currentUserId: string | null;
 }
 
-export function MyTicketsTable({ currentUserId }: TicketTableProps) {
-  const { data: tickets, isLoading } = api.ticket.listMyTickets.useQuery();
+export default function MyTicketsPage({ currentUserId }: TicketTableProps) {
+  const { data: tickets, isLoading } = api.ticket.listUserTickets.useQuery();
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");

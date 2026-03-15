@@ -10,6 +10,12 @@ export const ticketRouter = createTRPCRouter({
       include: { messages: true, createdBy: true, assignedTo: true },
     });
   }),
+  listUserTickets: protectedProcedure.query(({ ctx }) => {
+    return ctx.db.ticket.findMany({
+      where: { createdById: ctx.session.user.id },
+      include: { messages: true, createdBy: true, assignedTo: true },
+    });
+  }),
 
   create: protectedProcedure
     .input(

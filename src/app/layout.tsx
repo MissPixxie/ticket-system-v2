@@ -22,7 +22,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await getSession();
   return (
-    <html lang="en" className={`${geist.variable} font-sans`}>
+    <html lang="en" className={`${geist.variable} font-sans text-white`}>
       <body>
         <TRPCReactProvider>
           <SocketProvider userId={session?.user?.id ?? null}>

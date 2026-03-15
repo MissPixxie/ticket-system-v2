@@ -86,11 +86,11 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center dark:bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs dark:bg-black/60"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-lg bg-linear-to-b p-6 shadow-lg dark:from-[#3b0e7a] dark:to-[#282a53]"
+        className="w-full max-w-xl rounded-lg bg-linear-to-b p-6 shadow-lg dark:from-[#3b0e7a]/70 dark:to-[#282a53]/70"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="grid grid-cols-5 gap-4 sm:grid-cols-5 md:gap-8">
@@ -104,7 +104,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                   setDepartment(dep.value as Department);
                   setIsSelected(dep.id);
                 }}
-                className={`flex max-w-xs flex-col items-center gap-4 rounded-xl p-4 shadow-lg/40 transition-all duration-300 ${
+                className={`flex max-w-xs cursor-pointer flex-col items-center gap-4 rounded-xl p-4 shadow-lg/40 transition-all duration-300 ${
                   isSelected === dep.id
                     ? "scale-110 bg-blue-500 text-white"
                     : isSelected !== null
@@ -140,7 +140,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               type="checkbox"
               checked={isAnonymous}
               onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="h-4 w-4"
+              className="h-4 w-4 cursor-pointer"
             />
             <label>Skicka anonymt</label>
           </div>
@@ -150,7 +150,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               value={priority}
               onClick={(e) => e.stopPropagation()}
               onChange={(e) => setPriority(e.target.value as Priority)}
-              className="rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+              className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
             >
               <option value="LOW">Låg</option>
               <option value="MEDIUM">Medium</option>
@@ -161,13 +161,13 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="rounded border px-4 py-2"
+              className="cursor-pointer rounded border px-4 py-2"
             >
               Avbryt
             </button>
             <button
               type="submit"
-              className="rounded-full bg-blue-500 px-10 py-3 text-white"
+              className="cursor-pointer rounded-full bg-blue-500 px-10 py-3 text-white"
             >
               Skicka
             </button>
