@@ -8,8 +8,8 @@ import { useState } from "react";
 import { UserSection } from "~/app/_components/create-user/userSection";
 
 const ROLE_MAP = {
-  USER: "cmmqoth2d0006x0u9q91ogbrc",
-  HANDLER: "cmmqoth270005x0u9ugh7zbj8",
+  USER: "cmmqzjj6l0006k0u9lwzfyu3l",
+  HANDLER: "cmmqzjj6f0005k0u9itc44n56",
   ADMIN: "ADMIN_ROLE_ID_HÄR",
 } as const;
 
@@ -169,7 +169,7 @@ export default function ListUsersPage() {
                             </select>
                             {/* BEHÖRIGHETER */}
                             <div className="rounded-lg bg-white/5 p-3">
-                              <p className="mb-2 text-xs text-center tracking-wide text-white/60 uppercase">
+                              <p className="mb-2 text-center text-xs tracking-wide text-white/60 uppercase">
                                 Behörigheter
                               </p>
 

@@ -6,8 +6,8 @@ import CreateUserModal from "./createUserModal";
 import { FaUserPlus } from "react-icons/fa6";
 
 const ROLE_MAP = {
-  USER: "cmmqoth2d0006x0u9q91ogbrc",
-  HANDLER: "cmmqoth270005x0u9ugh7zbj8",
+  USER: "cmmqzjj6l0006k0u9lwzfyu3l",
+  HANDLER: "cmmqzjj6f0005k0u9itc44n56",
 } as const;
 
 export function UserSection() {

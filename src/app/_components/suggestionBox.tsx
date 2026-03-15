@@ -12,7 +12,7 @@ import { useSocket } from "../socketProvider";
 type FilterType = "latest" | "popular" | "status";
 
 export function SuggestionBox() {
-  const id = "cmmqothj10007x0u9q9rsrdwa";
+  const id = "cmmqzjjn80007k0u9z3586u2k";
   const [filter, setFilter] = useState<FilterType>("latest");
   const [isAnonymous, setIsAnonymous] = useState(false);
 

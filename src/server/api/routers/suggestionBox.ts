@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createAuditLog } from "~/server/lib/audit";
 import { prismaEventService } from "../services/eventService";
+import { TRPCError } from "@trpc/server";
+import { SuggestionStatus } from "@prisma/client";
 
 export const suggestionBoxRouter = createTRPCRouter({
   listSuggestions: protectedProcedure
@@ -39,22 +42,6 @@ export const suggestionBoxRouter = createTRPCRouter({
         },
       });
 
-      await ctx.db.subscription.upsert({
-        where: {
-          userId_type_originId: {
-            userId: ctx.session.user.id,
-            type: "SUGGESTION",
-            originId: suggestion.id,
-          },
-        },
-        create: {
-          userId: ctx.session.user.id,
-          type: "SUGGESTION",
-          originId: suggestion.id,
-        },
-        update: {},
-      });
-
       await prismaEventService.createEvent({
         type: "SUGGESTION_CREATED",
         originId: suggestion.id,
@@ -63,7 +50,65 @@ export const suggestionBoxRouter = createTRPCRouter({
         metadata: { suggestionBoxId: input.suggestionBoxId },
       });
 
+      await createAuditLog({
+        type: "SUGGESTION_CREATED",
+        severity: "INFO",
+        entityType: "SUGGESTION",
+        entityId: suggestion.id,
+        actor: { connect: { id: ctx.session.user.id } },
+        message: `${ctx.session.user.email} created a suggestion`,
+      });
+
       return suggestion;
+    }),
+
+  updateSuggestionStatus: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().min(1),
+        status: z.nativeEnum(SuggestionStatus),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const suggestion = await ctx.db.suggestion.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!suggestion) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Suggestion hittades inte",
+        });
+      }
+
+      const updated = await ctx.db.suggestion.update({
+        where: { id: input.id },
+        data: {
+          status: input.status,
+        },
+      });
+
+      await prismaEventService.createEvent({
+        type: "SUGGESTION_STATUS_CHANGED",
+        originId: input.id,
+        originType: "SUGGESTION",
+        actorId: ctx.session.user.id,
+        metadata: {
+          oldStatus: suggestion.status,
+          newStatus: input.status,
+        },
+      });
+
+      await createAuditLog({
+        type: "SUGGESTION_STATUS_CHANGED",
+        severity: "INFO",
+        entityType: "SUGGESTION",
+        entityId: input.id,
+        actor: { connect: { id: ctx.session.user.id } },
+        message: `Status changed from ${suggestion.status} to ${input.status}`,
+      });
+
+      return updated;
     }),
 
   voteSuggestion: protectedProcedure
@@ -81,7 +126,20 @@ export const suggestionBoxRouter = createTRPCRouter({
       });
 
       if (existingVote) {
-        return ctx.db.vote.delete({ where: { id: existingVote.id } });
+        await ctx.db.vote.delete({
+          where: { id: existingVote.id },
+        });
+
+        await createAuditLog({
+          type: "SUGGESTION_VOTE_REMOVED",
+          severity: "INFO",
+          entityType: "SUGGESTION",
+          entityId: input.id,
+          actor: { connect: { id: userId } },
+          message: `${ctx.session.user.email} removed vote`,
+        });
+
+        return { removed: true };
       }
 
       const vote = await ctx.db.vote.create({
@@ -92,28 +150,21 @@ export const suggestionBoxRouter = createTRPCRouter({
         },
       });
 
-      await ctx.db.subscription.upsert({
-        where: {
-          userId_type_originId: {
-            userId,
-            type: "SUGGESTION",
-            originId: input.id,
-          },
-        },
-        create: {
-          userId,
-          type: "SUGGESTION",
-          originId: input.id,
-        },
-        update: {},
-      });
-
       await prismaEventService.createEvent({
-        type: "SUGGESTION_CREATED",
+        type: "SUGGESTION_VOTED",
         originId: input.id,
         originType: "SUGGESTION",
-        actorId: ctx.session.user.id,
+        actorId: userId,
         metadata: { voteType: input.vote },
+      });
+
+      await createAuditLog({
+        type: "SUGGESTION_VOTED",
+        severity: "INFO",
+        entityType: "SUGGESTION",
+        entityId: input.id,
+        actor: { connect: { id: userId } },
+        message: `${ctx.session.user.email} voted on suggestion`,
       });
 
       return vote;

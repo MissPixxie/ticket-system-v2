@@ -13,6 +13,27 @@ datasource db {
   // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
 }
 
+model AuditLog {
+  id         String   @id @default(cuid())
+  type       String
+  severity   Severity
+  entityType String
+  entityId   String
+  actorId    String?
+  message    String
+  diff       Json?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+}
+
+enum Severity {
+  INFO
+  WARNING
+  ERROR
+}
+
 enum EventType {
   TICKET_CREATED
   TICKET_STATUS_CHANGED
@@ -21,6 +42,8 @@ enum EventType {
   MESSAGE_ADDED
   SUGGESTION_CREATED
   SUGGESTION_STATUS_CHANGED
+  SUGGESTION_VOTED
+  ROLE_CHANGED
 }
 
 enum EventOrigin {
@@ -254,6 +277,8 @@ model User {
 
   suggestions          Suggestion[] @relation("SuggestionOwner")
   ticketsParticipating Ticket[]     @relation("TicketParticipants")
+
+  auditLogs AuditLog[]
 }
 
 model UserDepartment {

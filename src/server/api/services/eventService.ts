@@ -12,7 +12,8 @@ export class PrismaEventService extends EventEmitter {
       | "TICKET_CHANGED_PRIORITY"
       | "MESSAGE_ADDED"
       | "SUGGESTION_CREATED"
-      | "SUGGESTION_STATUS_CHANGED";
+      | "SUGGESTION_STATUS_CHANGED"
+      | "SUGGESTION_VOTED" | "ROLE_CHANGED";
     originId: string;
     originType: "TICKET" | "SUGGESTION";
     actorId: string;

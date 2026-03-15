@@ -1,17 +1,12 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createAuditLog } from "~/server/lib/audit";
 import { prismaEventService } from "../services/eventService";
+import { TRPCError } from "@trpc/server";
 
 export const ticketRouter = createTRPCRouter({
   listAllTickets: protectedProcedure.query(({ ctx }) => {
     return ctx.db.ticket.findMany({
-      include: { messages: true, createdBy: true, assignedTo: true },
-    });
-  }),
-
-  listMyTickets: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.ticket.findMany({
-      where: { createdById: ctx.session.user.id },
       include: { messages: true, createdBy: true, assignedTo: true },
     });
   }),
@@ -45,13 +40,22 @@ export const ticketRouter = createTRPCRouter({
         actorId: ctx.session.user.id,
       });
 
+      await createAuditLog({
+        type: "TICKET_CREATED",
+        severity: "INFO",
+        entityType: "TICKET",
+        entityId: ticket.id,
+        actor: { connect: { id: ctx.session.user.id } },
+        message: `${ctx.session.user.email} created ticket "${ticket.title}"`,
+      });
+
       return ticket;
     }),
 
   updateTicket: protectedProcedure
     .input(
       z.object({
-        id: z.string().min(1),
+        id: z.string(),
         status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]).optional(),
         priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
         assignedToId: z.string().optional(),
@@ -61,17 +65,11 @@ export const ticketRouter = createTRPCRouter({
       const ticket = await ctx.db.ticket.findUnique({
         where: { id: input.id },
       });
-      if (!ticket) throw new Error("Ticket hittades inte");
 
-      if (ticket.assignedToId === null) {
-        const updatedTicket = await ctx.db.ticket.update({
-          where: { id: input.id },
-          data: {
-            status: input.status,
-            priority: input.priority,
-            assignedToId: ctx.session.user.id,
-          },
-          include: { assignedTo: true },
+      if (!ticket) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Ticket hittades inte",
         });
       }
 
@@ -80,8 +78,8 @@ export const ticketRouter = createTRPCRouter({
         data: {
           status: input.status,
           priority: input.priority,
+          assignedToId: input.assignedToId,
         },
-        include: { assignedTo: true },
       });
 
       if (input.status && input.status !== ticket.status) {
@@ -90,7 +88,19 @@ export const ticketRouter = createTRPCRouter({
           originId: ticket.id,
           originType: "TICKET",
           actorId: ctx.session.user.id,
-          metadata: { oldStatus: ticket.status, newStatus: input.status },
+          metadata: {
+            oldStatus: ticket.status,
+            newStatus: input.status,
+          },
+        });
+
+        await createAuditLog({
+          type: "TICKET_STATUS_CHANGED",
+          severity: "INFO",
+          entityType: "TICKET",
+          entityId: ticket.id,
+          actor: { connect: { id: ctx.session.user.id } },
+          message: `Status changed from ${ticket.status} to ${input.status}`,
         });
       }
 
@@ -105,6 +115,15 @@ export const ticketRouter = createTRPCRouter({
             newPriority: input.priority,
           },
         });
+
+        await createAuditLog({
+          type: "TICKET_CHANGED_PRIORITY",
+          severity: "WARNING",
+          entityType: "TICKET",
+          entityId: ticket.id,
+          actor: { connect: { id: ctx.session.user.id } },
+          message: `Priority changed from ${ticket.priority} to ${input.priority}`,
+        });
       }
 
       if (input.assignedToId && input.assignedToId !== ticket.assignedToId) {
@@ -117,6 +136,15 @@ export const ticketRouter = createTRPCRouter({
             oldAssignee: ticket.assignedToId,
             newAssignee: input.assignedToId,
           },
+        });
+
+        await createAuditLog({
+          type: "TICKET_ASSIGNED",
+          severity: "INFO",
+          entityType: "TICKET",
+          entityId: ticket.id,
+          actor: { connect: { id: ctx.session.user.id } },
+          message: `Ticket assigned to ${input.assignedToId}`,
         });
       }
 
@@ -131,28 +159,13 @@ export const ticketRouter = createTRPCRouter({
         data: { participants: { connect: { id: input.userId } } },
       });
 
-      await ctx.db.subscription.upsert({
-        where: {
-          userId_type_originId: {
-            userId: input.userId,
-            type: "TICKET",
-            originId: input.ticketId,
-          },
-        },
-        create: {
-          userId: input.userId,
-          type: "TICKET",
-          originId: input.ticketId,
-        },
-        update: {},
-      });
-
-      await prismaEventService.createEvent({
-        type: "TICKET_ASSIGNED",
-        originId: input.ticketId,
-        originType: "TICKET",
-        actorId: ctx.session.user.id,
-        metadata: { addedUserId: input.userId },
+      await createAuditLog({
+        type: "TICKET_USER_INVITED",
+        severity: "INFO",
+        entityType: "TICKET",
+        entityId: input.ticketId,
+        actor: { connect: { id: ctx.session.user.id } },
+        message: `${ctx.session.user.email} invited user ${input.userId} to ticket`,
       });
 
       return updatedTicket;

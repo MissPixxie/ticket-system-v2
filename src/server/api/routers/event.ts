@@ -14,6 +14,8 @@ export const eventRouter = createTRPCRouter({
           "MESSAGE_ADDED",
           "SUGGESTION_CREATED",
           "SUGGESTION_STATUS_CHANGED",
+          "SUGGESTION_VOTED",
+          "ROLE_CHANGED",
         ]),
         originId: z.string().min(1),
         originType: z.enum(["TICKET", "SUGGESTION"]),

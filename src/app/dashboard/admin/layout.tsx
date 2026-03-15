@@ -6,10 +6,28 @@ import { TiTicket } from "react-icons/ti";
 import { LuLogs } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
+import { getSession } from "~/server/better-auth/server";
+import { db } from "~/server/db";
+import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const session = await getSession();
+
+  if (!session) {
+    redirect("/");
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    include: { role: true },
+  });
+
+  if (user?.role?.name !== "ADMIN") {
+    redirect("/");
+  }
+
   const menuItems = [
     {
       id: "home",
@@ -29,7 +47,12 @@ export default async function AdminLayout({
       route: "/dashboard/admin/users-list",
       icon: <FaUser />,
     },
-    { id: "logs", label: "Loggar", icon: <LuLogs /> },
+    {
+      id: "logs",
+      label: "Loggar",
+      route: "/dashboard/admin/logs",
+      icon: <LuLogs />,
+    },
     { id: "settings", label: "Inställningar", icon: <IoSettingsOutline /> },
   ];
 
@@ -37,16 +60,27 @@ export default async function AdminLayout({
     <body>
       <Header />
       <div className="flex flex-row gap-10 bg-linear-to-b from-[#2e026d] to-[#15162c]">
-        <aside className="h-screen w-74 bg-linear-to-b from-[#655e6d] to-[#2c2c33]">
-          <div className="flex cursor-pointer flex-col items-center text-white">
+        <aside className="h-screen w-72 border-r border-white/10 bg-white/5 backdrop-blur-xl">
+          <div className="flex flex-col pt-6 text-white">
+            <div className="mb-6 px-6 text-sm font-semibold tracking-widest text-white/40 uppercase">
+              Navigation
+            </div>
+
             {menuItems.map((item) => (
               <Link
                 key={item.id}
                 href={item.route ?? "#"}
-                className="flex w-full items-center justify-center pt-5 pb-5 hover:bg-gray-50/5"
+                className="group text-md flex w-full items-center gap-3 px-6 py-4 font-medium transition-all duration-200 hover:bg-white/10"
               >
-                {item.icon && <span className="mr-2">{item.icon}</span>}
-                {item.label}
+                {item.icon && (
+                  <span className="text-lg text-white/70 transition group-hover:text-white">
+                    {item.icon}
+                  </span>
+                )}
+
+                <span className="transition group-hover:translate-x-1">
+                  {item.label}
+                </span>
               </Link>
             ))}
           </div>

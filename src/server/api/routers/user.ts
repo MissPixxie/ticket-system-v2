@@ -1,4 +1,5 @@
-import { optional, z } from "zod";
+import { z } from "zod";
+import { createAuditLog } from "~/server/lib/audit";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -7,7 +8,6 @@ import {
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
-  // lägg till kontroll av behörighet för säkerhetsskull senare
   listAll: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.user.findMany({
       select: {
@@ -84,20 +84,36 @@ export const userRouter = createTRPCRouter({
             message: "Ogiltig roll vald",
           });
         }
-        return ctx.db.user.create({
+
+        const newUser = await ctx.db.user.create({
           data: {
             name: input.name,
             email: input.email,
             password: input.password,
             role: { connect: { id: input.roleId } },
-
             departments: {
               create: input.departments.map((dept) => ({
                 department: dept,
               })),
             },
           },
+          include: {
+            role: true,
+          },
         });
+
+        await createAuditLog({
+          type: "USER_CREATED",
+          severity: "INFO",
+          entityType: "USER",
+          entityId: newUser.id,
+          actor: {
+            connect: { id: ctx.session.user.id },
+          },
+          message: `${ctx.session.user.email} created user ${newUser.email}`,
+        });
+
+        return newUser;
       } catch (error: any) {
         console.error("CREATE USER ERROR:", error);
 
@@ -108,7 +124,7 @@ export const userRouter = createTRPCRouter({
           });
         }
 
-        throw error; // 👈 tillfälligt för debugging
+        throw error;
       }
     }),
 
@@ -140,7 +156,7 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      return ctx.db.user.update({
+      const updatedUser = await ctx.db.user.update({
         where: { id: input.id },
         data: {
           name: input.name,
@@ -148,7 +164,38 @@ export const userRouter = createTRPCRouter({
             connect: { id: input.roleId },
           },
         },
+        include: { role: true },
       });
+
+      const diff: Record<string, any> = {};
+
+      if (user.name !== input.name) {
+        diff.name = {
+          old: user.name,
+          new: input.name,
+        };
+      }
+
+      if (user.role?.id !== input.roleId) {
+        diff.role = {
+          old: user.role?.name,
+          new: updatedUser.role?.name,
+        };
+      }
+
+      await createAuditLog({
+        type: "USER_UPDATED",
+        severity: "INFO",
+        entityType: "USER",
+        entityId: updatedUser.id,
+        actor: {
+          connect: { id: ctx.session.user.id },
+        },
+        message: `${ctx.session.user.email} updated user ${updatedUser.email}`,
+        diff,
+      });
+
+      return updatedUser;
     }),
 
   deleteUser: protectedProcedure
@@ -158,11 +205,35 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.user.delete({
+      const user = await ctx.db.user.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Användaren finns inte",
+        });
+      }
+
+      const deletedUser = await ctx.db.user.delete({
         where: {
           id: input.id,
         },
       });
+
+      await createAuditLog({
+        type: "USER_DELETED",
+        severity: "WARNING",
+        entityType: "USER",
+        entityId: deletedUser.id,
+        actor: {
+          connect: { id: ctx.session.user.id },
+        },
+        message: `${ctx.session.user.email} deleted user ${deletedUser.email}`,
+      });
+
+      return deletedUser;
     }),
 
   login: publicProcedure
@@ -178,10 +249,28 @@ export const userRouter = createTRPCRouter({
       });
 
       if (!user) {
+        await createAuditLog({
+          type: "LOGIN_FAILED",
+          severity: "WARNING",
+          entityType: "AUTH",
+          entityId: "LOGIN",
+          message: `Failed login attempt for ${input.email}`,
+        });
+
         throw new Error("Ingen användare hittades med den e-postadressen");
       }
 
-      // Returnera bara relevant info, aldrig lösenordet
+      await createAuditLog({
+        type: "LOGIN_SUCCESS",
+        severity: "INFO",
+        entityType: "USER",
+        entityId: user.id,
+        actor: {
+          connect: { id: user.id },
+        },
+        message: `${user.email} logged in`,
+      });
+
       return { id: user.id, email: user.email, name: user.name };
     }),
 });
