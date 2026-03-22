@@ -14,7 +14,7 @@ const news = dummyNews;
 
 export default function HandlerHome() {
   const { data: tickets, isLoading: ticketsLoading } =
-    api.ticket.listAllTickets.useQuery();
+    api.ticket.listAllTickets.useQuery({ limit: 20 });
   const { data: suggestions, isLoading: suggestionsLoading } =
     api.suggestionBox.listSuggestions.useQuery({
       suggestionBoxId: "cmn08ax080007c0u96m7vawdg",
@@ -35,7 +35,9 @@ export default function HandlerHome() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10 backdrop-blur-lg transition hover:bg-white/10">
             <p className="text-sm text-white/60">Totala tickets</p>
-            <p className="mt-2 text-3xl font-bold">{tickets?.length ?? 0}</p>
+            <p className="mt-2 text-3xl font-bold">
+              {tickets?.tickets.length ?? 0}
+            </p>
           </div>
 
           <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10 backdrop-blur-lg transition hover:bg-white/10">

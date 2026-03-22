@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function AdminHome() {
   const { data: users } = api.user.listAll.useQuery({ limit: 20 });
-  const { data: tickets } = api.ticket.listAllTickets.useQuery();
+  const { data: tickets } = api.ticket.listAllTickets.useQuery({ limit: 20});
 
   return (
     <main className="min-h-screen px-6 py-12 text-white">
@@ -33,7 +33,7 @@ export default function AdminHome() {
           <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
             <div className="flex items-center justify-between">
               <FaTicketAlt className="text-amber-400" />
-              <span className="text-3xl font-bold">{tickets?.length ?? 0}</span>
+              <span className="text-3xl font-bold">{tickets?.tickets.length ?? 0}</span>
             </div>
             <p className="mt-2 text-white/60">Tickets</p>
           </div>

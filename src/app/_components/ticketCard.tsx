@@ -8,7 +8,8 @@ import { TicketHistory } from "./ticketHistory";
 import ChatBox from "./chatBox";
 import { InviteSection } from "./invite-user/inviteSection";
 
-type Ticket = RouterOutputs["ticket"]["listAllTickets"][number];
+type TicketList = RouterOutputs["ticket"]["listAllTickets"];
+type Ticket = TicketList["tickets"][number];
 
 type TicketCardProps = Ticket & { currentUserId: string | null };
 
@@ -21,14 +22,21 @@ export default function TicketCard({
 
   const updateTicket = api.ticket.updateTicket.useMutation({
     onSuccess: (updatedTicket) => {
-      utils.ticket.listAllTickets.setData(undefined, (oldData) => {
-        if (!oldData) return [];
-        return oldData.map((ticket) =>
-          ticket.id === updatedTicket.id
-            ? { ...ticket, ...updatedTicket }
-            : ticket,
-        );
-      });
+      utils.ticket.listAllTickets.setData(
+        { limit: 20, cursor: null },
+        (oldData) => {
+          if (!oldData) return { tickets: [], nextCursor: null };
+
+          return {
+            ...oldData,
+            tickets: oldData.tickets.map((ticket) =>
+              ticket.id === updatedTicket.id
+                ? { ...ticket, ...updatedTicket }
+                : ticket,
+            ),
+          };
+        },
+      );
     },
   });
 

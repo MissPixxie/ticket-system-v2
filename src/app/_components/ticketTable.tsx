@@ -24,7 +24,7 @@ interface TicketTableProps {
 }
 
 export function TicketTable({ currentUserId, currentUserRole }: TicketTableProps) {
-  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery();
+  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({ limit: 20});
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
@@ -50,7 +50,7 @@ export function TicketTable({ currentUserId, currentUserRole }: TicketTableProps
     setFilter(value);
   };
 
-  const filteredTickets = tickets?.filter((ticket) => {
+  const filteredTickets = tickets?.tickets.filter((ticket) => {
     const userId = currentUserId;
     switch (filter) {
       case "MINA":
@@ -78,7 +78,7 @@ export function TicketTable({ currentUserId, currentUserRole }: TicketTableProps
   });
 
   if (isLoading) return <p>Laddar tickets...</p>;
-  if (!tickets || tickets.length === 0) return <p>Inga tickets hittades</p>;
+  if (!tickets || tickets.tickets.length === 0) return <p>Inga tickets hittades</p>;
 
   return (
     <div className="mt-15 rounded-2xl bg-white/5 shadow-lg/15 backdrop-blur-lg">

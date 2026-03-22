@@ -20,7 +20,7 @@ const statusClasses: Record<string, string> = {
 };
 
 export default function TicketsPage() {
-  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery();
+  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({ limit: 20});
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
   const [search, setSearch] = useState("");
@@ -33,16 +33,16 @@ export default function TicketsPage() {
     );
   }
 
-  const total = tickets?.length ?? 0;
+  const total = tickets?.tickets.length ?? 0;
   const newTickets =
-    tickets?.filter((t) => t.status === Status.OPEN).length ?? 0;
+    tickets?.tickets.filter((t) => t.status === Status.OPEN).length ?? 0;
 
   const inProgress =
-    tickets?.filter((t) => t.status === Status.IN_PROGRESS).length ?? 0;
+    tickets?.tickets.filter((t) => t.status === Status.IN_PROGRESS).length ?? 0;
 
-  const closed = tickets?.filter((t) => t.status === Status.CLOSED).length ?? 0;
+  const closed = tickets?.tickets.filter((t) => t.status === Status.CLOSED).length ?? 0;
 
-  const filteredTickets = tickets?.filter((ticket) => {
+  const filteredTickets = tickets?.tickets.filter((ticket) => {
     switch (filter) {
       case "OPEN":
         return ticket.status === "OPEN";

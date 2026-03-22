@@ -5,11 +5,30 @@ import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
 
 export const ticketRouter = createTRPCRouter({
-  listAllTickets: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.ticket.findMany({
-      include: { messages: true, createdBy: true, assignedTo: true },
-    });
-  }),
+  listAllTickets: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(50).default(20),
+        cursor: z.string().nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const tickets = await ctx.db.ticket.findMany({
+        take: input.limit + 1,
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+        orderBy: { createdAt: "desc" },
+        include: { messages: true, createdBy: true, assignedTo: true },
+      });
+
+      let nextCursor: string | null = null;
+      if (tickets.length > input.limit) {
+        const nextItem = tickets.pop()!;
+        nextCursor = nextItem.id;
+      }
+
+      return { tickets, nextCursor };
+    }),
+
   listUserTickets: protectedProcedure.query(({ ctx }) => {
     return ctx.db.ticket.findMany({
       where: { createdById: ctx.session.user.id },

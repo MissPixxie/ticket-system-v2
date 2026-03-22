@@ -5,7 +5,8 @@ import { api, type RouterOutputs } from "~/trpc/react";
 import { useSocket } from "../socketProvider";
 import { getCurrentUserId } from "./getCurrentUserId";
 
-type Ticket = RouterOutputs["ticket"]["listAllTickets"][number];
+type TicketList = RouterOutputs["ticket"]["listAllTickets"];
+type Ticket = TicketList["tickets"][number];
 
 interface ChatBoxProps extends Ticket {
   currentUserId: string | undefined;
