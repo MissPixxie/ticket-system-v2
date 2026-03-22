@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { createAuditLog } from "~/server/api/services/auditLogService";
+import {
+  createAuditLog,
+  logAuditAsync,
+} from "~/server/api/services/auditLogService";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -98,113 +101,84 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const hashedPassword = await hashPassword(input.password);
 
-      try {
-        const newUser = await ctx.db.user.create({
-          data: {
-            name: input.name,
-            email: input.email,
-            password: input.password,
-            role: { connect: { id: input.roleId } },
-            departments: {
-              create: input.departments.map((dept) => ({
-                department: dept,
-              })),
-            },
-          },
-          include: {
-            role: true,
-          },
+      const role = await ctx.db.role.findUnique({
+        where: { id: input.roleId },
+      });
+
+      if (!role) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Vald roll finns inte",
         });
-
-        createAuditLog({
-          type: "USER_CREATED",
-          severity: "INFO",
-          entityType: "USER",
-          entityId: newUser.id,
-          actor: {
-            connect: { id: ctx.session.user.id },
-          },
-          message: `${ctx.session.user.email} created user ${newUser.email}`,
-        });
-
-        return newUser;
-      } catch (error: any) {
-        console.error("CREATE USER ERROR:", error);
-
-        if (error.code === "P2002") {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "E-postadressen används redan",
-          });
-        }
-
-        throw error;
       }
+
+      const newUser = await ctx.db.user.create({
+        data: {
+          name: input.name,
+          email: input.email,
+          password: input.password,
+          role: { connect: { id: role.id } },
+          departments: {
+            create: input.departments.map((dept) => ({
+              department: dept,
+            })),
+          },
+        },
+        include: {
+          role: true,
+        },
+      });
+
+      logAuditAsync({
+        type: "USER_CREATED",
+        severity: "INFO",
+        entityType: "USER",
+        entityId: newUser.id,
+        actor: { connect: { id: ctx.session.user.id } },
+        message: `${ctx.session.user.email} created user ${newUser.email}`,
+      });
+
+      return newUser;
     }),
 
   updateUser: protectedProcedure
     .input(
-      z.object({
-        id: z.string(),
-        name: z.string().min(1),
-        roleId: z.string(),
-      }),
+      z.object({ id: z.string(), name: z.string().min(1), roleId: z.string() }),
     )
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUnique({
         where: { id: input.id },
         include: { role: true },
       });
-
-      if (!user) {
+      if (!user)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Användaren finns inte",
         });
-      }
-
-      if (user.role?.name === "ADMIN") {
+      if (user.role?.name === "ADMIN")
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Det går inte att ändra en administratör",
         });
-      }
 
       const updatedUser = await ctx.db.user.update({
         where: { id: input.id },
-        data: {
-          name: input.name,
-          role: {
-            connect: { id: input.roleId },
-          },
-        },
+        data: { name: input.name, role: { connect: { id: input.roleId } } },
         include: { role: true },
       });
 
       const diff: Record<string, any> = {};
+      if (user.name !== input.name)
+        diff.name = { old: user.name, new: input.name };
+      if (user.role?.id !== input.roleId)
+        diff.role = { old: user.role?.name, new: updatedUser.role?.name };
 
-      if (user.name !== input.name) {
-        diff.name = {
-          old: user.name,
-          new: input.name,
-        };
-      }
-
-      if (user.role?.id !== input.roleId) {
-        diff.role = {
-          old: user.role?.name,
-          new: updatedUser.role?.name,
-        };
-      }
-
-      createAuditLog({
+      logAuditAsync({
         type: "USER_UPDATED",
         severity: "INFO",
         entityType: "USER",
         entityId: updatedUser.id,
-        actor: {
-          connect: { id: ctx.session.user.id },
-        },
+        actor: { connect: { id: ctx.session.user.id } },
         message: `${ctx.session.user.email} updated user ${updatedUser.email}`,
         diff,
       });
@@ -213,37 +187,23 @@ export const userRouter = createTRPCRouter({
     }),
 
   deleteUser: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      }),
-    )
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({
-        where: { id: input.id },
-      });
-
-      if (!user) {
+      const user = await ctx.db.user.findUnique({ where: { id: input.id } });
+      if (!user)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Användaren finns inte",
         });
-      }
 
-      const deletedUser = await ctx.db.user.delete({
-        where: {
-          id: input.id,
-        },
-      });
+      const deletedUser = await ctx.db.user.delete({ where: { id: input.id } });
 
-      createAuditLog({
+      logAuditAsync({
         type: "USER_DELETED",
         severity: "WARNING",
         entityType: "USER",
         entityId: deletedUser.id,
-        actor: {
-          connect: { id: ctx.session.user.id },
-        },
+        actor: { connect: { id: ctx.session.user.id } },
         message: `${ctx.session.user.email} deleted user ${deletedUser.email}`,
       });
 
@@ -251,37 +211,32 @@ export const userRouter = createTRPCRouter({
     }),
 
   login: publicProcedure
-    .input(
-      z.object({
-        email: z.string().email(),
-        password: z.string().min(1),
-      }),
-    )
+    .input(z.object({ email: z.string().email(), password: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUnique({
         where: { email: input.email },
       });
 
       if (!user) {
-        createAuditLog({
+        logAuditAsync({
           type: "LOGIN_FAILED",
           severity: "WARNING",
           entityType: "AUTH",
           entityId: "LOGIN",
           message: `Failed login attempt for ${input.email}`,
         });
-
-        throw new Error("Ingen användare hittades med den e-postadressen");
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Ingen användare hittades med den e-postadressen",
+        });
       }
 
-      createAuditLog({
+      logAuditAsync({
         type: "LOGIN_SUCCESS",
         severity: "INFO",
         entityType: "USER",
         entityId: user.id,
-        actor: {
-          connect: { id: user.id },
-        },
+        actor: { connect: { id: user.id } },
         message: `${user.email} logged in`,
       });
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import { Department } from "@prisma/client";
 import { toast } from "sonner";
 import {
@@ -10,11 +11,7 @@ import {
   FaShoppingCart,
   FaHandHoldingHeart,
 } from "react-icons/fa";
-
-const ROLE_MAP = {
-  USER: "cmmqoth2d0006x0u9q91ogbrc",
-  HANDLER: "cmmqoth270005x0u9ugh7zbj8",
-} as const;
+import { ROLE_MAP } from "~/app/constants/roles";
 
 type RoleKey = keyof typeof ROLE_MAP;
 
@@ -98,13 +95,13 @@ export default function CreateUserModal({
     toast.success("Användare skapad!");
   }
 
-  return (
+  return ReactDOM.createPortal(
     <div
-      className="back fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs dark:bg-black/60"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-5xl rounded-2xl bg-white/5 p-8"
+        className="w-full max-w-5xl rounded-2xl bg-linear-to-b from-[#3b0e7a]/70 to-[#282a53]/70 p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-8 text-center text-3xl font-bold">Skapa Användare</h2>
@@ -204,6 +201,7 @@ export default function CreateUserModal({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

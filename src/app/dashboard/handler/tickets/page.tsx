@@ -6,6 +6,7 @@ import { TicketSection } from "~/app/_components/create-ticket/ticketSection";
 import { useState } from "react";
 import { useSocket } from "~/app/socketProvider";
 import TicketCard from "~/app/_components/ticketCard";
+import { TicketTable } from "~/app/_components/ticketTable";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -136,122 +137,7 @@ export default function TicketsPage({ currentUserId }: TicketTableProps) {
           </div>
         </div>
 
-        {/* TABLE CARD */}
-
-        <div className="mt-15 rounded-2xl bg-white/5 shadow-lg/15 backdrop-blur-lg">
-          {/* FILTER BAR */}
-
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 p-5">
-            <div className="flex items-center gap-4">
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="rounded-lg bg-white/10 px-3 py-2 text-sm"
-              >
-                <option value="ALL" className="text-black">
-                  Alla
-                </option>
-                <option value="OPEN" className="text-black">
-                  Öppna
-                </option>
-                <option value="IN_PROGRESS" className="text-black">
-                  Pågående
-                </option>
-                <option value="CLOSED" className="text-black">
-                  Stängda
-                </option>
-              </select>
-
-              <input
-                type="text"
-                placeholder="Sök tickets..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="rounded-lg bg-white/10 px-3 py-2 text-sm"
-              />
-            </div>
-
-            <TicketSection />
-          </div>
-
-          {/* TABLE HEADER */}
-
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] border-b border-white/10 px-5 py-4 text-sm text-white/70">
-            <div className="font-semibold">Titel</div>
-            <div className="font-semibold">Avdelning</div>
-            <div className="font-semibold">Status</div>
-            <div className="font-semibold">Prioritet</div>
-            <div className="font-semibold">Skapad</div>
-            <div className="font-semibold">Hanteras av</div>
-          </div>
-
-          {/* ROWS */}
-
-          {visibleTickets?.map((ticket) => (
-            <div key={ticket.id} className="border-t border-white/5">
-              <div
-                className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center px-5 py-4 hover:bg-white/5"
-                onClick={() =>
-                  setSelectedTicketId(
-                    selectedTicketId === ticket.id ? null : ticket.id,
-                  )
-                }
-              >
-                <div>{ticket.title}</div>
-
-                <div>{ticket.department}</div>
-
-                <div>
-                  <span
-                    className={`rounded-md px-2 py-1 text-xs ${
-                      statusClasses[ticket.status]
-                    }`}
-                  >
-                    {ticket.status.replace("_", " ")}
-                  </span>
-                </div>
-
-                <div>
-                  <span
-                    className={`rounded-md px-2 py-1 text-xs ${
-                      priorityClasses[ticket.priority]
-                    }`}
-                  >
-                    {ticket.priority}
-                  </span>
-                </div>
-
-                <div>{ticket.createdAt.toLocaleDateString()}</div>
-
-                <div>
-                  {ticket.assignedTo?.name ?? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUpdate(ticket.id);
-                      }}
-                      className="ml-auto cursor-pointer rounded-md bg-linear-to-r from-purple-700 to-indigo-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                    >
-                      Acceptera
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {selectedTicketId === ticket.id && (
-                <div className="p-5">
-                  <TicketCard {...ticket} currentUserId={currentUserId} />
-                </div>
-              )}
-            </div>
-          ))}
-
-          {!visibleTickets?.length && (
-            <div className="p-10 text-center text-white/60">
-              Inga tickets hittades
-            </div>
-          )}
-        </div>
+        <TicketTable currentUserId={null} currentUserRole="HANDLER" />
       </div>
     </main>
   );

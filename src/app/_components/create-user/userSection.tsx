@@ -4,11 +4,7 @@ import { useState } from "react";
 import { useCreateUser } from "./useCreateUser";
 import CreateUserModal from "./createUserModal";
 import { FaUserPlus } from "react-icons/fa6";
-
-const ROLE_MAP = {
-  USER: "cmmqzjj6l0006k0u9lwzfyu3l",
-  HANDLER: "cmmqzjj6f0005k0u9itc44n56",
-} as const;
+import { ROLE_MAP } from "~/app/constants/roles";
 
 export function UserSection() {
   const [isOpen, setIsOpen] = useState(false);

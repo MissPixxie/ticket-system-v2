@@ -3,6 +3,7 @@
 import { api } from "~/trpc/react";
 import { FaUsers, FaTicketAlt, FaPlus } from "react-icons/fa";
 import { UserSection } from "~/app/_components/create-user/userSection";
+import Link from "next/link";
 
 export default function AdminHome() {
   const { data: users } = api.user.listAll.useQuery({ limit: 20 });
@@ -45,9 +46,12 @@ export default function AdminHome() {
           <div className="flex flex-wrap gap-4">
             <UserSection />
 
-            <button className="cursor-pointer rounded-xl bg-white/10 px-5 py-3 font-medium transition hover:bg-white/20">
+            <Link
+              href={"/dashboard/admin/tickets"}
+              className="cursor-pointer rounded-xl bg-white/10 px-5 py-3 font-medium transition hover:bg-white/20"
+            >
               Se alla tickets
-            </button>
+            </Link>
           </div>
         </div>
       </div>
