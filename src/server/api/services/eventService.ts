@@ -1,5 +1,7 @@
 import { EventEmitter } from "events";
 import { db } from "~/server/db";
+import { createAuditLog } from "./auditLogService";
+import { Severity } from "@prisma/client";
 
 type EventMetadata = Record<string, any>;
 
@@ -21,6 +23,7 @@ export class PrismaEventService extends EventEmitter {
     originId: string;
     originType: "TICKET" | "SUGGESTION" | "NEWS";
     actorId: string;
+    severity?: "INFO" | "WARNING" | "ERROR";
     metadata?: EventMetadata;
   }) {
     const { type, originId, originType, actorId, metadata } = params;
@@ -68,6 +71,17 @@ export class PrismaEventService extends EventEmitter {
       event,
       subscriptions,
     });
+
+    // if (params.severity) {
+    //   createAuditLog({
+    //     type: params.type,
+    //     severity: params.severity,
+    //     entityType: params.originType,
+    //     entityId: params.originId,
+    //     actor: { connect: { id: params.actorId } },
+    //     message:
+    //   });
+    // }
 
     return event;
   }

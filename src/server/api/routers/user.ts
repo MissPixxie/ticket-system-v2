@@ -1,28 +1,51 @@
 import { z } from "zod";
-import { createAuditLog } from "~/server/lib/audit";
+import { createAuditLog } from "~/server/api/services/auditLogService";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { hashPassword } from "../services/hashService";
 
 export const userRouter = createTRPCRouter({
-  listAll: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: {
-          select: {
-            name: true,
-          },
+  listAll: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(50).default(20),
+        cursor: z.string().nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const users = await ctx.db.user.findMany({
+        take: input.limit + 1,
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+        orderBy: {
+          createdAt: "desc",
         },
-        createdAt: true,
-      },
-    });
-  }),
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: {
+            select: { name: true },
+          },
+          createdAt: true,
+        },
+      });
+
+      let nextCursor: typeof input.cursor = null;
+
+      if (users.length > input.limit) {
+        const nextItem = users.pop();
+        nextCursor = nextItem!.id;
+      }
+
+      return {
+        users,
+        nextCursor,
+      };
+    }),
 
   searchUser: protectedProcedure
     .input(
@@ -73,18 +96,9 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const hashedPassword = await hashPassword(input.password);
+
       try {
-        const role = await ctx.db.role.findUnique({
-          where: { id: input.roleId },
-        });
-
-        if (!role) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Ogiltig roll vald",
-          });
-        }
-
         const newUser = await ctx.db.user.create({
           data: {
             name: input.name,
@@ -102,7 +116,7 @@ export const userRouter = createTRPCRouter({
           },
         });
 
-        await createAuditLog({
+        createAuditLog({
           type: "USER_CREATED",
           severity: "INFO",
           entityType: "USER",
@@ -183,7 +197,7 @@ export const userRouter = createTRPCRouter({
         };
       }
 
-      await createAuditLog({
+      createAuditLog({
         type: "USER_UPDATED",
         severity: "INFO",
         entityType: "USER",
@@ -222,7 +236,7 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      await createAuditLog({
+      createAuditLog({
         type: "USER_DELETED",
         severity: "WARNING",
         entityType: "USER",
@@ -249,7 +263,7 @@ export const userRouter = createTRPCRouter({
       });
 
       if (!user) {
-        await createAuditLog({
+        createAuditLog({
           type: "LOGIN_FAILED",
           severity: "WARNING",
           entityType: "AUTH",
@@ -260,7 +274,7 @@ export const userRouter = createTRPCRouter({
         throw new Error("Ingen användare hittades med den e-postadressen");
       }
 
-      await createAuditLog({
+      createAuditLog({
         type: "LOGIN_SUCCESS",
         severity: "INFO",
         entityType: "USER",

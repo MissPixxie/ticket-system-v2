@@ -74,31 +74,6 @@ export default function UserHome() {
           </Link>
         </div>
 
-        {/* STATS */}
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            <p className="text-sm text-white/60">Öppna tickets</p>
-            <p className="mt-2 text-3xl font-bold text-blue-400">
-              {openTickets}
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            <p className="text-sm text-white/60">Pågående tickets</p>
-            <p className="mt-2 text-3xl font-bold text-amber-400">
-              {inProgress}
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            <p className="text-sm text-white/60">Totala förslag</p>
-            <p className="mt-2 text-3xl font-bold text-green-400">
-              {mySuggestions}
-            </p>
-          </div>
-        </div>
-
         {/* CONTENT GRID */}
 
         <div className="grid gap-6 lg:grid-cols-2">

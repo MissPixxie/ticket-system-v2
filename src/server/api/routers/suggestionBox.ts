@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { createAuditLog } from "~/server/lib/audit";
+import { createAuditLog } from "~/server/api/services/auditLogService";
 import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
 import { SuggestionStatus } from "@prisma/client";
@@ -22,6 +22,17 @@ export const suggestionBoxRouter = createTRPCRouter({
         hasVoted: s.votes.some((v) => v.userId === userId),
         user: s.isAnonymous ? { name: "Anonym" } : s.user,
       }));
+    }),
+
+  findSuggestion: protectedProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const suggestion = await ctx.db.suggestion.findUnique({
+        where: { id: input.id },
+        include: {
+          user: true,
+        },
+      });
     }),
 
   createSuggestion: protectedProcedure
@@ -123,20 +134,25 @@ export const suggestionBoxRouter = createTRPCRouter({
 
       const existingVote = await ctx.db.vote.findFirst({
         where: { suggestionId: input.id, userId },
+        include: {
+          user: true,
+        },
       });
+
+      const suggestion = await ctx.db.suggestion.findUnique({
+        where: { id: input.id },
+        include: {
+          user: true,
+        },
+      });
+
+      if (suggestion?.user.id === ctx.session.user.id) {
+        return;
+      }
 
       if (existingVote) {
         await ctx.db.vote.delete({
           where: { id: existingVote.id },
-        });
-
-        await createAuditLog({
-          type: "SUGGESTION_VOTE_REMOVED",
-          severity: "INFO",
-          entityType: "SUGGESTION",
-          entityId: input.id,
-          actor: { connect: { id: userId } },
-          message: `${ctx.session.user.email} removed vote`,
         });
 
         return { removed: true };
@@ -156,15 +172,6 @@ export const suggestionBoxRouter = createTRPCRouter({
         originType: "SUGGESTION",
         actorId: userId,
         metadata: { voteType: input.vote },
-      });
-
-      await createAuditLog({
-        type: "SUGGESTION_VOTED",
-        severity: "INFO",
-        entityType: "SUGGESTION",
-        entityId: input.id,
-        actor: { connect: { id: userId } },
-        message: `${ctx.session.user.email} voted on suggestion`,
       });
 
       return vote;

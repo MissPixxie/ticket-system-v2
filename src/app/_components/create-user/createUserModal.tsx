@@ -100,11 +100,11 @@ export default function CreateUserModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs"
+      className="back fixed inset-0 z-50 flex items-center justify-center"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-5xl rounded-2xl bg-white/5 p-8 backdrop-blur-3xl"
+        className="w-full max-w-5xl rounded-2xl bg-white/5 p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-8 text-center text-3xl font-bold">Skapa Användare</h2>

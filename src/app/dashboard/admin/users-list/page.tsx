@@ -23,7 +23,7 @@ type RoleKey = keyof typeof ROLE_MAP;
 
 export default function ListUsersPage() {
   const utils = api.useUtils();
-  const { data: users, isLoading } = api.user.listAll.useQuery();
+  const { data: users, isLoading } = api.user.listAll.useQuery({ limit: 20 });
 
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -55,7 +55,7 @@ export default function ListUsersPage() {
   if (isLoading)
     return <p className="text-center text-white/70">Laddar användare...</p>;
 
-  if (!users || users.length === 0)
+  if (!users || users.users.length === 0)
     return <p className="text-center text-white/70">Inga användare hittades</p>;
 
   return (
@@ -80,7 +80,7 @@ export default function ListUsersPage() {
             </thead>
 
             <tbody>
-              {users.map((user) => {
+              {users.users.map((user) => {
                 const isAdmin = user.role?.name === "ADMIN";
 
                 return (

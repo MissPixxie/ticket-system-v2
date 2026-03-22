@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prismaEventService } from "../services/eventService";
-import { createAuditLog } from "~/server/lib/audit";
+import { createAuditLog } from "~/server/api/services/auditLogService";
 import { TRPCError } from "@trpc/server";
 
 export const newsRouter = createTRPCRouter({

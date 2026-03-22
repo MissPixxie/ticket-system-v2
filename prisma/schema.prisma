@@ -25,6 +25,9 @@ model News {
   isPinned    Boolean  @default(false)
   isPublished Boolean  @default(true)
   priority    Priority @default(LOW)
+
+  @@index([newsId])
+  @@index([isPublished])
 }
 
 enum Category {
@@ -32,6 +35,17 @@ enum Category {
   STORE_MANUAL
   PRODUCT_INFORMATION
   CAMPAIGN
+}
+
+enum AuditMessageType {
+  USER_MESSAGE
+  SYSTEM_MESSAGE
+}
+
+enum Severity {
+  INFO
+  WARNING
+  ERROR
 }
 
 model AuditLog {
@@ -47,12 +61,10 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   actor User? @relation(fields: [actorId], references: [id])
-}
 
-enum Severity {
-  INFO
-  WARNING
-  ERROR
+  @@index([entityId])
+  @@index([actorId])
+  @@index([createdAt])
 }
 
 enum EventType {
@@ -104,6 +116,11 @@ model Question {
   messages    Message[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+
+  @@index([questionId])
+  @@index([category])
+  @@index([status])
+  @@index([createdAt])
 }
 
 enum QuestionCategory {
@@ -166,6 +183,8 @@ enum SuggestionStatus {
 model SuggestionBox {
   id          String       @id @default(cuid())
   suggestions Suggestion[]
+
+  @@index([id])
 }
 
 model Suggestion {
@@ -184,6 +203,8 @@ model Suggestion {
   subscribers Subscription[]
 
   @@index([status])
+  @@index([suggestionBoxId])
+  @@index([userId])
 }
 
 model Vote {
@@ -195,6 +216,7 @@ model Vote {
   suggestionId String
 
   @@unique([userId, suggestionId])
+  @@index([suggestionId])
 }
 
 // TICKET ENUMS & MODEL
@@ -337,6 +359,10 @@ model User {
   news News[]
 
   questions Question[]
+
+  @@index([id])
+  @@index([email])
+  @@index([createdAt])
 }
 
 model UserDepartment {

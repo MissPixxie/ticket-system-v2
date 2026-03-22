@@ -2,13 +2,11 @@
 
 import { api } from "~/trpc/react";
 import { FaUsers, FaTicketAlt, FaPlus } from "react-icons/fa";
+import { UserSection } from "~/app/_components/create-user/userSection";
 
 export default function AdminHome() {
-  const { data: users } = api.user.listAll.useQuery();
+  const { data: users } = api.user.listAll.useQuery({ limit: 20 });
   const { data: tickets } = api.ticket.listAllTickets.useQuery();
-
-  const totalUsers = users?.length ?? 0;
-  const totalTickets = tickets?.length ?? 0;
 
   return (
     <main className="min-h-screen px-6 py-12 text-white">
@@ -24,7 +22,9 @@ export default function AdminHome() {
           <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
             <div className="flex items-center justify-between">
               <FaUsers className="text-blue-400" />
-              <span className="text-3xl font-bold">{totalUsers}</span>
+              <span className="text-3xl font-bold">
+                {users?.users.length ?? 0}
+              </span>
             </div>
             <p className="mt-2 text-white/60">Användare</p>
           </div>
@@ -32,7 +32,7 @@ export default function AdminHome() {
           <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
             <div className="flex items-center justify-between">
               <FaTicketAlt className="text-amber-400" />
-              <span className="text-3xl font-bold">{totalTickets}</span>
+              <span className="text-3xl font-bold">{tickets?.length ?? 0}</span>
             </div>
             <p className="mt-2 text-white/60">Tickets</p>
           </div>
@@ -43,10 +43,7 @@ export default function AdminHome() {
           <h2 className="mb-6 text-xl font-semibold">Snabbåtgärder</h2>
 
           <div className="flex flex-wrap gap-4">
-            <button className="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium transition hover:bg-blue-500">
-              <FaPlus />
-              Skapa användare
-            </button>
+            <UserSection />
 
             <button className="cursor-pointer rounded-xl bg-white/10 px-5 py-3 font-medium transition hover:bg-white/20">
               Se alla tickets

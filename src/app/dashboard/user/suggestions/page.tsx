@@ -21,7 +21,7 @@ const statusStyles = {
 };
 
 export default function SuggestionsPage() {
-  const suggestionBoxId = "cmmqzjjn80007k0u9z3586u2k";
+  const suggestionBoxId = "cmn08ax080007c0u96m7vawdg";
   const { socket } = useSocket();
   const [filter, setFilter] = useState<FilterType>("latest");
   const [content, setContent] = useState("");

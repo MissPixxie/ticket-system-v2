@@ -86,11 +86,11 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs dark:bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-lg bg-linear-to-b p-6 shadow-lg dark:from-[#3b0e7a]/70 dark:to-[#282a53]/70"
+        className="w-full max-w-xl rounded-lg bg-linear-to-b from-[#3b0e7a]/70 to-[#282a53]/70 p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="grid grid-cols-5 gap-4 sm:grid-cols-5 md:gap-8">
