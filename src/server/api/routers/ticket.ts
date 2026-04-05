@@ -36,6 +36,22 @@ export const ticketRouter = createTRPCRouter({
     });
   }),
 
+  getTicketById: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().uuid().min(1),
+
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const ticket = await ctx.db.ticket.findUnique({
+        where: { id: input.id },
+        include: { messages: true, createdBy: true, assignedTo: true },
+      });
+
+      return ticket;
+    }),
+
   create: protectedProcedure
     .input(
       z.object({

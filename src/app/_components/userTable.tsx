@@ -61,7 +61,7 @@ export function UserTable({ onSelectUsers }: UserTableProps) {
               setSelectMode((prev) => !prev);
               setSelectedUsers([]);
             }}
-            className="rounded-lg cursor-pointer bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/20"
+            className="cursor-pointer rounded-lg bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/20"
           >
             {selectMode ? "Avbryt val" : "Välj flera"}
           </button>
@@ -143,13 +143,16 @@ export function UserTable({ onSelectUsers }: UserTableProps) {
             {!selectMode && selectedUserId === user.id && (
               <div className="p-5 text-sm text-white/70">
                 <p>
-                  <strong>ID:</strong> {user.id}
-                </p>
-                <p>
                   <strong>Email:</strong> {user.email}
                 </p>
                 <p>
                   <strong>Roll:</strong> {user.role?.name}
+                </p>
+                <p>
+                  <strong>Pågående tickets:</strong>
+                  {user.role?.name === "USER"
+                    ? (user._count.ticketsHandled ?? 0)
+                    : (user._count.ticketsCreated ?? 0)}
                 </p>
               </div>
             )}

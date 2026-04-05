@@ -8,11 +8,12 @@ import { getCurrentUserId } from "./getCurrentUserId";
 type TicketList = RouterOutputs["ticket"]["listAllTickets"];
 type Ticket = TicketList["tickets"][number];
 
-interface ChatBoxProps extends Ticket {
+interface ChatBoxProps {
+  ticketId: string;
   currentUserId: string | undefined;
 }
 
-export default function ChatBox({ id: ticketId, currentUserId }: ChatBoxProps) {
+export default function ChatBox({ticketId, currentUserId }: ChatBoxProps) {
   const { socket } = useSocket();
   const [newMessage, setNewMessage] = useState("");
 

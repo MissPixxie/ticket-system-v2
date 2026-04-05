@@ -20,7 +20,7 @@ export default function AdminHome() {
 
         {/* STATS */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg">
             <div className="flex items-center justify-between">
               <FaUsers className="text-blue-400" />
               <span className="text-3xl font-bold">
@@ -30,7 +30,7 @@ export default function AdminHome() {
             <p className="mt-2 text-white/60">Användare</p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg">
             <div className="flex items-center justify-between">
               <FaTicketAlt className="text-amber-400" />
               <span className="text-3xl font-bold">
@@ -42,7 +42,7 @@ export default function AdminHome() {
         </div>
 
         {/* QUICK ACTIONS */}
-        <div className="rounded-2xl bg-white/5 p-8 backdrop-blur-lg">
+        <div className="rounded-2xl bg-white/5 p-8 shadow-lg">
           <h2 className="mb-6 text-xl font-semibold">Snabbåtgärder</h2>
 
           <div className="flex flex-wrap gap-4">

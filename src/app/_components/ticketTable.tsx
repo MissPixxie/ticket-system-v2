@@ -177,7 +177,7 @@ export function TicketTable({
                 if (!ticket.assignedTo) {
                   switch (currentUserRole) {
                     case "USER":
-                      return <span>igen</span>;
+                      return <span>ingen</span>;
                     case "HANDLER":
                       return (
                         <button

@@ -79,26 +79,26 @@ export default function TicketsPage() {
 
         {/* STATS CARDS */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg transition">
             <p className="text-sm text-white/60">Totala tickets</p>
             <p className="mt-2 text-3xl font-bold">{total}</p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg transition">
             <p className="text-sm text-white/60">Nya tickets</p>
             <p className="mt-2 text-3xl font-bold text-blue-400">
               {newTickets}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg transition">
             <p className="text-sm text-white/60">Pågående tickets</p>
             <p className="mt-2 text-3xl font-bold text-amber-400">
               {inProgress}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg transition">
             <p className="text-sm text-white/60">Stängda tickets</p>
             <p className="mt-2 text-3xl font-bold text-green-400">{closed}</p>
           </div>

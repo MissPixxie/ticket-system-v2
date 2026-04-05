@@ -34,6 +34,9 @@ export const userRouter = createTRPCRouter({
             select: { name: true },
           },
           createdAt: true,
+          _count: {
+            select: { ticketsHandled: true, ticketsCreated: true },
+          },
         },
       });
 
