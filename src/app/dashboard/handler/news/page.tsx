@@ -4,7 +4,7 @@ import { useState } from "react";
 import { dummyNews, type DummyNews } from "~/app/_data/dummyNews";
 import { RiEdit2Fill } from "react-icons/ri";
 import { FaTrashAlt } from "react-icons/fa";
-import { EditSection } from "~/app/_components/edit-news/editSection";
+import { EditSection } from "~/app/_components/modals/edit-news/editSection";
 import NewsCard from "~/app/_components/newsCard";
 import { api } from "~/trpc/react";
 

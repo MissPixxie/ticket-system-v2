@@ -5,7 +5,7 @@ import { RiEdit2Fill } from "react-icons/ri";
 import { FaTrashAlt } from "react-icons/fa";
 import { toast } from "sonner";
 import { useState } from "react";
-import { UserSection } from "~/app/_components/create-user/userSection";
+import { UserSection } from "~/app/_components/modals/create-user/userSection";
 
 const ROLE_MAP = {
   USER: "cmmqzjj6l0006k0u9lwzfyu3l",

@@ -33,6 +33,8 @@ export const suggestionBoxRouter = createTRPCRouter({
           user: true,
         },
       });
+      if (!suggestion) throw new TRPCError({ code: "NOT_FOUND" });
+      return suggestion;
     }),
 
   createSuggestion: protectedProcedure
@@ -147,7 +149,7 @@ export const suggestionBoxRouter = createTRPCRouter({
       });
 
       if (suggestion?.user.id === ctx.session.user.id) {
-        return;
+        return { voted: false, reason: "own suggestion" };
       }
 
       if (existingVote) {

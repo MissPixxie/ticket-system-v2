@@ -4,7 +4,8 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 import TicketCard from "./ticketCard";
 import { useSocket } from "../socketProvider";
-import { TicketSection } from "./create-ticket/ticketSection";
+import { TicketSection } from "./modals/create-ticket/ticketSection";
+import { PickSection } from "./modals/handler-picker/pickSection";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -23,8 +24,13 @@ interface TicketTableProps {
   currentUserRole: "ADMIN" | "HANDLER" | "USER";
 }
 
-export function TicketTable({ currentUserId, currentUserRole }: TicketTableProps) {
-  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({ limit: 20});
+export function TicketTable({
+  currentUserId,
+  currentUserRole,
+}: TicketTableProps) {
+  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({
+    limit: 20,
+  });
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
@@ -78,7 +84,8 @@ export function TicketTable({ currentUserId, currentUserRole }: TicketTableProps
   });
 
   if (isLoading) return <p>Laddar tickets...</p>;
-  if (!tickets || tickets.tickets.length === 0) return <p>Inga tickets hittades</p>;
+  if (!tickets || tickets.tickets.length === 0)
+    return <p>Inga tickets hittades</p>;
 
   return (
     <div className="mt-15 rounded-2xl bg-white/5 shadow-lg/15 backdrop-blur-lg">
@@ -184,18 +191,7 @@ export function TicketTable({ currentUserId, currentUserRole }: TicketTableProps
                         </button>
                       );
                     case "ADMIN":
-                      return (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Här kan du t.ex. öppna en modal för att välja handläggare
-                            //openAssignHandlerModal(ticket.id);
-                          }}
-                          className="rounded-lg border-2 border-green-500 bg-green-200/30 px-10 py-3 text-white shadow-md hover:bg-green-500"
-                        >
-                          Välj handläggare
-                        </button>
-                      );
+                      return <PickSection ticketId={ticket.id} />;
                   }
                 } else {
                   // Om ticket redan har någon assignedTo

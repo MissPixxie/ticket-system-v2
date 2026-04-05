@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useSocket } from "~/app/socketProvider";
-import { TicketSection } from "~/app/_components/create-ticket/ticketSection";
+import { TicketSection } from "~/app/_components/modals/create-ticket/ticketSection";
 import TicketCard from "~/app/_components/ticketCard";
 import { TicketTable } from "~/app/_components/ticketTable";
 

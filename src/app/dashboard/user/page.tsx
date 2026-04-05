@@ -3,9 +3,9 @@
 import { api } from "~/trpc/react";
 import { FaLightbulb, FaTicketAlt } from "react-icons/fa";
 import { HiSpeakerphone } from "react-icons/hi";
-import { useCreateTicket } from "~/app/_components/create-ticket/useCreateTicket";
+import { useCreateTicket } from "~/app/_components/modals/create-ticket/useCreateTicket";
 import { useState } from "react";
-import CreateTicketModal from "~/app/_components/create-ticket/createTicketModal";
+import CreateTicketModal from "~/app/_components/modals/create-ticket/createTicketModal";
 import Link from "next/link";
 
 export default function UserHome() {

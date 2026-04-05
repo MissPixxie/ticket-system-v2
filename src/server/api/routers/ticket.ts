@@ -125,7 +125,7 @@ export const ticketRouter = createTRPCRouter({
           entityType: "TICKET",
           entityId: ticket.id,
           actor: { connect: { id: ctx.session.user.id } },
-          message: `Status changed from ${ticket.status} to ${input.status}`,
+          message: `${ctx.session.user.email} changed status from ${ticket.status} to ${input.status}`,
         });
       }
 
@@ -147,7 +147,7 @@ export const ticketRouter = createTRPCRouter({
           entityType: "TICKET",
           entityId: ticket.id,
           actor: { connect: { id: ctx.session.user.id } },
-          message: `Priority changed from ${ticket.priority} to ${input.priority}`,
+          message: `${ctx.session.user.email} changed priority from ${ticket.priority} to ${input.priority}`,
         });
       }
 

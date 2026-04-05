@@ -3,7 +3,7 @@
 import { api } from "~/trpc/react";
 import { Status } from "@prisma/client";
 import { useState } from "react";
-import { TicketSection } from "~/app/_components/create-ticket/ticketSection";
+import { TicketSection } from "~/app/_components/modals/create-ticket/ticketSection";
 import TicketCard from "~/app/_components/ticketCard";
 import { TicketTable } from "~/app/_components/ticketTable";
 
@@ -20,7 +20,9 @@ const statusClasses: Record<string, string> = {
 };
 
 export default function TicketsPage() {
-  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({ limit: 20});
+  const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({
+    limit: 20,
+  });
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
   const [search, setSearch] = useState("");
@@ -40,7 +42,8 @@ export default function TicketsPage() {
   const inProgress =
     tickets?.tickets.filter((t) => t.status === Status.IN_PROGRESS).length ?? 0;
 
-  const closed = tickets?.tickets.filter((t) => t.status === Status.CLOSED).length ?? 0;
+  const closed =
+    tickets?.tickets.filter((t) => t.status === Status.CLOSED).length ?? 0;
 
   const filteredTickets = tickets?.tickets.filter((ticket) => {
     switch (filter) {

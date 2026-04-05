@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import {
   FaHandHoldingHeart,
   FaLaptop,
@@ -9,104 +10,112 @@ import {
   FaUsers,
 } from "react-icons/fa";
 
-export type Category =
-  | "NEWS"
-  | "STORE_MANUAL"
-  | "PRODUCT_INFORMATION"
-  | "CAMPAIGN";
+export type Department = "IT" | "HR" | "CAMPAIGN" | "PRODUCT" | "CUSTOMERCLUB";
 export type Priority = "LOW" | "MEDIUM" | "URGENT";
 
-export interface EditNewsData {
-  newsId: string;
+export interface CreateTicketData {
   title: string;
-  content: string;
-  category: Category;
+  issue: string;
+  department: Department;
+  isAnonymous?: boolean;
   priority?: Priority;
 }
 
-interface EditNewsModalProps {
-  newsId: string;
+interface CreateTicketModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: EditNewsData) => void;
+  onSubmit: (data: CreateTicketData) => void;
 }
 
-const EditNewsModal: React.FC<EditNewsModalProps> = ({
-  newsId,
+const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
 }) => {
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [issue, setIssue] = useState("");
   const [priority, setPriority] = useState<Priority>("LOW");
-  const [category, setCategory] = useState<Category>("NEWS");
+  const [department, setDepartment] = useState<Department>("IT");
   const [isSelected, setIsSelected] = useState<null | number>(null);
 
   if (!isOpen) return null;
 
-  const categorys = [
-    { id: 1, value: "NEWS", label: "NEWS", icon: <FaLaptop size={22} /> },
-    {
-      id: 2,
-      value: "STORE_MANUAL",
-      label: "STORE_MANUAL",
-      icon: <FaUsers size={22} />,
-    },
+  const departments = [
+    { id: 1, value: "IT", label: "IT", icon: <FaLaptop size={22} /> },
+    { id: 2, value: "HR", label: "HR", icon: <FaUsers size={22} /> },
     {
       id: 3,
-      value: "PRODUCT_INFORMATION",
-      label: "PRODUCT_INFORMATION",
+      value: "CAMPAIGN",
+      label: "Kampanj",
       icon: <FaShopify size={22} />,
     },
     {
       id: 4,
-      value: "CAMPAIGN",
-      label: "CAMPAIGN",
+      value: "PRODUCT",
+      label: "Produkt",
       icon: <FaShoppingCart size={22} />,
+    },
+    {
+      id: 5,
+      value: "CUSTOMERCLUB",
+      label: "Kundklubb",
+      icon: <FaHandHoldingHeart size={22} />,
     },
   ];
 
+  const orderedDepartments = [...departments];
+  if (isSelected !== null) {
+    const index = orderedDepartments.findIndex((dep) => dep.id === isSelected);
+    if (index !== -1) {
+      const [selected] = orderedDepartments.splice(index, 1);
+      if (selected) {
+        orderedDepartments.splice(2, 0, selected);
+      }
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ newsId, title, content, category, priority });
+    onSubmit({ title, issue, department, isAnonymous, priority });
     setTitle("");
-    setContent("");
-    setCategory("NEWS");
+    setIssue("");
+    setDepartment("IT");
     setIsSelected(null);
+    setIsAnonymous(false);
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs dark:bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-lg bg-linear-to-b p-6 shadow-lg dark:from-[#3b0e7a]/70 dark:to-[#282a53]/70"
+        className="w-full max-w-xl rounded-lg bg-linear-to-b from-[#3b0e7a]/70 to-[#282a53]/70 p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="grid grid-cols-5 gap-4 sm:grid-cols-5 md:gap-8">
-          {categorys.map((cat) => (
+          {orderedDepartments.map((dep) => (
             <div
-              key={cat.id}
+              key={dep.id}
               className="flex flex-col items-center justify-center gap-2"
             >
               <button
                 onClick={() => {
-                  setCategory(cat.value as Category);
-                  setIsSelected(cat.id);
+                  setDepartment(dep.value as Department);
+                  setIsSelected(dep.id);
                 }}
                 className={`flex max-w-xs cursor-pointer flex-col items-center gap-4 rounded-xl p-4 shadow-lg/40 transition-all duration-300 ${
-                  isSelected === cat.id
+                  isSelected === dep.id
                     ? "scale-110 bg-blue-500 text-white"
                     : isSelected !== null
                       ? "notSelected"
                       : "bg-white/10 hover:bg-white/20"
                 }`}
               >
-                {cat.icon}
+                {dep.icon}
               </button>
-              <span className="text-xs font-bold">{cat.label}</span>
+              <span className="text-xs font-bold">{dep.label}</span>
             </div>
           ))}
         </div>
@@ -118,15 +127,24 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
             placeholder="Titel"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-black required:border-red-500 required:text-red-500"
+            className="rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
           />
-          <label htmlFor="content">Beskriv problemet</label>
+          <label htmlFor="issue">Beskriv problemet</label>
           <textarea
             placeholder="Beskriv problemet"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-black required:border-red-500 required:text-red-500"
+            value={issue}
+            onChange={(e) => setIssue(e.target.value)}
+            className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
           />
+          <div className="flex items-center gap-2 text-sm text-white">
+            <input
+              type="checkbox"
+              checked={isAnonymous}
+              onChange={(e) => setIsAnonymous(e.target.checked)}
+              className="h-4 w-4 cursor-pointer"
+            />
+            <label>Skicka anonymt</label>
+          </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold">Prioritet</label>
             <select
@@ -157,8 +175,9 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 
-export default EditNewsModal;
+export default CreateTicketModal;
