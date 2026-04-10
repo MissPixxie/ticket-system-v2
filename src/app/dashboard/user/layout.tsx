@@ -1,4 +1,3 @@
-import "~/styles/globals.css";
 import Link from "next/link";
 import Header from "~/app/_components/header";
 import { IoMdHome } from "react-icons/io";
@@ -11,6 +10,7 @@ import { db } from "~/server/db";
 import { redirect } from "next/navigation";
 import { MdCampaign } from "react-icons/md";
 import { FaRegLightbulb } from "react-icons/fa6";
+import { ImBooks } from "react-icons/im";
 
 export default async function UserLayout({
   children,
@@ -54,6 +54,12 @@ export default async function UserLayout({
       label: "Nyheter",
       route: "/dashboard/user/news",
       icon: <MdCampaign size={22} />,
+    },
+    {
+      id: "resources",
+      label: "Resurser",
+      route: "/dashboard/user/resources",
+      icon: <ImBooks size={20} />,
     },
     {
       id: "suggestions",

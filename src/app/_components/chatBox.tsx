@@ -9,25 +9,25 @@ type TicketList = RouterOutputs["ticket"]["listAllTickets"];
 type Ticket = TicketList["tickets"][number];
 
 interface ChatBoxProps {
-  ticketId: string;
+  id: string;
   currentUserId: string | undefined;
 }
 
-export default function ChatBox({ticketId, currentUserId }: ChatBoxProps) {
+export default function ChatBox({ id, currentUserId }: ChatBoxProps) {
   const { socket } = useSocket();
   const [newMessage, setNewMessage] = useState("");
 
   const utils = api.useUtils();
 
   const { data: messages, isLoading } = api.message.listMessages.useQuery({
-    ticketId,
+    id,
   });
 
   const sortedMessages = messages ? [...messages].reverse() : [];
 
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {
-      utils.message.listMessages.invalidate({ ticketId });
+      utils.message.listMessages.invalidate({ id });
       setNewMessage("");
     },
   });
@@ -35,9 +35,9 @@ export default function ChatBox({ticketId, currentUserId }: ChatBoxProps) {
   useEffect(() => {
     if (!socket) return;
 
-    const handler = (msg: { ticketId: string }) => {
-      if (msg.ticketId === ticketId) {
-        utils.message.listMessages.invalidate({ ticketId });
+    const handler = (msg: { id: string }) => {
+      if (msg.id === id) {
+        utils.message.listMessages.invalidate({ id });
       }
     };
 
@@ -45,14 +45,14 @@ export default function ChatBox({ticketId, currentUserId }: ChatBoxProps) {
     return () => {
       socket.off("chat:message", handler);
     };
-  }, [socket, ticketId, utils.message.listMessages]);
+  }, [socket, id, utils.message.listMessages]);
 
   const handleSend = () => {
     if (!newMessage.trim()) return;
 
-    createMessage.mutate({ ticketId, message: newMessage });
+    createMessage.mutate({ id, message: newMessage });
 
-    socket?.emit("chat:message", { ticketId });
+    socket?.emit("chat:message", { id });
     setNewMessage("");
   };
 

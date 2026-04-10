@@ -6,23 +6,36 @@ import { TRPCError } from "@trpc/server";
 import { SuggestionStatus } from "@prisma/client";
 
 export const suggestionBoxRouter = createTRPCRouter({
-  listSuggestions: protectedProcedure
-    .input(z.object({ suggestionBoxId: z.string().min(1) }))
-    .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
+  listSuggestions: protectedProcedure.query(async ({ ctx }) => {
+    const suggestionBox = await ctx.db.suggestionBox.findFirstOrThrow();
+    const userId = ctx.session.user.id;
 
-      const suggestions = await ctx.db.suggestion.findMany({
-        where: { suggestionBoxId: input.suggestionBoxId },
-        include: { votes: true, user: true },
-        orderBy: { createdAt: "desc" },
-      });
+    const suggestions = await ctx.db.suggestion.findMany({
+      where: { suggestionBoxId: suggestionBox.id },
+      include: { user: true },
+      orderBy: [{ voteCount: "desc" }, { createdAt: "desc" }],
+    });
 
-      return suggestions.map((s) => ({
-        ...s,
-        hasVoted: s.votes.some((v) => v.userId === userId),
-        user: s.isAnonymous ? { name: "Anonym" } : s.user,
-      }));
-    }),
+    const userVotes = await ctx.db.vote.findMany({
+      where: {
+        userId,
+        suggestionId: {
+          in: suggestions.map((s) => s.id),
+        },
+      },
+      select: {
+        suggestionId: true,
+      },
+    });
+
+    const votedSet = new Set(userVotes.map((v) => v.suggestionId));
+
+    return suggestions.map((s) => ({
+      ...s,
+      hasVoted: votedSet.has(s.id),
+      user: s.isAnonymous ? { name: "Anonym" } : s.user,
+    }));
+  }),
 
   findSuggestion: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
@@ -41,15 +54,15 @@ export const suggestionBoxRouter = createTRPCRouter({
     .input(
       z.object({
         content: z.string().min(1),
-        suggestionBoxId: z.string().min(1),
         isAnonymous: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const suggestionBox = await ctx.db.suggestionBox.findFirstOrThrow();
       const suggestion = await ctx.db.suggestion.create({
         data: {
           content: input.content,
-          suggestionBoxId: input.suggestionBoxId,
+          suggestionBoxId: suggestionBox.id,
           userId: ctx.session.user.id,
           isAnonymous: input.isAnonymous ?? false,
         },
@@ -60,7 +73,7 @@ export const suggestionBoxRouter = createTRPCRouter({
         originId: suggestion.id,
         originType: "SUGGESTION",
         actorId: ctx.session.user.id,
-        metadata: { suggestionBoxId: input.suggestionBoxId },
+        metadata: { suggestionBoxId: suggestionBox.id },
       });
 
       await createAuditLog({
@@ -134,38 +147,67 @@ export const suggestionBoxRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      const existingVote = await ctx.db.vote.findFirst({
-        where: { suggestionId: input.id, userId },
-        include: {
-          user: true,
-        },
-      });
-
       const suggestion = await ctx.db.suggestion.findUnique({
         where: { id: input.id },
-        include: {
-          user: true,
-        },
+        select: { userId: true },
       });
 
-      if (suggestion?.user.id === ctx.session.user.id) {
+      if (!suggestion) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // ❌ block own vote
+      if (suggestion.userId === userId) {
         return { voted: false, reason: "own suggestion" };
       }
 
+      const existingVote = await ctx.db.vote.findUnique({
+        where: {
+          userId_suggestionId: {
+            userId,
+            suggestionId: input.id,
+          },
+        },
+      });
+
+      // =========================
+      // UNVOTE
+      // =========================
       if (existingVote) {
-        await ctx.db.vote.delete({
-          where: { id: existingVote.id },
+        await ctx.db.$transaction(async (tx) => {
+          await tx.vote.delete({
+            where: { id: existingVote.id },
+          });
+
+          await tx.suggestion.update({
+            where: { id: input.id },
+            data: {
+              voteCount: { decrement: 1 },
+            },
+          });
         });
 
         return { removed: true };
       }
 
-      const vote = await ctx.db.vote.create({
-        data: {
-          type: input.vote,
-          suggestionId: input.id,
-          userId,
-        },
+      // =========================
+      // VOTE
+      // =========================
+      await ctx.db.$transaction(async (tx) => {
+        await tx.vote.create({
+          data: {
+            type: input.vote,
+            suggestionId: input.id,
+            userId,
+          },
+        });
+
+        await tx.suggestion.update({
+          where: { id: input.id },
+          data: {
+            voteCount: { increment: 1 },
+          },
+        });
       });
 
       await prismaEventService.createEvent({
@@ -176,6 +218,6 @@ export const suggestionBoxRouter = createTRPCRouter({
         metadata: { voteType: input.vote },
       });
 
-      return vote;
+      return { voted: true };
     }),
 });

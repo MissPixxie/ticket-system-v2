@@ -10,9 +10,7 @@ import Link from "next/link";
 
 export default function UserHome() {
   const { data: tickets } = api.ticket.listUserTickets.useQuery();
-  const { data: suggestions } = api.suggestionBox.listSuggestions.useQuery({
-    suggestionBoxId: "cmmqzjjn80007k0u9z3586u2k",
-  });
+  const { data: suggestions } = api.suggestionBox.listSuggestions.useQuery();
   const [isOpen, setIsOpen] = useState(false);
   const { createTicket, isLoading } = useCreateTicket();
 
@@ -84,14 +82,15 @@ export default function UserHome() {
 
             <div className="space-y-3 text-sm">
               {tickets?.slice(0, 5).map((ticket) => (
-                <div
+                <Link
                   key={ticket.id}
-                  className="flex justify-between rounded-lg bg-white/5 px-3 py-2"
+                  href={`/dashboard/user/my-tickets/${ticket.id}`}
+                  className="flex justify-between rounded-lg bg-white/5 px-3 py-2 transition hover:bg-white/10"
                 >
+                  <span>{ticket.id}</span>
                   <span>{ticket.title}</span>
-
                   <span className="text-white/60">{ticket.status}</span>
-                </div>
+                </Link>
               ))}
 
               {!tickets?.length && (
@@ -106,21 +105,18 @@ export default function UserHome() {
             <h2 className="mb-4 font-semibold">Populära förslag</h2>
 
             <div className="space-y-3 text-sm">
-              {suggestions
-                ?.sort((a, b) => b.votes.length - a.votes.length)
-                .slice(0, 5)
-                .map((suggestion) => (
-                  <div
-                    key={suggestion.id}
-                    className="flex justify-between rounded-lg bg-white/5 px-3 py-2"
-                  >
-                    <span>{suggestion.content}</span>
+              {suggestions?.slice(0, 5).map((suggestion) => (
+                <div
+                  key={suggestion.id}
+                  className="flex justify-between rounded-lg bg-white/5 px-3 py-2"
+                >
+                  <span>{suggestion.content}</span>
 
-                    <span className="text-white/60">
-                      ▲ {suggestion.votes.length}
-                    </span>
-                  </div>
-                ))}
+                  <span className="text-white/60">
+                    ▲ {suggestion.voteCount}
+                  </span>
+                </div>
+              ))}
 
               {!suggestions?.length && (
                 <p className="text-white/60">Inga förslag ännu</p>

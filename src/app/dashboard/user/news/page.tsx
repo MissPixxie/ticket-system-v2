@@ -114,27 +114,6 @@ export default function NewsPage() {
             })}
           </div>
         </div>
-
-        {/* RESURSER SEKTION */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <HiOutlineDocumentText className="text-purple-400" size={28} />
-            <h1 className="text-2xl font-bold tracking-wide">Butiksresurser</h1>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {dummyResources.map((item) => (
-              <a
-                key={item.id}
-                href={item.link}
-                className="flex cursor-pointer flex-col justify-between rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
-              >
-                <h2 className="text-lg font-semibold">{item.title}</h2>
-                <p className="mt-2 text-sm text-white/70">{item.description}</p>
-              </a>
-            ))}
-          </div>
-        </div>
       </div>
     </main>
   );

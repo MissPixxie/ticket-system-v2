@@ -7,15 +7,6 @@ export type SuggestionStatus =
   | "REJECTED"
   | "IMPLEMENTED";
 
-export interface DummyVote {
-  id: string;
-  type: "UPVOTE" | "DOWNVOTE";
-  user: {
-    id: string;
-    name: string;
-  };
-}
-
 export interface DummySuggestion {
   id: string;
   content: string;
@@ -27,8 +18,14 @@ export interface DummySuggestion {
     name: string;
   };
   suggestionBoxId: string;
-  votes: DummyVote[];
+
+  // 🔥 NYA STANDARDEN
+  voteCount: number;
 }
+
+// ----------------------------------
+// DUMMY DATA (optimerad version)
+// ----------------------------------
 
 export const dummySuggestions: DummySuggestion[] = [
   {
@@ -39,10 +36,7 @@ export const dummySuggestions: DummySuggestion[] = [
     isAnonymous: false,
     user: { id: "u1", name: "Butik A" },
     suggestionBoxId: "box1",
-    votes: [
-      { id: "v1", type: "UPVOTE", user: { id: "u2", name: "Butik B" } },
-      { id: "v2", type: "UPVOTE", user: { id: "u3", name: "Butik C" } },
-    ],
+    voteCount: 2,
   },
   {
     id: "s2",
@@ -52,7 +46,7 @@ export const dummySuggestions: DummySuggestion[] = [
     isAnonymous: false,
     user: { id: "u2", name: "Butik B" },
     suggestionBoxId: "box1",
-    votes: [],
+    voteCount: 0,
   },
   {
     id: "s3",
@@ -62,7 +56,7 @@ export const dummySuggestions: DummySuggestion[] = [
     isAnonymous: false,
     user: { id: "u3", name: "Butik C" },
     suggestionBoxId: "box1",
-    votes: [{ id: "v3", type: "UPVOTE", user: { id: "u1", name: "Butik A" } }],
+    voteCount: 1,
   },
   {
     id: "s4",
@@ -72,7 +66,7 @@ export const dummySuggestions: DummySuggestion[] = [
     isAnonymous: false,
     user: { id: "u4", name: "Butik D" },
     suggestionBoxId: "box1",
-    votes: [],
+    voteCount: 0,
   },
   {
     id: "s5",
@@ -82,9 +76,6 @@ export const dummySuggestions: DummySuggestion[] = [
     isAnonymous: true,
     user: { id: "u5", name: "Butik E" },
     suggestionBoxId: "box1",
-    votes: [
-      { id: "v4", type: "UPVOTE", user: { id: "u1", name: "Butik A" } },
-      { id: "v5", type: "UPVOTE", user: { id: "u3", name: "Butik C" } },
-    ],
+    voteCount: 2,
   },
 ];

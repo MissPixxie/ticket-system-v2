@@ -9,7 +9,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { hashPassword } from "../services/hashService";
+import { auth } from "~/server/better-auth";
 
 export const userRouter = createTRPCRouter({
   listAll: protectedProcedure
@@ -102,8 +102,6 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const hashedPassword = await hashPassword(input.password);
-
       const role = await ctx.db.role.findUnique({
         where: { id: input.roleId },
       });
@@ -115,11 +113,19 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      const newUser = await ctx.db.user.create({
-        data: {
-          name: input.name,
+      const created = await auth.api.signUpEmail({
+        body: {
           email: input.email,
           password: input.password,
+          name: input.name,
+        },
+      });
+
+      const userId = created.user.id;
+
+      const newUser = await ctx.db.user.update({
+        where: { id: userId },
+        data: {
           role: { connect: { id: role.id } },
           departments: {
             create: input.departments.map((dept) => ({

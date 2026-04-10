@@ -4,10 +4,10 @@ import { prismaEventService } from "../services/eventService";
 
 export const messageRouter = createTRPCRouter({
   listMessages: protectedProcedure
-    .input(z.object({ ticketId: z.string().min(1) }))
+    .input(z.object({ id: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
       return ctx.db.message.findMany({
-        where: { ticketId: input.ticketId },
+        where: { ticketId: input.id },
         include: { createdBy: true },
         orderBy: { createdAt: "asc" },
       });
@@ -16,14 +16,14 @@ export const messageRouter = createTRPCRouter({
   createMessage: protectedProcedure
     .input(
       z.object({
-        ticketId: z.string().min(1),
+        id: z.string().min(1),
         message: z.string().min(1),
         type: z.enum(["USER_MESSAGE", "SYSTEM_MESSAGE"]).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const ticket = await ctx.db.ticket.findUnique({
-        where: { id: input.ticketId },
+        where: { id: input.id },
         select: { id: true, createdById: true, assignedToId: true },
       });
 
@@ -31,7 +31,7 @@ export const messageRouter = createTRPCRouter({
 
       const newMessage = await ctx.db.message.create({
         data: {
-          ticketId: input.ticketId,
+          ticketId: input.id,
           message: input.message,
           createdById: ctx.session.user.id,
           type: input.type || "USER_MESSAGE",

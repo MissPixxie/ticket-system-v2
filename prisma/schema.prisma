@@ -13,30 +13,6 @@ datasource db {
   // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
 }
 
-model News {
-  newsId      String   @id @default(cuid())
-  title       String
-  category    Category @default(NEWS)
-  content     String
-  createdBy   User     @relation(fields: [createdById], references: [id])
-  createdById String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isPinned    Boolean  @default(false)
-  isPublished Boolean  @default(true)
-  priority    Priority @default(LOW)
-
-  @@index([newsId])
-  @@index([isPublished])
-}
-
-enum Category {
-  NEWS
-  STORE_MANUAL
-  PRODUCT_INFORMATION
-  CAMPAIGN
-}
-
 enum AuditMessageType {
   USER_MESSAGE
   SYSTEM_MESSAGE
@@ -54,13 +30,13 @@ model AuditLog {
   severity   Severity
   entityType String
   entityId   String
-  actorId    String?
   message    String
   diff       Json?
   metadata   Json?
   createdAt  DateTime @default(now())
 
-  actor User? @relation(fields: [actorId], references: [id])
+  actor   User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorId String?
 
   @@index([entityId])
   @@index([actorId])
@@ -91,13 +67,13 @@ enum EventOrigin {
 model Event {
   id         String      @id @default(cuid())
   type       EventType
-  actorId    String
   originId   String
   originType EventOrigin
   metadata   Json?
   createdAt  DateTime    @default(now())
 
-  actor         User           @relation(fields: [actorId], references: [id])
+  actor         User?          @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorId       String?
   notifications Notification[]
 
   @@index([originId, originType])
@@ -106,18 +82,18 @@ model Event {
 }
 
 model Question {
-  questionId  String           @id @default(cuid())
+  id          String           @id @default(cuid())
   title       String
   content     String
-  createdBy   User             @relation(fields: [createdById], references: [id])
-  createdById String
+  createdBy   User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
   category    QuestionCategory @default(GENERAL)
   status      QuestionStatus   @default(PENDING)
   messages    Message[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
-  @@index([questionId])
+  @@index([id])
   @@index([category])
   @@index([status])
   @@index([createdAt])
@@ -149,7 +125,7 @@ model Subscription {
   originId  String
   createdAt DateTime         @default(now())
 
-  user         User        @relation(fields: [userId], references: [id])
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   suggestion   Suggestion? @relation(fields: [suggestionId], references: [id])
   suggestionId String?
 
@@ -164,11 +140,61 @@ model Notification {
   seen      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user  User  @relation(fields: [userId], references: [id])
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event @relation(fields: [eventId], references: [id])
 
   @@index([userId, seen])
   @@index([createdAt])
+}
+
+// NEWS MODEL
+
+model News {
+  id          String   @id @default(cuid())
+  title       String
+  category    Category @default(NEWS)
+  content     String
+  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isPinned    Boolean  @default(false)
+  isPublished Boolean  @default(true)
+  priority    Priority @default(LOW)
+
+  @@index([id])
+  @@index([isPublished])
+}
+
+enum Category {
+  NEWS
+  STORE_MANUAL
+  PRODUCT_INFORMATION
+  CAMPAIGN
+}
+
+// RESOURCES MODEL
+
+enum ResourceCategory {
+  DOCUMENTATION
+  TUTORIAL
+  INFORMATION
+  OTHER
+}
+
+model Resource {
+  id          String           @id @default(cuid())
+  title       String
+  description String
+  category    ResourceCategory @default(OTHER)
+  createdBy   User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([id])
+  @@index([category])
+  @@index([title])
 }
 
 // SUGGESTION BOX MODELS
@@ -193,13 +219,14 @@ model Suggestion {
   createdAt   DateTime         @default(now())
   status      SuggestionStatus @default(SENT)
   isAnonymous Boolean          @default(false)
-  user        User             @relation("SuggestionOwner", fields: [userId], references: [id])
-  userId      String
+  user        User?            @relation("SuggestionOwner", fields: [userId], references: [id], onDelete: SetNull)
+  userId      String?
 
   suggestionBox   SuggestionBox @relation(fields: [suggestionBoxId], references: [id])
   suggestionBoxId String
 
   votes       Vote[]
+  voteCount   Int            @default(0)
   subscribers Subscription[]
 
   @@index([status])
@@ -210,8 +237,8 @@ model Suggestion {
 model Vote {
   id           String     @id @default(cuid())
   type         String
-  user         User       @relation(fields: [userId], references: [id])
-  userId       String
+  user         User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId       String?
   suggestion   Suggestion @relation(fields: [suggestionId], references: [id])
   suggestionId String
 
@@ -254,8 +281,8 @@ model Ticket {
   updatedAt   DateTime   @updatedAt
   solvedAt    DateTime?
 
-  createdBy    User      @relation("TicketsCreated", fields: [createdById], references: [id])
-  createdById  String
+  createdBy    User?     @relation("TicketsCreated", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById  String?
   assignedTo   User?     @relation("TicketsHandled", fields: [assignedToId], references: [id])
   assignedToId String?
   participants User[]    @relation("TicketParticipants")
@@ -281,12 +308,12 @@ model Message {
   type      MessageType @default(USER_MESSAGE)
   createdAt DateTime    @default(now())
 
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
 
   ticket     Ticket?   @relation(fields: [ticketId], references: [id])
   ticketId   String?
-  question   Question? @relation(fields: [questionId], references: [questionId])
+  question   Question? @relation(fields: [questionId], references: [id])
   questionId String?
 
   @@unique([id])
@@ -359,6 +386,7 @@ model User {
   news News[]
 
   questions Question[]
+  resources Resource[]
 
   @@index([id])
   @@index([email])

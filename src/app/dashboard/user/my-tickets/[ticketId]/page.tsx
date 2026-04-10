@@ -2,6 +2,8 @@
 
 import { api } from "~/trpc/react";
 import ChatBox from "~/app/_components/chatBox";
+import { getCurrentUserId } from "~/app/_components/getCurrentUserId";
+import { useState, useEffect } from "react";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -16,12 +18,11 @@ const statusClasses: Record<string, string> = {
 };
 
 export default function TicketPage({
-  ticketId,
-  currentUserId,
+  params,
 }: {
-  ticketId: string;
-  currentUserId: string;
+  params: { ticketId: string };
 }) {
+  const { ticketId } = params;
   const { data: ticket, isLoading } = api.ticket.getTicketById.useQuery({
     id: ticketId,
   });

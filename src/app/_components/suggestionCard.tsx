@@ -37,7 +37,7 @@ export default function SuggestionCard({
           <div className="flex flex-row gap-3">
             <div className="flex items-center gap-1">
               <Heart />
-              <span>{s.votes.length}</span>
+              <span>{s.voteCount}</span>
             </div>
             <h2 className="text-lg font-semibold">{s.content}</h2>
           </div>

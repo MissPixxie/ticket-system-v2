@@ -6,9 +6,9 @@ import { RiArrowUpDoubleFill } from "react-icons/ri";
 import { FaLightbulb } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa";
 import { GoTrophy } from "react-icons/go";
+import { GoDotFill } from "react-icons/go";
 import { toast } from "sonner";
 import { useSocket } from "~/app/socketProvider";
-import { GoDotFill } from "react-icons/go";
 
 type FilterType = "latest" | "popular" | "status";
 
@@ -21,18 +21,15 @@ const statusStyles = {
 };
 
 export default function SuggestionsPage() {
-  const suggestionBoxId = "cmn08ax080007c0u96m7vawdg";
+  const utils = api.useUtils();
   const { socket } = useSocket();
+
   const [filter, setFilter] = useState<FilterType>("latest");
   const [content, setContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  const utils = api.useUtils();
-
   const { data: suggestions, isLoading } =
-    api.suggestionBox.listSuggestions.useQuery({
-      suggestionBoxId,
-    });
+    api.suggestionBox.listSuggestions.useQuery();
 
   const vote = api.suggestionBox.voteSuggestion.useMutation({
     onSuccess: async () => {
@@ -43,15 +40,12 @@ export default function SuggestionsPage() {
   const createSuggestion = api.suggestionBox.createSuggestion.useMutation({
     onSuccess: async (suggestion) => {
       toast.success("Idén skickades");
-
       setContent("");
 
       await utils.suggestionBox.invalidate();
 
-      if (!socket) return;
-
-      socket.emit("create:room", suggestion.id);
-      socket.emit("join:room", suggestion.id);
+      socket?.emit("create:room", suggestion.id);
+      socket?.emit("join:room", suggestion.id);
     },
   });
 
@@ -61,7 +55,7 @@ export default function SuggestionsPage() {
     }
 
     if (filter === "popular") {
-      return b.votes.length - a.votes.length;
+      return b.voteCount - a.voteCount;
     }
 
     const order = {
@@ -79,25 +73,19 @@ export default function SuggestionsPage() {
     <main className="flex min-h-screen justify-center px-6 py-12 text-white">
       <div className="w-full max-w-5xl rounded-2xl bg-white/5 p-8 shadow-lg/15 backdrop-blur-lg">
         {/* HEADER */}
-
         <div className="mb-8 flex items-center gap-3">
           <FaLightbulb className="text-yellow-400" size={22} />
 
           <div>
-            <h1 className="text-2xl font-bold tracking-wide">
-              Idé & Förbättringsförslag
-            </h1>
-
+            <h1 className="text-2xl font-bold">Idé & Förbättringsförslag</h1>
             <p className="mt-1 text-sm text-white/70">
-              Dela idéer, produkter kunder efterfrågar eller förbättringar i
-              arbetet. Huvudkontoret kan granska och följa upp dem här.
+              Dela idéer och förbättringar för verksamheten.
             </p>
           </div>
         </div>
 
-        {/* CREATE IDEA */}
-
-        <div className="mb-10 rounded-xl bg-white/5 p-4 backdrop-blur">
+        {/* CREATE */}
+        <div className="mb-10 rounded-xl bg-white/5 p-4">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -109,7 +97,6 @@ export default function SuggestionsPage() {
 
               createSuggestion.mutate({
                 content,
-                suggestionBoxId,
                 isAnonymous,
               });
             }}
@@ -119,7 +106,7 @@ export default function SuggestionsPage() {
               placeholder="Beskriv din idé..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="min-h-22.5 rounded-lg bg-white/10 p-3 text-sm text-white placeholder:text-white/40 focus:outline-none"
+              className="min-h-24 rounded-lg bg-white/10 p-3 text-sm outline-none"
             />
 
             <div className="flex items-center justify-between">
@@ -128,27 +115,25 @@ export default function SuggestionsPage() {
                   type="checkbox"
                   checked={isAnonymous}
                   onChange={(e) => setIsAnonymous(e.target.checked)}
-                  className="h-4 w-4 cursor-pointer"
                 />
                 Skicka anonymt
               </label>
 
               <button
                 type="submit"
-                className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm hover:bg-blue-500"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm hover:bg-blue-500"
               >
-                Skicka idé
+                Skicka
               </button>
             </div>
           </form>
         </div>
 
         {/* FILTER */}
-
         <div className="mb-6 flex gap-3">
           <button
             onClick={() => setFilter("latest")}
-            className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
               filter === "latest"
                 ? "bg-white/20"
                 : "bg-white/5 hover:bg-white/10"
@@ -160,7 +145,7 @@ export default function SuggestionsPage() {
 
           <button
             onClick={() => setFilter("popular")}
-            className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
               filter === "popular"
                 ? "bg-white/20"
                 : "bg-white/5 hover:bg-white/10"
@@ -172,17 +157,18 @@ export default function SuggestionsPage() {
 
           <button
             onClick={() => setFilter("status")}
-            className={`flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 text-sm ${
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
               filter === "status"
                 ? "bg-white/20"
                 : "bg-white/5 hover:bg-white/10"
             }`}
           >
-            <GoDotFill size={20} />
+            <GoDotFill />
             Status
           </button>
         </div>
 
+        {/* LIST */}
         <div className="space-y-4">
           {isLoading && (
             <p className="text-sm text-white/60">Laddar idéer...</p>
@@ -195,44 +181,43 @@ export default function SuggestionsPage() {
           {sortedSuggestions?.map((suggestion) => (
             <div
               key={suggestion.id}
-              className="flex items-start gap-4 rounded-xl bg-white/5 p-4 transition hover:bg-white/10"
+              className="flex items-start gap-4 rounded-xl bg-white/5 p-4 hover:bg-white/10"
             >
+              {/* VOTE */}
               <button
                 onClick={() => {
                   vote.mutate({ id: suggestion.id, vote: "UP" });
-
-                  if (!socket) return;
-
-                  socket.emit("join:room", suggestion.id);
-                  socket.emit("suggestion:voted", suggestion.id);
+                  socket?.emit("suggestion:voted", suggestion.id);
                 }}
+                className="flex flex-col items-center"
               >
                 <RiArrowUpDoubleFill
                   size={26}
                   className={
                     suggestion.hasVoted
-                      ? "cursor-pointer text-green-600"
-                      : "cursor-pointer text-gray-500 hover:text-green-600"
+                      ? "text-green-500"
+                      : "text-gray-500 hover:text-green-500"
                   }
                 />
 
-                <span>{suggestion.votes.length}</span>
+                <span className="text-sm text-white/70">
+                  {suggestion.voteCount}
+                </span>
               </button>
 
+              {/* CONTENT */}
               <div className="flex-1">
-                <p className="text-white">{suggestion.content}</p>
+                <p>{suggestion.content}</p>
 
-                <div className="mt-2 flex items-center gap-3 text-xs text-white/60">
-                  <span>{suggestion.user?.name ?? "Anonym"}</span>
-
-                  <span>
-                    {new Date(suggestion.createdAt).toLocaleDateString()}
-                  </span>
+                <div className="mt-2 text-xs text-white/60">
+                  {suggestion.user?.name ?? "Anonym"} ·{" "}
+                  {new Date(suggestion.createdAt).toLocaleDateString()}
                 </div>
               </div>
 
+              {/* STATUS */}
               <span
-                className={`rounded-full px-3 py-1 text-xs font-medium ${
+                className={`rounded-full px-3 py-1 text-xs ${
                   statusStyles[suggestion.status]
                 }`}
               >
