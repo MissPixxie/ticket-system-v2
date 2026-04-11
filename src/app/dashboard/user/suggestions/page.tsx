@@ -9,6 +9,7 @@ import { GoTrophy } from "react-icons/go";
 import { GoDotFill } from "react-icons/go";
 import { toast } from "sonner";
 import { useSocket } from "~/app/socketProvider";
+import SkeletonSuggestionCard from "~/app/_components/skeletonComponents/cards/skeletonSuggestionCard";
 
 type FilterType = "latest" | "popular" | "status";
 
@@ -169,11 +170,14 @@ export default function SuggestionsPage() {
         </div>
 
         {/* LIST */}
+        {isLoading && (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <SkeletonSuggestionCard key={i} />
+            ))}
+          </div>
+        )}
         <div className="space-y-4">
-          {isLoading && (
-            <p className="text-sm text-white/60">Laddar idéer...</p>
-          )}
-
           {!isLoading && sortedSuggestions?.length === 0 && (
             <p className="text-sm text-white/60">Inga idéer än</p>
           )}

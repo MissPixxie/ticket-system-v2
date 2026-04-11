@@ -63,7 +63,7 @@ export default function NewsPage() {
   if (isLoading) {
     return (
       <main className="min-h-screen px-6 py-12 text-white">
-        <div>
+        <div className="mx-auto max-w-7xl space-y-10">
           <h1 className="text-xl font-semibold tracking-wide text-white">
             Laddar nyheter
           </h1>
@@ -87,7 +87,7 @@ export default function NewsPage() {
 
   return (
     <main className="min-h-screen px-6 py-12 text-white">
-      <div className="mx-auto max-w-7xl space-y-12">
+      <div className="mx-auto max-w-7xl space-y-10">
         {/* NYHETER SEKTION */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">

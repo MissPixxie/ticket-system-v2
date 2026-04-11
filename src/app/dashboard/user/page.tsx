@@ -7,7 +7,6 @@ import { useCreateTicket } from "~/app/_components/modals/create-ticket/useCreat
 import { useState } from "react";
 import CreateTicketModal from "~/app/_components/modals/create-ticket/createTicketModal";
 import Link from "next/link";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import CampaignList from "~/app/_components/campaignList";
 
 export default function UserHome() {
