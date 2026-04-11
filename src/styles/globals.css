@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
@@ -12,17 +13,19 @@
 }
 
 @keyframes hide {
-  from {opacity: 1;}
-  to {opacity: 0.2;}
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.2;
+  }
 }
-
 
 .notSelected {
   animation-name: hide;
   animation-duration: 1s;
   animation-fill-mode: forwards;
 }
-
 
 @keyframes messageAnimation {
   from {
@@ -33,7 +36,6 @@
     opacity: 0;
   }
 }
-
 
 .popUpMessage {
   animation-name: messageAnimation;
@@ -63,10 +65,12 @@
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
   animation: shimmer 1.5s infinite;
 }
 
@@ -98,3 +102,7 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+.card {
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
