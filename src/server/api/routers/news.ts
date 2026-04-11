@@ -8,52 +8,55 @@ export const newsRouter = createTRPCRouter({
   // =========================
   // LIST NEWS (OPTIMERAD)
   // =========================
-  listNews: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id;
+  listNews: protectedProcedure
+    .input(z.object({ limit: z.number().optional() }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
 
-    const news = await ctx.db.news.findMany({
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
+      const news = await ctx.db.news.findMany({
+        take: input?.limit ?? 5,
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
           },
-        },
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
+          comments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+      });
 
-    const votes = await ctx.db.newsVote.findMany({
-      where: {
-        userId,
-        newsId: {
-          in: news.map((n) => n.id),
+      const votes = await ctx.db.newsVote.findMany({
+        where: {
+          userId,
+          newsId: {
+            in: news.map((n) => n.id),
+          },
         },
-      },
-      select: {
-        newsId: true,
-        type: true,
-      },
-    });
+        select: {
+          newsId: true,
+          type: true,
+        },
+      });
 
-    const voteMap = new Map(votes.map((v) => [v.newsId, v.type]));
+      const voteMap = new Map(votes.map((v) => [v.newsId, v.type]));
 
-    return news.map((n) => ({
-      ...n,
-      hasVoted: voteMap.has(n.id),
-      userVote: voteMap.get(n.id) ?? null,
-    }));
-  }),
+      return news.map((n) => ({
+        ...n,
+        hasVoted: voteMap.has(n.id),
+        userVote: voteMap.get(n.id) ?? null,
+      }));
+    }),
 
   // =========================
   // CREATE NEWS

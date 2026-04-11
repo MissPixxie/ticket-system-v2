@@ -16,7 +16,7 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
 
   const updateNews = api.news.updateNews.useMutation({
     onSuccess: (updateNews) => {
-      utils.news.listNews.setData(undefined, (oldData) => {
+      utils.news.listNews.setData({}, (oldData) => {
         if (!oldData) return [];
         return oldData.map((news) =>
           news.id === updateNews.id ? { ...news, ...updateNews } : news,
@@ -27,7 +27,7 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
 
   const publishNews = api.news.publishNews.useMutation({
     onSuccess: (updateNews) => {
-      utils.news.listNews.setData(undefined, (oldData) => {
+      utils.news.listNews.setData({}, (oldData) => {
         if (!oldData) return [];
         return oldData.map((news) =>
           news.id === updateNews.id ? { ...news, ...updateNews } : news,

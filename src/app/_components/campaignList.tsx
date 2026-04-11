@@ -3,10 +3,10 @@
 import { api } from "~/trpc/react";
 import { useState } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-import SkeletonCard from "./skeletonCard";
+import SkeletonCard from "./skeletonComponents/skeletonCard";
 
 export default function CampaignList() {
-  const { data: news, isLoading } = api.news.listNews.useQuery();
+  const { data: news, isLoading } = api.news.listNews.useQuery({ limit: 5 });
   const [openNewsId, setOpenNewsId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState<Record<string, string>>({});
   const [showAll, setShowAll] = useState(false);

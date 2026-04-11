@@ -13,7 +13,7 @@ import CampaignList from "~/app/_components/campaignList";
 export default function UserHome() {
   const { data: tickets } = api.ticket.listUserTickets.useQuery();
   const { data: suggestions } = api.suggestionBox.listSuggestions.useQuery();
-  const { data: news } = api.news.listNews.useQuery();
+  const { data: news } = api.news.listNews.useQuery({ limit: 5 });
   const [isOpen, setIsOpen] = useState(false);
   const { createTicket, isLoading } = useCreateTicket();
   const [openNewsId, setOpenNewsId] = useState<string | null>(null);
