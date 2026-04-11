@@ -147,7 +147,7 @@ model Notification {
   @@index([createdAt])
 }
 
-// NEWS MODEL
+// NEWS & CAMPAIGN MODEL
 
 model News {
   id          String   @id @default(cuid())
@@ -156,13 +156,19 @@ model News {
   content     String
   createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdById String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   isPinned    Boolean  @default(false)
   isPublished Boolean  @default(true)
   priority    Priority @default(LOW)
 
-  @@index([id])
+  votes     NewsVote[]
+  upVotes   Int           @default(0)
+  downVotes Int           @default(0)
+  comments  NewsComment[]
+
   @@index([isPublished])
 }
 
@@ -172,6 +178,63 @@ enum Category {
   PRODUCT_INFORMATION
   CAMPAIGN
 }
+
+model NewsVote {
+  id        String   @id @default(cuid())
+  type      VoteType
+  userId    String
+  newsId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  news News @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, newsId])
+  @@index([newsId])
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+model NewsComment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String?
+  newsId    String
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  news News  @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@index([newsId])
+}
+
+// model CAMPAIGN {
+//   id          String   @id @default(cuid())
+//   title       String
+//   startDate   DateTime
+//   endDate     DateTime
+//   content     String
+//   createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+//   createdById String?
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   isPinned    Boolean  @default(false)
+//   isPublished Boolean  @default(true)
+//   signedByUser User?    @relation("CampaignUserSignature", fields: [signedByUserId], references: [id])
+//   signedByUserId String?
+
+//   votes     NewsVote[]
+//   upVotes   Int           @default(0)
+//   downVotes Int           @default(0)
+//   comments  NewsComment[]
+
+//   @@index([isPublished])
+// }
 
 // RESOURCES MODEL
 
@@ -281,12 +344,14 @@ model Ticket {
   updatedAt   DateTime   @updatedAt
   solvedAt    DateTime?
 
-  createdBy    User?     @relation("TicketsCreated", fields: [createdById], references: [id], onDelete: SetNull)
-  createdById  String?
-  assignedTo   User?     @relation("TicketsHandled", fields: [assignedToId], references: [id])
-  assignedToId String?
-  participants User[]    @relation("TicketParticipants")
-  messages     Message[]
+  createdBy       User?     @relation("TicketsCreated", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById     String?
+  assignedTo      User?     @relation("TicketsHandled", fields: [assignedToId], references: [id])
+  assignedToId    String?
+  participants    User[]    @relation("TicketParticipants")
+  messages        Message[]
+  signedByUser    Boolean   @default(false)
+  signedByHandler Boolean   @default(false)
 
   @@unique([id])
   @@index([createdById])
@@ -385,8 +450,10 @@ model User {
 
   news News[]
 
-  questions Question[]
-  resources Resource[]
+  questions    Question[]
+  resources    Resource[]
+  newsVotes    NewsVote[]
+  newsComments NewsComment[]
 
   @@index([id])
   @@index([email])

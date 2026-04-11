@@ -1,5 +1,8 @@
 import { auth } from "~/server/better-auth";
 import { db } from "~/server/db";
+import { seedNews } from "./seeds/seedNews";
+import { seedSuggestions } from "./seeds/seedSuggestions";
+import { seedQuestions } from "./seeds/seedQuestions";
 
 async function main() {
   await db.permission.createMany({
@@ -30,132 +33,56 @@ async function main() {
   });
 
   const userRole = await db.role.create({
-    data: {
-      name: "USER",
-    },
+    data: { name: "USER" },
   });
-
-  const userOne = {
-    email: "admin@example.com",
-    name: "Admin",
-    password: "StrongP@ssw0rd123!",
-    role: adminRole.name,
-  };
-
-  const userTwo = {
-    email: "handler@example.com",
-    name: "Handler",
-    password: "StrongP@ssw0rd123!",
-    role: handlerRole.name,
-  };
-
-  const userThree = {
-    email: "user@example.com",
-    name: "Regular User",
-    password: "StrongP@ssw0rd123!",
-    role: userRole.name,
-  };
-
-  // const users = [
-  //   {
-  //     email: "admin@example.com",
-  //     name: "Admin",
-  //     password: "StrongP@ssw0rd123!",
-  //     role: adminRole.name,
-  //   },
-  //   {
-  //     email: "handler@example.com",
-  //     name: "Handler",
-  //     password: "StrongP@ssw0rd123!",
-  //     role: handlerRole.name,
-  //   },
-  //   {
-  //     email: "user@example.com",
-  //     name: "Regular User",
-  //     password: "StrongP@ssw0rd123!",
-  //     role: userRole.name,
-  //   },
-  // ];
 
   const createdUserOne = await auth.api.signUpEmail({
     body: {
-      email: userOne.email,
-      password: userOne.password,
-      name: userOne.name,
+      email: "admin@example.com",
+      password: "StrongP@ssw0rd123!",
+      name: "Admin",
     },
   });
 
   await db.user.update({
     where: { id: createdUserOne.user.id },
-    data: {
-      role: {
-        connect: { name: "ADMIN" },
-      },
-    },
+    data: { role: { connect: { name: "ADMIN" } } },
   });
 
   const createdUserTwo = await auth.api.signUpEmail({
     body: {
-      email: userTwo.email,
-      password: userTwo.password,
-      name: userTwo.name,
+      email: "handler@example.com",
+      password: "StrongP@ssw0rd123!",
+      name: "Handler",
     },
   });
 
   await db.user.update({
     where: { id: createdUserTwo.user.id },
-    data: {
-      role: {
-        connect: { name: "HANDLER" },
-      },
-    },
+    data: { role: { connect: { name: "HANDLER" } } },
   });
 
   const createdUserThree = await auth.api.signUpEmail({
     body: {
-      email: userThree.email,
-      password: userThree.password,
-      name: userThree.name,
+      email: "user@example.com",
+      password: "StrongP@ssw0rd123!",
+      name: "User",
     },
   });
 
   await db.user.update({
     where: { id: createdUserThree.user.id },
-    data: {
-      role: {
-        connect: {
-          name: "USER",
-        },
-      },
-    },
+    data: { role: { connect: { name: "USER" } } },
   });
 
   const existingBox = await db.suggestionBox.findFirst();
   if (!existingBox) {
-    const box = await db.suggestionBox.create({});
-    console.log("Created default SuggestionBox with id:", box.id);
-  } else {
-    console.log("SuggestionBox already exists with id:", existingBox.id);
+    await db.suggestionBox.create({});
   }
 
-  // for (const user of users) {
-  //   const created = await auth.api.signUpEmail({
-  //     body: {
-  //       email: user.email,
-  //       password: user.password,
-  //       name: user.name,
-  //     },
-  //   });
-
-  // await db.user.update({
-  //   where: { id: created.user.id },
-  //   data: {
-  //     role: {
-  //       connect: { name: user.role }
-  //    },
-  //   }
-  // });
-  //}
+  await seedNews();
+  await seedSuggestions();
+  await seedQuestions();
 
   console.log("✅ Seed klar!");
 }

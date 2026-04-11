@@ -19,7 +19,7 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
       utils.news.listNews.setData(undefined, (oldData) => {
         if (!oldData) return [];
         return oldData.map((news) =>
-          news.newsId === updateNews.newsId ? { ...news, ...updateNews } : news,
+          news.id === updateNews.id ? { ...news, ...updateNews } : news,
         );
       });
     },
@@ -30,32 +30,32 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
       utils.news.listNews.setData(undefined, (oldData) => {
         if (!oldData) return [];
         return oldData.map((news) =>
-          news.newsId === updateNews.newsId ? { ...news, ...updateNews } : news,
+          news.id === updateNews.id ? { ...news, ...updateNews } : news,
         );
       });
     },
   });
 
-  const handleUpdateNews = (newsId: string) => {
+  const handleUpdateNews = (id: string) => {
     updateNews.mutate({
-      newsId,
+      id,
     });
   };
 
-  const handleArchiveNews = (newsId: string) => {
+  const handleArchiveNews = (id: string) => {
     publishNews.mutate({
-      newsId,
+      id,
       isPublished: false,
     });
   };
 
-  const isExpanded = expandedId === newsProps.newsId;
+  const isExpanded = expandedId === newsProps.id;
 
   return (
     <div
-      key={newsProps.newsId}
+      key={newsProps.id}
       className="cursor-pointer rounded-2xl bg-white/5 p-6 shadow-lg/15 transition hover:bg-white/10"
-      onClick={() => setExpandedId(isExpanded ? null : newsProps.newsId)}
+      onClick={() => setExpandedId(isExpanded ? null : newsProps.id)}
     >
       {/* Header */}
       <div className="mb-2 flex items-center justify-between">
@@ -66,7 +66,7 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
       </div>
 
       <p className="mb-2 text-sm text-white/70">
-        {newsProps.createdAt.toLocaleDateString()} · {newsProps.createdBy.name}
+        {newsProps.createdAt.toLocaleDateString()} · {newsProps.createdBy?.name}
       </p>
 
       <p className="line-clamp-3 text-white/80">{newsProps.content}</p>
@@ -79,11 +79,11 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
         >
           <div className="flex gap-2">
             {/* EDIT */}
-            <EditSection newsId={newsProps.newsId} />
+            <EditSection newsId={newsProps.id} />
 
             {/* DELETE */}
             <button
-              onClick={() => handleArchiveNews(newsProps.newsId)}
+              onClick={() => handleArchiveNews(newsProps.id)}
               className="cursor-pointer rounded-lg bg-white/10 p-2 hover:bg-red-500/30"
             >
               <FaTrashAlt size={18} />

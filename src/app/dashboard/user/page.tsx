@@ -7,12 +7,17 @@ import { useCreateTicket } from "~/app/_components/modals/create-ticket/useCreat
 import { useState } from "react";
 import CreateTicketModal from "~/app/_components/modals/create-ticket/createTicketModal";
 import Link from "next/link";
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
+import CampaignList from "~/app/_components/campaignList";
 
 export default function UserHome() {
   const { data: tickets } = api.ticket.listUserTickets.useQuery();
   const { data: suggestions } = api.suggestionBox.listSuggestions.useQuery();
+  const { data: news } = api.news.listNews.useQuery();
   const [isOpen, setIsOpen] = useState(false);
   const { createTicket, isLoading } = useCreateTicket();
+  const [openNewsId, setOpenNewsId] = useState<string | null>(null);
+  const [messageInput, setMessageInput] = useState<Record<string, string>>({});
 
   const openTickets = tickets?.filter((t) => t.status === "OPEN").length ?? 0;
 
@@ -20,6 +25,42 @@ export default function UserHome() {
     tickets?.filter((t) => t.status === "IN_PROGRESS").length ?? 0;
 
   const mySuggestions = suggestions?.length ?? 0;
+
+  const campaignNews = news?.filter((n) => n.category === "CAMPAIGN") ?? [];
+
+  const toggleNews = (id: string) => {
+    setOpenNewsId((prev) => (prev === id ? null : id));
+  };
+
+  const utils = api.useUtils();
+
+  const sendMessage = api.news.addMessage.useMutation({
+    onSuccess: async () => {
+      await utils.news.listNews.invalidate();
+    },
+  });
+
+  const handleSendMessage = (id: string) => {
+    const content = messageInput[id];
+
+    if (!content?.trim()) return;
+
+    sendMessage.mutate({
+      id,
+      content,
+    });
+
+    setMessageInput((prev) => ({
+      ...prev,
+      [id]: "",
+    }));
+  };
+
+  const vote = api.news.voteNews.useMutation({
+    onSuccess: async () => {
+      await utils.news.listNews.invalidate();
+    },
+  });
 
   return (
     <main className="min-h-screen px-6 py-12 text-white">
@@ -34,42 +75,47 @@ export default function UserHome() {
             Här är en översikt över vad som händer i systemet.
           </p>
         </div>
+        <CampaignList />
 
         {/* QUICK ACTIONS */}
+        <div>
+          <h1 className="text-xl font-semibold tracking-wide text-white">
+            Snabblänkar
+          </h1>
+          <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <button
+              onClick={() => setIsOpen(true)}
+              className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
+            >
+              <FaTicketAlt className="mb-3 text-blue-400" size={20} />
+              <p className="font-semibold">Skapa ticket</p>
+              <p className="text-sm text-white/60">
+                Rapportera problem eller fråga support.
+              </p>
+            </button>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <button
-            onClick={() => setIsOpen(true)}
-            className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
-          >
-            <FaTicketAlt className="mb-3 text-blue-400" size={20} />
-            <p className="font-semibold">Skapa ticket</p>
-            <p className="text-sm text-white/60">
-              Rapportera problem eller fråga support.
-            </p>
-          </button>
+            <Link
+              href="/dashboard/user/suggestions"
+              className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
+            >
+              <FaLightbulb className="mb-3 text-yellow-400" size={20} />
+              <p className="font-semibold">Skicka förslag</p>
+              <p className="text-sm text-white/60">
+                Dela idéer eller produkter kunder efterfrågar.
+              </p>
+            </Link>
 
-          <Link
-            href="/dashboard/user/suggestions"
-            className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
-          >
-            <FaLightbulb className="mb-3 text-yellow-400" size={20} />
-            <p className="font-semibold">Skicka förslag</p>
-            <p className="text-sm text-white/60">
-              Dela idéer eller produkter kunder efterfrågar.
-            </p>
-          </Link>
-
-          <Link
-            href="/dashboard/user/news"
-            className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
-          >
-            <HiSpeakerphone className="mb-3 text-purple-400" size={20} />
-            <p className="font-semibold">Se nyheter</p>
-            <p className="text-sm text-white/60">
-              Läs senaste uppdateringarna från HQ.
-            </p>
-          </Link>
+            <Link
+              href="/dashboard/user/news"
+              className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
+            >
+              <HiSpeakerphone className="mb-3 text-purple-400" size={20} />
+              <p className="font-semibold">Se nyheter</p>
+              <p className="text-sm text-white/60">
+                Läs senaste uppdateringarna från HQ.
+              </p>
+            </Link>
+          </div>
         </div>
 
         {/* CONTENT GRID */}

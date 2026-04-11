@@ -20,7 +20,8 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "seed": "npx tsx -r dotenv/config prisma/seed.ts"
+    "seed": "npx tsx -r dotenv/config prisma/seed.ts",
+      "seedNews": "npx tsx -r dotenv/config prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
