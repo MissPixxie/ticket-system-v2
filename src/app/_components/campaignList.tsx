@@ -3,7 +3,7 @@
 import { api } from "~/trpc/react";
 import { useState } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-import SkeletonCard from "./skeletonComponents/skeletonCard";
+import SkeletonCard from "./skeletonComponents/cards/skeletonCampaignCard";
 
 export default function CampaignList() {
   const { data: news, isLoading } = api.news.listNews.useQuery({ limit: 5 });

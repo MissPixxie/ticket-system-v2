@@ -194,7 +194,7 @@ export default function CreateUserModal({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full cursor-pointer rounded-xl bg-blue-600 py-3 font-semibold transition hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50"
+              className="submit-button"
             >
               {isLoading ? "Skapar..." : "Skapa användare"}
             </button>

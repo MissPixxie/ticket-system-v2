@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import { useState } from "react";
 import { HiSpeakerphone, HiOutlineDocumentText } from "react-icons/hi";
 import { MdCampaign } from "react-icons/md";
-import SkeletonCard from "~/app/_components/skeletonComponents/skeletonCard";
+import SkeletonNewsCard from "~/app/_components/skeletonComponents/cards/skeletonNewsCard";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 
 const PAGE_SIZE = 5;
@@ -16,7 +16,6 @@ export default function NewsPage() {
   });
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState<Record<string, string>>({});
-  const [showAll, setShowAll] = useState(false);
   const utils = api.useUtils();
 
   const hasMore = news.length === visibleCount;
@@ -63,14 +62,14 @@ export default function NewsPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen text-white">
+      <main className="min-h-screen px-6 py-12 text-white">
         <div>
           <h1 className="text-xl font-semibold tracking-wide text-white">
             Laddar nyheter
           </h1>
           <div className="mt-4 space-y-3">
             {[...Array(5)].map((_, i) => (
-              <SkeletonCard key={i} />
+              <SkeletonNewsCard key={i} />
             ))}
           </div>
         </div>

@@ -1,4 +1,4 @@
-export default function SkeletonCard() {
+export default function SkeletonCampaignCard() {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
       {/* SHIMMER */}

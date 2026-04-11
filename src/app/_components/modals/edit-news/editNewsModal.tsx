@@ -149,10 +149,7 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
             >
               Avbryt
             </button>
-            <button
-              type="submit"
-              className="cursor-pointer rounded-full bg-blue-500 px-10 py-3 text-white"
-            >
+            <button type="submit" className="submit-button">
               Skicka
             </button>
           </div>

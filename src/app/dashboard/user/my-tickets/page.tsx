@@ -6,6 +6,8 @@ import { useSocket } from "~/app/socketProvider";
 import { TicketSection } from "~/app/_components/modals/create-ticket/ticketSection";
 import TicketCard from "~/app/_components/ticketCard";
 import { TicketTable } from "~/app/_components/ticketTable";
+import CreateTicketModal from "~/app/_components/modals/create-ticket/createTicketModal";
+import { useCreateTicket } from "~/app/_components/modals/create-ticket/useCreateTicket";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -29,6 +31,8 @@ export default function MyTicketsPage({ currentUserId }: TicketTableProps) {
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const { createTicket } = useCreateTicket();
 
   const { socket } = useSocket();
   const utils = api.useUtils();
@@ -88,7 +92,7 @@ export default function MyTicketsPage({ currentUserId }: TicketTableProps) {
     <main className="min-h-screen px-6 py-12 text-white">
       <div className="mx-auto w-full max-w-7xl">
         <h1 className="mb-8 text-2xl font-bold tracking-wide">Mina Tickets</h1>
-
+        <TicketSection />
         <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
             <p className="text-sm text-white/60">Totala</p>

@@ -21,7 +21,7 @@ export default async function Header() {
         </p>
         <Link
           href={"/"}
-          className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+          className="cursor-pointer rounded-lg bg-blue-500/20 px-4 py-2 text-lg text-blue-300 hover:bg-blue-500/30"
         >
           Sign out
         </Link>

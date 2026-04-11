@@ -69,3 +69,32 @@
       transparent);
   animation: shimmer 1.5s infinite;
 }
+
+.submit-button {
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  background-color: rgba(59, 130, 246, 0.2);
+  padding: 0.5rem 0.75rem;
+  color: rgb(147, 197, 253);
+  transition: background-color 0.2s ease;
+}
+
+.submit-button:hover {
+  background-color: rgba(59, 130, 246, 0.3);
+}
+
+.abort-button {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 0.75rem;
+  transition: background-color 0.2s ease;
+}
+
+.abort-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
