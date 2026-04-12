@@ -6,13 +6,31 @@ import { TRPCError } from "@trpc/server";
 
 export const questionRouter = createTRPCRouter({
   listQuestions: protectedProcedure
-    .input(z.object({ questionId: z.string().min(1) }))
+    .input(
+      z.object({
+        limit: z.number().optional(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
-      return ctx.db.question.findMany({
-        where: { questionId: input.questionId },
-        include: { createdBy: true },
+      const questions = await ctx.db.question.findMany({
+        take: input?.limit ?? 5,
+        include: {
+          createdBy: {
+            select: { id: true, name: true },
+          },
+          messages: {
+            select: {
+              id: true,
+              message: true,
+              createdAt: true,
+              createdBy: { select: { id: true, name: true } },
+            },
+          },
+        },
         orderBy: { createdAt: "asc" },
       });
+
+      return questions;
     }),
 
   createQuestion: protectedProcedure

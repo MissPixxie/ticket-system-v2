@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import { Status } from "@prisma/client";
 import { useState } from "react";
 import { TicketSection } from "~/app/_components/modals/create-ticket/ticketSection";
-import TicketCard from "~/app/_components/ticketCard";
+import TicketCard from "~/app/_components/cards/ticketCard";
 import { TicketTable } from "~/app/_components/ticketTable";
 
 const priorityClasses: Record<string, string> = {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useSocket } from "~/app/socketProvider";
 import { TicketSection } from "~/app/_components/modals/create-ticket/ticketSection";
-import TicketCard from "~/app/_components/ticketCard";
+import TicketCard from "~/app/_components/cards/ticketCard";
 import { TicketTable } from "~/app/_components/ticketTable";
 import CreateTicketModal from "~/app/_components/modals/create-ticket/createTicketModal";
 import { useCreateTicket } from "~/app/_components/modals/create-ticket/useCreateTicket";

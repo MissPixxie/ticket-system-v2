@@ -1,8 +1,9 @@
 "use client";
 
 import { api } from "~/trpc/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
+import ResourceCard from "~/app/_components/cards/resourceCard";
 import SkeletonResourcesCard from "~/app/_components/skeletonComponents/cards/skeletonResourcesCard";
 
 export default function ResourcesPage() {
@@ -30,14 +31,7 @@ export default function ResourcesPage() {
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {resources.map((item) => (
-              <a
-                key={item.id}
-                href="#"
-                className="card flex cursor-pointer flex-col justify-between bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
-              >
-                <h2 className="text-lg font-semibold">{item.title}</h2>
-                <p className="mt-2 text-sm text-white/70">{item.content}</p>
-              </a>
+              <ResourceCard key={item.id} resourceItem={item} />
             ))}
           </div>
         </div>

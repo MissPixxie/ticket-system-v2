@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { api } from "~/trpc/react";
-import TicketCard from "./ticketCard";
+import TicketCard from "./cards/ticketCard";
 import { useSocket } from "../socketProvider";
 import { TicketSection } from "./modals/create-ticket/ticketSection";
 import { PickSection } from "./modals/handler-picker/pickSection";
@@ -88,7 +88,7 @@ export function TicketTable({
     return <p>Inga tickets hittades</p>;
 
   return (
-    <div className="mt-15 rounded-2xl bg-white/5 shadow-lg/15 backdrop-blur-lg">
+    <div className="primary-background mt-15 rounded-2xl shadow-lg/15 backdrop-blur-lg">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 p-5">
         <div className="flex items-center gap-4">
           <select

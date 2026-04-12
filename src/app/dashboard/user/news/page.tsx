@@ -103,7 +103,7 @@ export default function NewsPage() {
                 <div
                   key={news.id}
                   onClick={() => toggleNews(news.id)}
-                  className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 transition hover:bg-white/10"
+                  className="card"
                 >
                   {/* HEADER */}
                   <div className="flex items-center justify-between">

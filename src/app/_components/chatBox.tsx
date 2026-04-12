@@ -21,6 +21,7 @@ export default function ChatBox({ id, currentUserId }: ChatBoxProps) {
 
   const { data: messages, isLoading } = api.message.listMessages.useQuery({
     id,
+    type: "ticket",
   });
 
   const sortedMessages = messages ? [...messages].reverse() : [];

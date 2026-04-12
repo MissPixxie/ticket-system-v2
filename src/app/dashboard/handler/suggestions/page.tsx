@@ -5,7 +5,7 @@ import {
   dummySuggestions,
   type DummySuggestion,
 } from "~/app/_data/dummySuggestions";
-import SuggestionCard from "~/app/_components/suggestionCard";
+import SuggestionCard from "~/app/_components/cards/suggestionCard";
 
 export default function SuggestionsHandlerPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);

@@ -79,7 +79,7 @@ export default async function UserLayout({
     <div>
       <Header />
       <div className="flex flex-row gap-10 bg-linear-to-b from-[#2e026d] to-[#15162c]">
-        <aside className="min-h-screen w-72 border-r border-white/10 bg-white/5 backdrop-blur-xl">
+        <aside className="primary-background min-h-screen w-72 border-r border-white/10 backdrop-blur-xl">
           <div className="flex flex-col pt-6 text-white">
             <div className="mb-6 px-6 text-sm font-semibold tracking-widest text-white/40 uppercase">
               Navigation

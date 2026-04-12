@@ -3,7 +3,7 @@
 import { api } from "~/trpc/react";
 import ChatBox from "~/app/_components/chatBox";
 import { getCurrentUserId } from "~/app/_components/getCurrentUserId";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -26,6 +26,19 @@ export default function TicketPage({
   const { data: ticket, isLoading } = api.ticket.getTicketById.useQuery({
     id: ticketId,
   });
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await getCurrentUserId();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Fel vid hämtning av användare:", error);
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   if (isLoading || !ticket) {
     return (
@@ -100,7 +113,7 @@ export default function TicketPage({
           </div>
 
           <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
-            <ChatBox ticketId={ticket.id} currentUserId={currentUserId} />
+            <ChatBox id={ticket.id} currentUserId={currentUser || undefined} />
           </div>
         </div>
       </div>

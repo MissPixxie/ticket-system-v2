@@ -82,10 +82,7 @@ export default function UserHome() {
             Snabblänkar
           </h1>
           <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <button
-              onClick={() => setIsOpen(true)}
-              className="cursor-pointer rounded-2xl bg-white/5 p-6 text-left shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
-            >
+            <button onClick={() => setIsOpen(true)} className="card">
               <FaTicketAlt className="mb-3 text-blue-400" size={20} />
               <p className="font-semibold">Skapa ticket</p>
               <p className="text-sm text-white/60">

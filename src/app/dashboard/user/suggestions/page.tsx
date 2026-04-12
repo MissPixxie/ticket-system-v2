@@ -72,7 +72,7 @@ export default function SuggestionsPage() {
 
   return (
     <main className="flex min-h-screen justify-center px-6 py-12 text-white">
-      <div className="w-full max-w-5xl rounded-2xl bg-white/5 p-8 shadow-lg/15 backdrop-blur-lg">
+      <div className="primary-background w-full max-w-5xl rounded-2xl p-8 shadow-lg/15 backdrop-blur-lg">
         {/* HEADER */}
         <div className="mb-8 flex items-center gap-3">
           <FaLightbulb className="text-yellow-400" size={22} />
