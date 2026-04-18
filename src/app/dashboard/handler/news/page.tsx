@@ -1,25 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { dummyNews, type DummyNews } from "~/app/_data/dummyNews";
 import { RiEdit2Fill } from "react-icons/ri";
 import { FaTrashAlt } from "react-icons/fa";
 import { EditSection } from "~/app/_components/modals/edit-news/editSection";
 import NewsCard from "~/app/_components/cards/newsCard";
 import { api } from "~/trpc/react";
 
+const PAGE_SIZE = 5;
+
 export default function NewsPage() {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const utils = api.useUtils();
-  const [news, setNews] = useState<DummyNews[]>(dummyNews);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<
     "NEWS" | "STORE_MANUAL" | "PRODUCT_INFORMATION" | "CAMPAIGN"
   >("NEWS");
   const [content, setContent] = useState("");
 
+  const { data: news = [] } = api.news.listNews.useQuery({
+    limit: visibleCount,
+  });
+
   const createNews = api.news.createNews.useMutation({
     onSuccess: (newNews) => {
-      utils.news.listNews.setData(undefined, (oldData) => {
+      utils.news.listNews.setData({ limit: visibleCount }, (oldData) => {
         if (!oldData) return [newNews];
         return [newNews, ...oldData];
       });
@@ -62,20 +67,26 @@ export default function NewsPage() {
             <select
               value={category}
               onChange={(e) =>
-                setCategory(e.target.value as DummyNews["category"])
+                setCategory(
+                  e.target.value as
+                    | "NEWS"
+                    | "STORE_MANUAL"
+                    | "PRODUCT_INFORMATION"
+                    | "CAMPAIGN",
+                )
               }
               className="rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="Nyheter" className="text-black">
+              <option value="NEWS" className="text-black">
                 Nyheter
               </option>
-              <option value="Butiksmanual" className="text-black">
+              <option value="STORE_MANUAL" className="text-black">
                 Butiksmanual
               </option>
-              <option value="Produktinformation" className="text-black">
+              <option value="PRODUCT_INFORMATION" className="text-black">
                 Produktinformation
               </option>
-              <option value="Kampanjer" className="text-black">
+              <option value="CAMPAIGN" className="text-black">
                 Kampanjer
               </option>
             </select>
@@ -97,7 +108,7 @@ export default function NewsPage() {
         {/* Lista nyhetskort */}
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {news.map((item) => (
-            <NewsCard key={item.newsId} {...item} />
+            <NewsCard key={item.id} {...item} />
           ))}
         </div>
       </div>

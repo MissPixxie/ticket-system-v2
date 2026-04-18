@@ -58,6 +58,8 @@ enum EventType {
   NEWS_CHANGED_PRIORITY
   QUESTION_CREATED
   QUESTION_STATUS_CHANGED
+  RESOURCE_CREATED
+  RESOURCE_CHANGED
 }
 
 enum EventOrigin {
@@ -65,6 +67,7 @@ enum EventOrigin {
   SUGGESTION
   NEWS
   QUESTION
+  RESOURCE
 }
 
 model Event {
@@ -337,6 +340,7 @@ model Resource {
   createdById String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+  url         String?
 
   @@index([id])
   @@index([category])

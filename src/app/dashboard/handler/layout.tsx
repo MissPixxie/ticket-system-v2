@@ -11,6 +11,7 @@ import { db } from "~/server/db";
 import { redirect } from "next/navigation";
 import { MdCampaign } from "react-icons/md";
 import { FaRegLightbulb } from "react-icons/fa6";
+import { ImBooks } from "react-icons/im";
 
 export default async function HandlerLayout({
   children,
@@ -54,6 +55,12 @@ export default async function HandlerLayout({
       label: "Nyheter",
       route: "/dashboard/handler/news",
       icon: <MdCampaign size={22} />,
+    },
+    {
+      id: "resources",
+      label: "Resurser",
+      route: "/dashboard/handler/resources",
+      icon: <ImBooks size={20} />,
     },
     {
       id: "suggestions",

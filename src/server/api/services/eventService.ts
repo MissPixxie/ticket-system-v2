@@ -21,9 +21,11 @@ export class PrismaEventService extends EventEmitter {
       | "NEWS_CHANGED"
       | "NEWS_CHANGED_PRIORITY"
       | "QUESTION_CREATED"
-      | "QUESTION_STATUS_CHANGED";
+      | "QUESTION_STATUS_CHANGED"
+      | "RESOURCE_CREATED"
+      | "RESOURCE_CHANGED";
     originId: string;
-    originType: "TICKET" | "SUGGESTION" | "NEWS" | "QUESTION";
+    originType: "TICKET" | "SUGGESTION" | "NEWS" | "QUESTION" | "RESOURCE";
     actorId: string;
     severity?: "INFO" | "WARNING" | "ERROR";
     metadata?: EventMetadata;
@@ -57,24 +59,24 @@ export class PrismaEventService extends EventEmitter {
       },
     });
 
-    const subscriptions = await db.subscription.findMany({
-      where: {
-        originId,
-        type: originType,
-      },
-    });
+    // const subscriptions = await db.subscription.findMany({
+    //   where: {
+    //     originId,
+    //     type: originType,
+    //   },
+    // });
 
-    await db.notification.createMany({
-      data: subscriptions.map((sub) => ({
-        userId: sub.userId,
-        eventId: event.id,
-      })),
-    });
+    // await db.notification.createMany({
+    //   data: subscriptions.map((sub) => ({
+    //     userId: sub.userId,
+    //     eventId: event.id,
+    //   })),
+    // });
 
-    this.emit(`${originType.toLowerCase()}:${type.toLowerCase()}`, {
-      event,
-      subscriptions,
-    });
+    // this.emit(`${originType.toLowerCase()}:${type.toLowerCase()}`, {
+    //   event,
+    //   subscriptions,
+    // });
 
     // if (params.severity) {
     //   createAuditLog({

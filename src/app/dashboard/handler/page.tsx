@@ -4,26 +4,25 @@ import { api } from "~/trpc/react";
 import { FaLightbulb, FaRegClock } from "react-icons/fa";
 import { GoTrophy } from "react-icons/go";
 import { RiQuestionLine } from "react-icons/ri";
-import { useState } from "react";
-import { dummyQuestions } from "~/app/_data/dummyQuestions";
-import { dummyNews } from "~/app/_data/dummyNews";
 import Link from "next/link";
+import { useState } from "react";
 
-const questions = dummyQuestions;
-const news = dummyNews;
+const PAGE_SIZE = 5;
 
 export default function HandlerHome() {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const { data: tickets, isLoading: ticketsLoading } =
     api.ticket.listAllTickets.useQuery({ limit: 20 });
-  const { data: suggestions, isLoading: suggestionsLoading } =
-    api.suggestionBox.listSuggestions.useQuery({
-      suggestionBoxId: "cmn08ax080007c0u96m7vawdg",
-    });
-  // const { data: questions, isLoading: questionsLoading } =
-  //   api.question.listAllQuestions.useQuery();
-  // const { data: news, isLoading: newsLoading } = api.news.listNews.useQuery();
 
-  const generalNews = news.filter((n) => n.category === "NEWS");
+  const { data: suggestions } = api.suggestionBox.listSuggestions.useQuery();
+
+  const { data: questions = [] } = api.question.listQuestions.useQuery({
+    limit: visibleCount,
+  });
+
+  const { data: news = [] } = api.news.listNews.useQuery({
+    limit: visibleCount,
+  });
 
   return (
     <main className="min-h-screen px-6 py-12 text-white">
@@ -33,26 +32,26 @@ export default function HandlerHome() {
 
         {/* STATS / SNABBÖVERSIKT */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10">
             <p className="text-sm text-white/60">Totala tickets</p>
             <p className="mt-2 text-3xl font-bold">
               {tickets?.tickets.length ?? 0}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10">
             <p className="text-sm text-white/60">Öppna förslag</p>
             <p className="mt-2 text-3xl font-bold">
               {suggestions?.length ?? 0}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10">
             <p className="text-sm text-white/60">Frågor från butiker</p>
             <p className="mt-2 text-3xl font-bold">{questions?.length ?? 0}</p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10">
             <p className="text-sm text-white/60">Senaste nyheter</p>
             <p className="mt-2 text-3xl font-bold">{news?.length ?? 0}</p>
           </div>

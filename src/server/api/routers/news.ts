@@ -82,6 +82,24 @@ export const newsRouter = createTRPCRouter({
           category: input.category,
           createdById: ctx.session.user.id,
         },
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          comments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       await prismaEventService.createEvent({
@@ -100,7 +118,7 @@ export const newsRouter = createTRPCRouter({
         message: `${ctx.session.user.email} created news "${news.title}"`,
       });
 
-      return news;
+      return { ...news, hasVoted: false, userVote: null };
     }),
 
   // =========================

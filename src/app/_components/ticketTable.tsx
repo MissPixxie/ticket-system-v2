@@ -46,6 +46,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
     updateTicket.mutate({
       id: ticketId,
       status: "IN_PROGRESS",
+      assignedToId: me?.id || undefined,
     });
   };
 
@@ -182,7 +183,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
                             e.stopPropagation();
                             handleSetStatus(ticket.id);
                           }}
-                          className="rounded-lg border-2 border-blue-500 bg-blue-200/30 px-10 py-3 text-white shadow-md hover:bg-blue-500"
+                          className="submit-button"
                         >
                           Acceptera
                         </button>

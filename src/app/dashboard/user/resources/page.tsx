@@ -1,16 +1,14 @@
 "use client";
 
 import { api } from "~/trpc/react";
-import { useEffect, useState } from "react";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import ResourceCard from "~/app/_components/cards/resourceCard";
 import SkeletonResourcesCard from "~/app/_components/skeletonComponents/cards/skeletonResourcesCard";
 
 export default function ResourcesPage() {
-  const { data: news, isLoading } = api.news.listNews.useQuery({ limit: 5 });
-  const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
-
-  const resources = news?.filter((n) => n.category === "STORE_MANUAL") ?? [];
+  const { data: resources, isLoading } = api.resource.listResources.useQuery({
+    limit: 5,
+  });
 
   return (
     <main className="main-page-layout">
@@ -29,9 +27,10 @@ export default function ResourcesPage() {
             </div>
           )}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {resources.map((item) => (
-              <ResourceCard key={item.id} resourceItem={item} />
-            ))}
+            {resources &&
+              resources.map((item) => (
+                <ResourceCard key={item.id} resourceItem={item} />
+              ))}
           </div>
         </div>
       </div>
