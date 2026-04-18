@@ -4,6 +4,7 @@ import { api } from "~/trpc/react";
 import { Status } from "@prisma/client";
 import { useSocket } from "~/app/socketProvider";
 import { TicketTable } from "~/app/_components/ticketTable";
+import { TiTicket } from "react-icons/ti";
 
 export default function TicketsPage() {
   const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({
@@ -39,33 +40,34 @@ export default function TicketsPage() {
   }
 
   return (
-    <main className="min-h-screen px-6 py-12 text-white">
-      <div className="mx-auto w-full max-w-6xl">
-        <h1 className="mb-8 text-2xl font-bold tracking-wide">
-          Tickets Översikt
-        </h1>
+    <main className="main-page-layout">
+      <div className="container">
+        <div className="header-container">
+          <TiTicket className="text-purple-400" size={36} />
+          <h1 className="page-header">Tickets översikt</h1>
+        </div>
         {/* STATS CARDS */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="secondary-card">
             <p className="text-sm text-white/60">Totala tickets</p>
             <p className="mt-2 text-3xl font-bold">{total}</p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="secondary-card">
             <p className="text-sm text-white/60">Nya tickets</p>
             <p className="mt-2 text-3xl font-bold text-blue-400">
               {newTickets}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="secondary-card">
             <p className="text-sm text-white/60">Pågående tickets</p>
             <p className="mt-2 text-3xl font-bold text-amber-400">
               {inProgress}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg transition hover:bg-white/10">
+          <div className="secondary-card">
             <p className="text-sm text-white/60">Stängda tickets</p>
             <p className="mt-2 text-3xl font-bold text-green-400">{closed}</p>
           </div>

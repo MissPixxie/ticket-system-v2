@@ -5,10 +5,13 @@ import ReactDOM from "react-dom";
 import {
   FaHandHoldingHeart,
   FaLaptop,
+  FaRegFileAlt,
   FaShopify,
   FaShoppingCart,
   FaUsers,
 } from "react-icons/fa";
+import { ImInfo } from "react-icons/im";
+import { MdCampaign } from "react-icons/md";
 
 export type Category =
   | "NEWS"
@@ -47,24 +50,24 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
   if (!isOpen) return null;
 
   const categorys = [
-    { id: 1, value: "NEWS", label: "NEWS", icon: <FaLaptop size={22} /> },
+    { id: 1, value: "NEWS", label: "NEWS", icon: <MdCampaign size={24} /> },
     {
       id: 2,
       value: "STORE_MANUAL",
-      label: "STORE_MANUAL",
-      icon: <FaUsers size={22} />,
+      label: "MANUAL",
+      icon: <FaRegFileAlt size={22} />,
     },
     {
       id: 3,
       value: "PRODUCT_INFORMATION",
-      label: "PRODUCT_INFORMATION",
-      icon: <FaShopify size={22} />,
+      label: "INFORMATION",
+      icon: <ImInfo size={22} />,
     },
     {
       id: 4,
       value: "CAMPAIGN",
       label: "CAMPAIGN",
-      icon: <FaShoppingCart size={22} />,
+      icon: <FaShopify size={22} />,
     },
   ];
 
@@ -86,7 +89,7 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
         className="w-full max-w-xl rounded-lg bg-linear-to-b p-6 shadow-lg dark:from-[#3b0e7a]/70 dark:to-[#282a53]/70"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="grid grid-cols-5 gap-4 sm:grid-cols-5 md:gap-8">
+        <div className="flex justify-center md:gap-8">
           {categorys.map((cat) => (
             <div
               key={cat.id}
@@ -101,7 +104,7 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
                   isSelected === cat.id
                     ? "scale-110 bg-blue-500 text-white"
                     : isSelected !== null
-                      ? "notSelected"
+                      ? "bg-white/5 text-white/40 hover:bg-white/10"
                       : "bg-white/10 hover:bg-white/20"
                 }`}
               >
@@ -119,14 +122,14 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
             placeholder="Titel"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-800 required:border-red-500 required:text-red-500"
+            className="rounded-lg border border-black/50 bg-white/5 px-4 py-3 text-gray-200/65 required:border-red-500 required:text-red-500"
           />
-          <label htmlFor="content">Beskriv problemet</label>
+          <label htmlFor="content">Beskriv nyheten</label>
           <textarea
-            placeholder="Beskriv problemet"
+            placeholder="Beskriv nyheten"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-black required:border-red-500 required:text-red-500"
+            className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
           />
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold">Prioritet</label>

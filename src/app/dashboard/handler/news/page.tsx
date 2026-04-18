@@ -6,6 +6,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import { EditSection } from "~/app/_components/modals/edit-news/editSection";
 import NewsCard from "~/app/_components/cards/newsCard";
 import { api } from "~/trpc/react";
+import { MdCampaign } from "react-icons/md";
 
 const PAGE_SIZE = 5;
 
@@ -46,11 +47,12 @@ export default function NewsPage() {
   };
 
   return (
-    <main className="min-h-screen px-6 py-12 text-white">
+    <main className="main-page-layout">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
-        <h1 className="text-3xl font-bold tracking-wide">
-          Nyheter & Information
-        </h1>
+        <div className="header-container">
+          <MdCampaign className="text-purple-400" size={36} />
+          <h1 className="page-header">Nyheter & information</h1>
+        </div>
 
         {/* Skapa nyhet */}
         <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">

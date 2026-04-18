@@ -1,97 +1,119 @@
 "use client";
 
 import { useState } from "react";
-import { dummyQuestions, type DummyQuestion } from "~/app/_data/dummyQuestions";
+import { api } from "~/trpc/react";
+import { HiQuestionMarkCircle } from "react-icons/hi";
+import QuestionCard from "~/app/_components/cards/questionCard";
 
-interface Message {
-  id: string;
-  createdBy: { id: string; name: string };
-  content: string;
-  createdAt: Date;
-}
-
-interface Question {
-  id: string;
-  title: string;
-  content: string;
-  createdBy: { id: string; name: string };
-  createdAt: Date;
-  category: string;
-  status: "OPEN" | "ANSWERED" | "CLOSED";
-  messages: Message[];
-}
+const PAGE_SIZE = 5;
 
 export default function QuestionsPage() {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
+    null,
+  );
+  const [newMessage, setNewMessage] = useState("");
+  const utils = api.useUtils();
+  const { data: questions = [], isLoading } =
+    api.question.listQuestions.useQuery({
+      limit: visibleCount,
+    });
+  const { data: me } = api.user.me.useQuery();
 
-  const questions: Question[] = dummyQuestions.map((q) => ({
-    ...q,
-    messages: q.replies.map((r) => ({
-      id: r.id,
-      content: r.message,
-      createdAt: r.createdAt,
-      createdBy: r.createdBy,
-    })),
-  }));
+  const createQuestion = api.question.createQuestion.useMutation({
+    onSuccess: () => {
+      utils.question.listQuestions.invalidate();
+      setNewMessage("");
+    },
+  });
+
+  const hasMore = questions?.length === visibleCount;
+
+  const toggleQuestions = (id: string) => {
+    setSelectedQuestionId((prev) => (prev === id ? null : id));
+  };
+
+  const loadMore = () => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  };
+
+  const showLess = () => {
+    setVisibleCount(PAGE_SIZE);
+  };
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center text-white/70">
+        Laddar frågor...
+      </main>
+    );
+  }
+
+  if (!questions || questions.length === 0) {
+    return (
+      <main className="flex min-h-screen items-center justify-center text-white/70">
+        Inga frågor hittades
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-linear-to-b from-[#2e026d] to-[#15162c] p-6 text-white">
-      <h1 className="mb-6 text-3xl font-bold">Frågor från butiker</h1>
+    <main className="main-page-layout">
+      <div className="container">
+        <div className="header-container">
+          <HiQuestionMarkCircle className="text-purple-400" size={28} />
+          <h1 className="page-header">Frågor & Svar</h1>
+        </div>
 
-      <div className="flex flex-col gap-4">
-        {questions.map((q) => (
-          <div
-            key={q.id}
-            className="rounded-lg bg-white/5 p-4 shadow-lg/15 transition hover:bg-white/10"
-          >
-            <div
-              className="flex cursor-pointer justify-between"
-              onClick={() => setExpandedId(expandedId === q.id ? null : q.id)}
-            >
-              <div>
-                <h2 className="text-lg font-semibold">{q.title}</h2>
-                <p className="text-sm text-white/60">
-                  {q.createdBy.name} · {q.createdAt.toLocaleDateString()}
-                </p>
+        <div className="mt-4 space-y-3">
+          {questions.map((question) => {
+            return (
+              <div className="card">
+                <button
+                  onClick={() => {
+                    toggleQuestions(question.id);
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-medium">{question.question}</h2>
+                  </div>
+                  <div className="mt-2 text-xs text-white/40">
+                    {question.createdBy?.name} ·{" "}
+                    {new Date(question.createdAt).toLocaleDateString()}
+                  </div>
+                </button>
+                {selectedQuestionId === question.id && (
+                  <div className="p-5">
+                    <QuestionCard
+                      {...question}
+                      currentUserId={me?.id ?? null}
+                    />
+                  </div>
+                )}
               </div>
-              <div className="text-sm font-medium">{q.status}</div>
-            </div>
+            );
+          })}
+          <div className="flex justify-center gap-3">
+            {hasMore && (
+              <button
+                onClick={loadMore}
+                className="rounded-lg bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+              >
+                Visa fler
+              </button>
+            )}
 
-            {expandedId === q.id && (
-              <div className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-4">
-                <p>{q.content}</p>
-
-                {/* Chatbox-liknande område */}
-                <div className="flex flex-col gap-2">
-                  {q.messages.length === 0 && (
-                    <p className="text-sm text-white/60">Inga svar än</p>
-                  )}
-                  {q.messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className="rounded-lg bg-black/20 p-3 text-sm"
-                    >
-                      <div className="mb-1 text-xs text-white/60">
-                        {msg.createdBy.name} ·{" "}
-                        {msg.createdAt.toLocaleTimeString()}
-                      </div>
-                      {msg.content}
-                    </div>
-                  ))}
-
-                  {/* Nytt svar */}
-                  <textarea
-                    placeholder="Skriv ett svar..."
-                    className="mt-2 w-full rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button className="mt-1 self-end rounded-lg bg-blue-600 px-4 py-2 text-sm hover:bg-blue-700">
-                    Skicka
-                  </button>
-                </div>
-              </div>
+            {visibleCount > PAGE_SIZE && (
+              <button
+                onClick={showLess}
+                className="rounded-lg bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+              >
+                Visa mindre
+              </button>
             )}
           </div>
-        ))}
+        </div>
       </div>
     </main>
   );

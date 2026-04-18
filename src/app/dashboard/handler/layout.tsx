@@ -3,7 +3,7 @@ import Link from "next/link";
 import Header from "~/app/_components/header";
 import { IoMdHome } from "react-icons/io";
 import { TiTicket } from "react-icons/ti";
-import { LuLogs } from "react-icons/lu";
+import { LuLogs, LuMessageSquareText } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaRegQuestionCircle } from "react-icons/fa";
 import { getSession } from "~/server/better-auth/server";
@@ -37,6 +37,12 @@ export default async function HandlerLayout({
       label: "Hem",
       route: "/dashboard/handler/",
       icon: <IoMdHome size={22} />,
+    },
+    {
+      id: "messages",
+      label: "Meddelanden",
+      route: "/dashboard/handler/messages",
+      icon: <LuMessageSquareText size={20} />,
     },
     {
       id: "tickets",

@@ -32,26 +32,26 @@ export default function HandlerHome() {
 
         {/* STATS / SNABBÖVERSIKT */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10">
+          <div className="secondary-card">
             <p className="text-sm text-white/60">Totala tickets</p>
             <p className="mt-2 text-3xl font-bold">
               {tickets?.tickets.length ?? 0}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10">
+          <div className="secondary-card">
             <p className="text-sm text-white/60">Öppna förslag</p>
             <p className="mt-2 text-3xl font-bold">
               {suggestions?.length ?? 0}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10">
+          <div className="secondary-card">
             <p className="text-sm text-white/60">Frågor från butiker</p>
             <p className="mt-2 text-3xl font-bold">{questions?.length ?? 0}</p>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/10">
+          <div className="secondary-card">
             <p className="text-sm text-white/60">Senaste nyheter</p>
             <p className="mt-2 text-3xl font-bold">{news?.length ?? 0}</p>
           </div>
