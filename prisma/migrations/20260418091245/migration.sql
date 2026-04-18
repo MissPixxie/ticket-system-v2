@@ -26,16 +26,65 @@ CREATE TABLE "Event" (
 );
 
 -- CreateTable
+CREATE TABLE "SuggestionBox" (
+    "id" TEXT NOT NULL PRIMARY KEY
+);
+
+-- CreateTable
+CREATE TABLE "Suggestion" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "content" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "status" TEXT NOT NULL DEFAULT 'SENT',
+    "isAnonymous" BOOLEAN NOT NULL DEFAULT false,
+    "userId" TEXT,
+    "suggestionBoxId" TEXT NOT NULL,
+    "voteCount" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "Suggestion_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Suggestion_suggestionBoxId_fkey" FOREIGN KEY ("suggestionBoxId") REFERENCES "SuggestionBox" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Vote" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "type" TEXT NOT NULL,
+    "userId" TEXT,
+    "suggestionId" TEXT NOT NULL,
+    CONSTRAINT "Vote_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Vote_suggestionId_fkey" FOREIGN KEY ("suggestionId") REFERENCES "Suggestion" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
 CREATE TABLE "Question" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "title" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
+    "question" TEXT NOT NULL,
     "createdById" TEXT,
-    "category" TEXT NOT NULL DEFAULT 'GENERAL',
-    "status" TEXT NOT NULL DEFAULT 'PENDING',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "Question_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Thread" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "type" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ticketId" TEXT,
+    "questionId" TEXT,
+    CONSTRAINT "Thread_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Thread_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "message" TEXT NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'USER_MESSAGE',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdById" TEXT,
+    "threadId" TEXT,
+    CONSTRAINT "Message_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Message_threadId_fkey" FOREIGN KEY ("threadId") REFERENCES "Thread" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -73,7 +122,8 @@ CREATE TABLE "News" (
     "isPinned" BOOLEAN NOT NULL DEFAULT false,
     "isPublished" BOOLEAN NOT NULL DEFAULT true,
     "priority" TEXT NOT NULL DEFAULT 'LOW',
-    "voteCount" INTEGER NOT NULL DEFAULT 0,
+    "upVotes" INTEGER NOT NULL DEFAULT 0,
+    "downVotes" INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT "News_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
@@ -112,35 +162,6 @@ CREATE TABLE "Resource" (
 );
 
 -- CreateTable
-CREATE TABLE "SuggestionBox" (
-    "id" TEXT NOT NULL PRIMARY KEY
-);
-
--- CreateTable
-CREATE TABLE "Suggestion" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "content" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "status" TEXT NOT NULL DEFAULT 'SENT',
-    "isAnonymous" BOOLEAN NOT NULL DEFAULT false,
-    "userId" TEXT,
-    "suggestionBoxId" TEXT NOT NULL,
-    "voteCount" INTEGER NOT NULL DEFAULT 0,
-    CONSTRAINT "Suggestion_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Suggestion_suggestionBoxId_fkey" FOREIGN KEY ("suggestionBoxId") REFERENCES "SuggestionBox" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
--- CreateTable
-CREATE TABLE "Vote" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "type" TEXT NOT NULL,
-    "userId" TEXT,
-    "suggestionId" TEXT NOT NULL,
-    CONSTRAINT "Vote_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Vote_suggestionId_fkey" FOREIGN KEY ("suggestionId") REFERENCES "Suggestion" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
--- CreateTable
 CREATE TABLE "Ticket" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "title" TEXT NOT NULL,
@@ -155,22 +176,10 @@ CREATE TABLE "Ticket" (
     "solvedAt" DATETIME,
     "createdById" TEXT,
     "assignedToId" TEXT,
+    "signedByUser" BOOLEAN NOT NULL DEFAULT false,
+    "signedByHandler" BOOLEAN NOT NULL DEFAULT false,
     CONSTRAINT "Ticket_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "Ticket_assignedToId_fkey" FOREIGN KEY ("assignedToId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
-);
-
--- CreateTable
-CREATE TABLE "Message" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "message" TEXT NOT NULL,
-    "type" TEXT NOT NULL DEFAULT 'USER_MESSAGE',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdById" TEXT,
-    "ticketId" TEXT,
-    "questionId" TEXT,
-    CONSTRAINT "Message_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Message_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Message_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -292,16 +301,46 @@ CREATE INDEX "Event_actorId_idx" ON "Event"("actorId");
 CREATE INDEX "Event_createdAt_idx" ON "Event"("createdAt");
 
 -- CreateIndex
+CREATE INDEX "SuggestionBox_id_idx" ON "SuggestionBox"("id");
+
+-- CreateIndex
+CREATE INDEX "Suggestion_status_idx" ON "Suggestion"("status");
+
+-- CreateIndex
+CREATE INDEX "Suggestion_suggestionBoxId_idx" ON "Suggestion"("suggestionBoxId");
+
+-- CreateIndex
+CREATE INDEX "Suggestion_userId_idx" ON "Suggestion"("userId");
+
+-- CreateIndex
+CREATE INDEX "Vote_suggestionId_idx" ON "Vote"("suggestionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Vote_userId_suggestionId_key" ON "Vote"("userId", "suggestionId");
+
+-- CreateIndex
 CREATE INDEX "Question_id_idx" ON "Question"("id");
 
 -- CreateIndex
-CREATE INDEX "Question_category_idx" ON "Question"("category");
-
--- CreateIndex
-CREATE INDEX "Question_status_idx" ON "Question"("status");
-
--- CreateIndex
 CREATE INDEX "Question_createdAt_idx" ON "Question"("createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Thread_ticketId_key" ON "Thread"("ticketId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Thread_questionId_key" ON "Thread"("questionId");
+
+-- CreateIndex
+CREATE INDEX "Thread_id_idx" ON "Thread"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Thread_id_key" ON "Thread"("id");
+
+-- CreateIndex
+CREATE INDEX "Message_threadId_idx" ON "Message"("threadId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Message_id_key" ON "Message"("id");
 
 -- CreateIndex
 CREATE INDEX "Subscription_originId_type_idx" ON "Subscription"("originId", "type");
@@ -337,24 +376,6 @@ CREATE INDEX "Resource_category_idx" ON "Resource"("category");
 CREATE INDEX "Resource_title_idx" ON "Resource"("title");
 
 -- CreateIndex
-CREATE INDEX "SuggestionBox_id_idx" ON "SuggestionBox"("id");
-
--- CreateIndex
-CREATE INDEX "Suggestion_status_idx" ON "Suggestion"("status");
-
--- CreateIndex
-CREATE INDEX "Suggestion_suggestionBoxId_idx" ON "Suggestion"("suggestionBoxId");
-
--- CreateIndex
-CREATE INDEX "Suggestion_userId_idx" ON "Suggestion"("userId");
-
--- CreateIndex
-CREATE INDEX "Vote_suggestionId_idx" ON "Vote"("suggestionId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Vote_userId_suggestionId_key" ON "Vote"("userId", "suggestionId");
-
--- CreateIndex
 CREATE INDEX "Ticket_createdById_idx" ON "Ticket"("createdById");
 
 -- CreateIndex
@@ -368,12 +389,6 @@ CREATE INDEX "Ticket_department_idx" ON "Ticket"("department");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Ticket_id_key" ON "Ticket"("id");
-
--- CreateIndex
-CREATE INDEX "Message_ticketId_idx" ON "Message"("ticketId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Message_id_key" ON "Message"("id");
 
 -- CreateIndex
 CREATE INDEX "Post_name_idx" ON "Post"("name");

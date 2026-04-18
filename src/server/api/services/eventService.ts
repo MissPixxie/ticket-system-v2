@@ -19,9 +19,11 @@ export class PrismaEventService extends EventEmitter {
       | "ROLE_CHANGED"
       | "NEWS_CREATED"
       | "NEWS_CHANGED"
-      | "NEWS_CHANGED_PRIORITY";
+      | "NEWS_CHANGED_PRIORITY"
+      | "QUESTION_CREATED"
+      | "QUESTION_STATUS_CHANGED";
     originId: string;
-    originType: "TICKET" | "SUGGESTION" | "NEWS";
+    originType: "TICKET" | "SUGGESTION" | "NEWS" | "QUESTION";
     actorId: string;
     severity?: "INFO" | "WARNING" | "ERROR";
     metadata?: EventMetadata;
@@ -31,7 +33,9 @@ export class PrismaEventService extends EventEmitter {
     const originExists =
       originType === "TICKET"
         ? await db.ticket.findUnique({ where: { id: originId } })
-        : await db.suggestion.findUnique({ where: { id: originId } });
+        : originType === "QUESTION"
+          ? await db.question.findUnique({ where: { id: originId } })
+          : await db.suggestion.findUnique({ where: { id: originId } });
 
     if (!originExists) {
       throw new Error(`${originType} med id ${originId} finns inte`);

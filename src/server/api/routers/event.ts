@@ -16,13 +16,19 @@ export const eventRouter = createTRPCRouter({
           "SUGGESTION_STATUS_CHANGED",
           "SUGGESTION_VOTED",
           "ROLE_CHANGED",
+          "NEWS_CREATED",
+          "NEWS_CHANGED",
+          "NEWS_CHANGED_PRIORITY",
+          "QUESTION_CREATED",
+          "QUESTION_STATUS_CHANGED",
         ]),
         originId: z.string().min(1),
-        originType: z.enum(["TICKET", "SUGGESTION"]),
+        originType: z.enum(["TICKET", "SUGGESTION", "NEWS", "QUESTION"]),
         metadata: z.record(z.string()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+
       const originExists =
         input.originType === "TICKET"
           ? await ctx.db.ticket.findUnique({ where: { id: input.originId } })

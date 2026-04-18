@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
+import { ParentType } from "@prisma/client";
 
 export const ticketRouter = createTRPCRouter({
   listAllTickets: protectedProcedure
@@ -17,7 +18,11 @@ export const ticketRouter = createTRPCRouter({
         take: input.limit + 1,
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: { createdAt: "desc" },
-        include: { messages: true, createdBy: true, assignedTo: true },
+        include: {
+          createdBy: true,
+          assignedTo: true,
+          thread: { select: { id: true } },
+        },
       });
 
       let nextCursor: string | null = null;
@@ -32,21 +37,28 @@ export const ticketRouter = createTRPCRouter({
   listUserTickets: protectedProcedure.query(({ ctx }) => {
     return ctx.db.ticket.findMany({
       where: { createdById: ctx.session.user.id },
-      include: { messages: true, createdBy: true, assignedTo: true },
+      include: {
+        createdBy: true,
+        assignedTo: true,
+        thread: { select: { id: true } },
+      },
     });
   }),
 
   getTicketById: protectedProcedure
     .input(
       z.object({
-        id: z.string().uuid().min(1),
-
+        id: z.string().min(1),
       }),
     )
     .query(async ({ ctx, input }) => {
       const ticket = await ctx.db.ticket.findUnique({
         where: { id: input.id },
-        include: { messages: true, createdBy: true, assignedTo: true },
+        include: {
+          createdBy: true,
+          assignedTo: true,
+          thread: { select: { id: true } },
+        },
       });
 
       return ticket;
@@ -71,6 +83,14 @@ export const ticketRouter = createTRPCRouter({
           createdById: ctx.session.user.id,
           isAnonymous: input.isAnonymous ?? false,
           priority: input.priority ?? "LOW",
+          thread: {
+            create: {
+              type: ParentType.TICKET,
+            },
+          },
+        },
+        include: {
+          thread: true,
         },
       });
 

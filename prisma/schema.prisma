@@ -56,12 +56,15 @@ enum EventType {
   NEWS_CREATED
   NEWS_CHANGED
   NEWS_CHANGED_PRIORITY
+  QUESTION_CREATED
+  QUESTION_STATUS_CHANGED
 }
 
 enum EventOrigin {
   TICKET
   SUGGESTION
   NEWS
+  QUESTION
 }
 
 model Event {
@@ -81,41 +84,121 @@ model Event {
   @@index([createdAt])
 }
 
-model Question {
-  id          String           @id @default(cuid())
-  title       String
-  content     String
-  createdBy   User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String?
-  category    QuestionCategory @default(GENERAL)
-  status      QuestionStatus   @default(PENDING)
-  messages    Message[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+// SUGGESTION BOX MODELS
+enum SuggestionStatus {
+  SENT
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  IMPLEMENTED
+}
+
+model SuggestionBox {
+  id          String       @id @default(cuid())
+  suggestions Suggestion[]
 
   @@index([id])
-  @@index([category])
+}
+
+model Suggestion {
+  id          String           @id @default(cuid())
+  content     String
+  createdAt   DateTime         @default(now())
+  status      SuggestionStatus @default(SENT)
+  isAnonymous Boolean          @default(false)
+  user        User?            @relation("SuggestionOwner", fields: [userId], references: [id], onDelete: SetNull)
+  userId      String?
+
+  suggestionBox   SuggestionBox @relation(fields: [suggestionBoxId], references: [id])
+  suggestionBoxId String
+
+  votes       Vote[]
+  voteCount   Int            @default(0)
+  subscribers Subscription[]
+
   @@index([status])
+  @@index([suggestionBoxId])
+  @@index([userId])
+}
+
+model Vote {
+  id           String     @id @default(cuid())
+  type         String
+  user         User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId       String?
+  suggestion   Suggestion @relation(fields: [suggestionId], references: [id])
+  suggestionId String
+
+  @@unique([userId, suggestionId])
+  @@index([suggestionId])
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  question    String
+  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  thread      Thread?
+
+  @@index([id])
   @@index([createdAt])
 }
 
-enum QuestionCategory {
-  GENERAL
-  TECHNICAL
-  ACCOUNT
-  OTHER
+// MESSAGE ENUMS & MODEL
+
+model Thread {
+  id        String     @id @default(cuid())
+  type      ParentType
+  createdAt DateTime   @default(now())
+
+  messages Message[]
+
+  ticket   Ticket? @relation(fields: [ticketId], references: [id])
+  ticketId String? @unique
+
+  question   Question? @relation(fields: [questionId], references: [id])
+  questionId String?   @unique
+
+  @@unique([id])
+  @@index([id])
+  @@index([ticketId])
+  @@index([questionId])
 }
 
-enum QuestionStatus {
-  PENDING
-  ANSWERED
-  CLOSED
+enum MessageType {
+  USER_MESSAGE
+  HANDLER_MESSAGE
+  SYSTEM_MESSAGE
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  message   String
+  type      MessageType @default(USER_MESSAGE)
+  createdAt DateTime    @default(now())
+
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+
+  thread   Thread? @relation(fields: [threadId], references: [id])
+  threadId String?
+
+  @@unique([id])
+  @@index([threadId])
+}
+
+enum ParentType {
+  TICKET
+  QUESTION
 }
 
 enum SubscriptionType {
   TICKET
   SUGGESTION
   NEWS
+  QUESTION
 }
 
 model Subscription {
@@ -260,55 +343,6 @@ model Resource {
   @@index([title])
 }
 
-// SUGGESTION BOX MODELS
-enum SuggestionStatus {
-  SENT
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  IMPLEMENTED
-}
-
-model SuggestionBox {
-  id          String       @id @default(cuid())
-  suggestions Suggestion[]
-
-  @@index([id])
-}
-
-model Suggestion {
-  id          String           @id @default(cuid())
-  content     String
-  createdAt   DateTime         @default(now())
-  status      SuggestionStatus @default(SENT)
-  isAnonymous Boolean          @default(false)
-  user        User?            @relation("SuggestionOwner", fields: [userId], references: [id], onDelete: SetNull)
-  userId      String?
-
-  suggestionBox   SuggestionBox @relation(fields: [suggestionBoxId], references: [id])
-  suggestionBoxId String
-
-  votes       Vote[]
-  voteCount   Int            @default(0)
-  subscribers Subscription[]
-
-  @@index([status])
-  @@index([suggestionBoxId])
-  @@index([userId])
-}
-
-model Vote {
-  id           String     @id @default(cuid())
-  type         String
-  user         User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId       String?
-  suggestion   Suggestion @relation(fields: [suggestionId], references: [id])
-  suggestionId String
-
-  @@unique([userId, suggestionId])
-  @@index([suggestionId])
-}
-
 // TICKET ENUMS & MODEL
 enum Department {
   IT
@@ -344,45 +378,20 @@ model Ticket {
   updatedAt   DateTime   @updatedAt
   solvedAt    DateTime?
 
-  createdBy       User?     @relation("TicketsCreated", fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy       User?   @relation("TicketsCreated", fields: [createdById], references: [id], onDelete: SetNull)
   createdById     String?
-  assignedTo      User?     @relation("TicketsHandled", fields: [assignedToId], references: [id])
+  assignedTo      User?   @relation("TicketsHandled", fields: [assignedToId], references: [id])
   assignedToId    String?
-  participants    User[]    @relation("TicketParticipants")
-  messages        Message[]
-  signedByUser    Boolean   @default(false)
-  signedByHandler Boolean   @default(false)
+  participants    User[]  @relation("TicketParticipants")
+  thread          Thread?
+  signedByUser    Boolean @default(false)
+  signedByHandler Boolean @default(false)
 
   @@unique([id])
   @@index([createdById])
   @@index([assignedToId])
   @@index([status])
   @@index([department])
-}
-
-// MESSAGE ENUMS & MODEL
-enum MessageType {
-  USER_MESSAGE
-  HANDLER_MESSAGE
-  SYSTEM_MESSAGE
-}
-
-model Message {
-  id        String      @id @default(cuid())
-  message   String
-  type      MessageType @default(USER_MESSAGE)
-  createdAt DateTime    @default(now())
-
-  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String?
-
-  ticket     Ticket?   @relation(fields: [ticketId], references: [id])
-  ticketId   String?
-  question   Question? @relation(fields: [questionId], references: [id])
-  questionId String?
-
-  @@unique([id])
-  @@index([ticketId])
 }
 
 model Post {

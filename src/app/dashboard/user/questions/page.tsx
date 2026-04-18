@@ -1,186 +1,132 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { HiQuestionMarkCircle } from "react-icons/hi";
-import ChatBox from "~/app/_components/chatBox";
-import { getCurrentUserId } from "~/app/_components/getCurrentUserId";
-import type { QuestionWithMessages } from "~/app/constants/questions";
-import { useSocket } from "~/app/socketProvider";
+import QuestionCard from "~/app/_components/cards/questionCard";
 import { api } from "~/trpc/react";
 
+const PAGE_SIZE = 5;
+
 export default function QuestionPage() {
-  const { data: questions } = api.question.listQuestions.useQuery({
-    limit: 5,
-  });
-
-  const [expandedQuestion, setExpandedQuestion] =
-    useState<QuestionWithMessages | null>(null);
-
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
+    null,
+  );
   const [newMessage, setNewMessage] = useState("");
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const { socket } = useSocket();
   const utils = api.useUtils();
+  const { data: me } = api.user.me.useQuery();
 
-  const { data: messages = [], isLoading } = api.message.listMessages.useQuery({
-    id: expandedQuestion?.id ?? "",
-    type: "questions",
+  const { data: questions = [] } = api.question.listQuestions.useQuery({
+    limit: visibleCount,
   });
 
-  const sortedMessages = messages ? [...messages].reverse() : [];
-
-  const createMessage = api.message.createMessage.useMutation({
+  const createQuestion = api.question.createQuestion.useMutation({
     onSuccess: () => {
-      utils.message.listMessages.invalidate();
+      utils.question.listQuestions.invalidate();
       setNewMessage("");
     },
   });
 
-  // useEffect(() => {
-  //   const fetchCurrentUser = async () => {
-  //     try {
-  //       const user = await getCurrentUserId();
-  //       setCurrentUser(user);
-  //     } catch (error) {
-  //       console.error("Fel vid hämtning av användare:", error);
-  //     }
-  //   };
-  //   fetchCurrentUser();
-  // }, []);
+  const hasMore = questions?.length === visibleCount;
 
-  useEffect(() => {
-    if (!socket) return;
+  const toggleQuestions = (id: string) => {
+    setSelectedQuestionId((prev) => (prev === id ? null : id));
+  };
 
-    const handler = (msg: { id: string }) => {
-      if (msg.id === expandedQuestion?.id) {
-        utils.message.listMessages.invalidate({
-          id: expandedQuestion?.id,
-          type: "questions",
-        });
-      }
-    };
+  const loadMore = () => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  };
 
-    socket.on("chat:message", handler);
-    return () => {
-      socket.off("chat:message", handler);
-    };
-  }, [socket, expandedQuestion, utils.message.listMessages]);
+  const showLess = () => {
+    setVisibleCount(PAGE_SIZE);
+  };
 
   const handleSend = () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage) return;
 
-    if (!expandedQuestion?.id) return;
-    createMessage.mutate({
-      id: expandedQuestion.id,
-      message: newMessage,
-      type: "USER_MESSAGE",
-    });
+    createQuestion.mutate({ question: newMessage });
 
-    socket?.emit("chat:message", { id: expandedQuestion.id });
     setNewMessage("");
   };
 
+  if (!questions || questions.length === 0) {
+    return (
+      <main className="flex min-h-screen items-center justify-center text-white/70">
+        Inga frågor hittades
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen px-6 py-12 text-white">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <div className="flex items-center gap-3">
+    <main className="main-page-layout">
+      <div className="container">
+        <div className="header-container">
           <HiQuestionMarkCircle className="text-purple-400" size={28} />
-          <h1 className="text-2xl font-bold tracking-wide">Frågor & Svar</h1>
+          <h1 className="page-header">Frågor & Svar</h1>
         </div>
 
-        <div className="space-y-4">
-          {(!questions || questions.length === 0) && (
-            <p className="text-sm text-white/60">Inga frågor ännu</p>
-          )}
+        {/* QUESTION INPUT */}
+        <div className="flex gap-2">
+          <textarea
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Skriv en fråga..."
+            rows={3}
+            className="flex-1 resize-none rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button onClick={handleSend} className="submit-button">
+            Skicka
+          </button>
+        </div>
 
-          {/* QUESTION INPUT */}
-          <div className="flex gap-2">
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Skriv ett meddelande..."
-              rows={3}
-              className="flex-1 resize-none rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button onClick={handleSend} className="submit-button">
-              Skicka
-            </button>
-          </div>
-
-          {/* QUESTIONS */}
-          {questions &&
-            questions.map((question) => {
-              return (
-                <div
-                  key={question.id}
-                  onClick={() => setExpandedQuestion(question)}
-                  className="cursor-pointer rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg transition hover:bg-white/10"
+        {/* QUESTIONS */}
+        <div className="mt-4 space-y-3">
+          {questions.map((question) => {
+            return (
+              <div className="card">
+                <button
+                  onClick={() => {
+                    toggleQuestions(question.id);
+                  }}
                 >
-                  {/* HEADER */}
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">
-                      {question.content}
-                    </h2>
-                    <span className="text-sm text-white/60">
-                      {new Date(question.createdAt).toLocaleDateString()}
-                    </span>
+                    <h2 className="font-medium">{question.question}</h2>
                   </div>
-                  <p className="mt-1 text-xs text-white/50">
-                    Frågad av: {question.createdBy?.name}
-                  </p>
-
-                  {/* QUESTIONS CHAT */}
-
-                  <div className="mt-4 flex flex-col gap-3">
-                    <div className="flex max-h-64 flex-col-reverse gap-2 overflow-y-auto rounded-lg bg-black/30 p-4">
-                      {expandedQuestion?.messages.length === 0 && (
-                        <p className="text-sm opacity-60">
-                          Inga meddelanden ännu
-                        </p>
-                      )}
-
-                      {expandedQuestion?.messages
-                        .slice()
-                        .reverse()
-                        .map((msg) => (
-                          <div
-                            key={msg.id}
-                            className={`flex flex-col rounded-lg p-2 text-sm ${
-                              msg.createdBy === currentUser
-                                ? "ml-auto bg-blue-600 text-white"
-                                : "mr-auto bg-white/10 text-white"
-                            }`}
-                          >
-                            <div className="mb-1 text-xs opacity-60">
-                              {msg.createdBy?.name} ·{" "}
-                              {msg.createdAt.toLocaleTimeString()}
-                            </div>
-                            {msg.message}
-                          </div>
-                        ))}
-                    </div>
-
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex gap-2"
-                    >
-                      <textarea
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        rows={2}
-                        placeholder="Skriv ett meddelande..."
-                        className="flex-1 resize-none rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <button
-                        onClick={() => handleSend()}
-                        className="submit-button"
-                      >
-                        Skicka
-                      </button>
-                    </div>
+                  <div className="mt-2 text-xs text-white/40">
+                    {question.createdBy?.name} ·{" "}
+                    {new Date(question.createdAt).toLocaleDateString()}
                   </div>
-                </div>
-              );
-            })}
+                </button>
+                {selectedQuestionId === question.id && (
+                  <div className="p-5">
+                    <QuestionCard
+                      {...question}
+                      currentUserId={me?.id ?? null}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          <div className="flex justify-center gap-3">
+            {hasMore && (
+              <button
+                onClick={loadMore}
+                className="rounded-lg bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+              >
+                Visa fler
+              </button>
+            )}
+
+            {visibleCount > PAGE_SIZE && (
+              <button
+                onClick={showLess}
+                className="rounded-lg bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+              >
+                Visa mindre
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </main>

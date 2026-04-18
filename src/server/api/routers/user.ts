@@ -12,6 +12,10 @@ import { TRPCError } from "@trpc/server";
 import { auth } from "~/server/better-auth";
 
 export const userRouter = createTRPCRouter({
+  me: protectedProcedure.query(({ ctx }) => {
+    return ctx.session.user;
+  }),
+
   listAll: protectedProcedure
     .input(
       z.object({

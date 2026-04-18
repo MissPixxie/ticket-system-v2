@@ -6,58 +6,72 @@ export const messageRouter = createTRPCRouter({
   listMessages: protectedProcedure
     .input(
       z.object({
-        id: z.string().min(1),
-        type: z.enum(["ticket", "questions"]),
+        threadId: z.string().min(1),
       }),
     )
     .query(async ({ ctx, input }) => {
-      switch (input.type) {
-        case "ticket":
-          return ctx.db.message.findMany({
-            where: { ticketId: input.id },
-            include: { createdBy: true },
-            orderBy: { createdAt: "asc" },
-          });
-        case "questions":
-          return ctx.db.message.findMany({
-            where: { questionId: input.id },
-            include: { createdBy: true },
-            orderBy: { createdAt: "asc" },
-          });
-      }
+      return ctx.db.message.findMany({
+        where: {
+          threadId: input.threadId,
+        },
+        include: {
+          createdBy: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
     }),
 
   createMessage: protectedProcedure
     .input(
       z.object({
-        id: z.string().min(1),
+        threadId: z.string().min(1),
         message: z.string().min(1),
         type: z.enum(["USER_MESSAGE", "SYSTEM_MESSAGE"]).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const ticket = await ctx.db.ticket.findUnique({
-        where: { id: input.id },
-        select: { id: true, createdById: true, assignedToId: true },
+      const thread = await ctx.db.thread.findUnique({
+        where: { id: input.threadId },
       });
 
-      if (!ticket) throw new Error("Ticket hittades inte");
+      if (!thread) {
+        throw new Error("Thread hittades inte");
+      }
+      let originId: string;
+      let originType: "TICKET" | "QUESTION";
+
+      if (thread?.ticketId) {
+        originId = thread.ticketId;
+        originType = "TICKET";
+      } else if (thread?.questionId) {
+        originId = thread.questionId;
+        originType = "QUESTION";
+      } else {
+        throw new Error("Thread saknar koppling");
+      }
 
       const newMessage = await ctx.db.message.create({
         data: {
-          ticketId: input.id,
+          threadId: input.threadId,
           message: input.message,
           createdById: ctx.session.user.id,
-          type: input.type || "USER_MESSAGE",
+          type: input.type ?? "USER_MESSAGE",
+        },
+        include: {
+          createdBy: true,
         },
       });
 
       await prismaEventService.createEvent({
         type: "MESSAGE_ADDED",
-        originId: ticket.id,
-        originType: "TICKET",
+        originId,
+        originType,
         actorId: ctx.session.user.id,
-        metadata: { messageId: newMessage.id },
+        metadata: {
+          messageId: newMessage.id,
+        },
       });
 
       return newMessage;

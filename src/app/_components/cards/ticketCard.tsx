@@ -12,12 +12,10 @@ type Ticket = TicketList["tickets"][number];
 
 type TicketCardProps = Ticket & { currentUserId: string | null };
 
-export default function TicketCard({
-  currentUserId,
-  ...ticketProps
-}: TicketCardProps) {
+export default function TicketCard({ ...ticketProps }: TicketCardProps) {
   const [showHistory, setShowHistory] = useState(false);
   const utils = api.useUtils();
+  const { data: me } = api.user.me.useQuery();
 
   const updateTicket = api.ticket.updateTicket.useMutation({
     onSuccess: (updatedTicket) => {
@@ -68,8 +66,8 @@ export default function TicketCard({
         </p>
       </div>
       <div className="flex flex-col gap-4">
-        {currentUserId && (
-          <ChatBox {...ticketProps} currentUserId={currentUserId} />
+        {me?.id && ticketProps.thread?.id && (
+          <ChatBox threadId={ticketProps.thread.id} currentUserId={me.id} />
         )}
         <div className="mt-4 flex flex-row gap-4">
           <div className="flex flex-col gap-2">

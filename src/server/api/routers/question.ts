@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prismaEventService } from "../services/eventService";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { TRPCError } from "@trpc/server";
+import { ParentType } from "@prisma/client";
 
 export const questionRouter = createTRPCRouter({
   listQuestions: protectedProcedure
@@ -18,16 +19,13 @@ export const questionRouter = createTRPCRouter({
           createdBy: {
             select: { id: true, name: true },
           },
-          messages: {
-            select: {
-              id: true,
-              message: true,
-              createdAt: true,
-              createdBy: { select: { id: true, name: true } },
+          thread: {
+            include: {
+              messages: {},
             },
           },
         },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: "desc" },
       });
 
       return questions;
@@ -36,21 +34,24 @@ export const questionRouter = createTRPCRouter({
   createQuestion: protectedProcedure
     .input(
       z.object({
-        title: z.string().min(1),
-        content: z.string().min(1),
-        category: z.enum(["GENERAL", "TECHNICAL", "ACCOUNT", "OTHER"]),
+        question: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const question = await ctx.db.question.create({
         data: {
-          title: input.title,
-          content: input.content,
-          category: input.category,
+          question: input.question,
           createdById: ctx.session.user.id,
+          thread: {
+            create: {
+              type: ParentType.TICKET,
+            },
+          },
+        },
+        include: {
+          thread: true,
         },
       });
-
       //   await prismaEventService.createEvent({
       //     type: "NEWS_CREATED",
       //     originId: news.newsId,
@@ -69,7 +70,30 @@ export const questionRouter = createTRPCRouter({
 
       return question;
     }),
+  // addMessage: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       id: z.string(),
+  //       message: z.string().min(1),
+  //     }),
+  //   )
+  //   .mutation(async ({ ctx, input }) => {
+  //     const question = await ctx.db.question.findUnique({
+  //       where: { id: input.id },
+  //       include: { thread: true },
+  //     });
 
+  //     return ctx.db.message.create({
+  //       data: {
+  //         message: input.message,
+  //         threadId: question?.thread?.threadId,
+  //         createdById: ctx.session.user.id,
+  //       },
+  //       include: {
+  //         createdBy: true,
+  //       },
+  //     });
+  //   }),
   //   updateQuestion: protectedProcedure
   //     .input(
   //       z.object({

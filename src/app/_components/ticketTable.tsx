@@ -20,14 +20,10 @@ const statusClasses: Record<string, string> = {
 };
 
 interface TicketTableProps {
-  currentUserId: string | null;
   currentUserRole: "ADMIN" | "HANDLER" | "USER";
 }
 
-export function TicketTable({
-  currentUserId,
-  currentUserRole,
-}: TicketTableProps) {
+export function TicketTable({ currentUserRole }: TicketTableProps) {
   const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({
     limit: 20,
   });
@@ -36,6 +32,7 @@ export function TicketTable({
   const [search, setSearch] = useState("");
   const { socket } = useSocket();
   const utils = api.useUtils();
+  const { data: me } = api.user.me.useQuery();
 
   const updateTicket = api.ticket.updateTicket.useMutation({
     onSuccess: async (ticket) => {
@@ -57,7 +54,7 @@ export function TicketTable({
   };
 
   const filteredTickets = tickets?.tickets.filter((ticket) => {
-    const userId = currentUserId;
+    const userId = me?.id;
     switch (filter) {
       case "MINA":
         return ticket.assignedTo?.id === userId;

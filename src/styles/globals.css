@@ -19,6 +19,24 @@
     background-color: rgba(255, 255, 255, 0.05);
   }
 
+  .main-page-layout {
+    min-height: 100vh;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    color: #ffffff;
+  }
+
+  .container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
   .card {
     border-radius: 1rem;
     padding: 1.5rem;
@@ -33,6 +51,18 @@
 
   .card:hover {
     background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .page-header {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
   }
 
   .submit-button {

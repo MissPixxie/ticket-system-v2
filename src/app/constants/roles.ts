@@ -1,7 +1,7 @@
 // ~/constants/roles.ts
 export const ROLE_MAP = {
-  USER: "cmn08awhm0006c0u9oqx1b6kq",
-  HANDLER: "cmn08awha0005c0u9u1bhwcnz",
+  USER: "cmo44d83b0006ncu9u6qjizg9",
+  HANDLER: "cmo44d8340005ncu9ccp85eve",
 } as const;
 
 export type RoleKey = keyof typeof ROLE_MAP;

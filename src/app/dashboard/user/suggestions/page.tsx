@@ -78,7 +78,7 @@ export default function SuggestionsPage() {
           <FaLightbulb className="text-yellow-400" size={22} />
 
           <div>
-            <h1 className="text-2xl font-bold">Idé & Förbättringsförslag</h1>
+            <h1 className="page-header">Idé & Förbättringsförslag</h1>
             <p className="mt-1 text-sm text-white/70">
               Dela idéer och förbättringar för verksamheten.
             </p>

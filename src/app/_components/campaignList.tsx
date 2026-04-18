@@ -56,7 +56,7 @@ export default function CampaignList() {
             Kommande kampanjer
           </h1>
           <div className="mt-4 space-y-3">
-            {[...Array(5)].map((_, i) => (
+            {[...Array(2)].map((_, i) => (
               <SkeletonCard key={i} />
             ))}
           </div>

@@ -13,13 +13,12 @@ export default function ResourcesPage() {
   const resources = news?.filter((n) => n.category === "STORE_MANUAL") ?? [];
 
   return (
-    <main className="min-h-screen px-6 py-12 text-white">
-      <div className="mx-auto max-w-7xl space-y-12">
-        {/* RESURSER SEKTION */}
+    <main className="main-page-layout">
+      <div className="container">
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <HiOutlineDocumentText className="text-purple-400" size={28} />
-            <h1 className="text-2xl font-bold tracking-wide">Butiksresurser</h1>
+            <h1 className="page-header">Butiksresurser</h1>
           </div>
 
           {isLoading && (

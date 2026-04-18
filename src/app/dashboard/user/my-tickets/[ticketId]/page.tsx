@@ -2,8 +2,6 @@
 
 import { api } from "~/trpc/react";
 import ChatBox from "~/app/_components/chatBox";
-import { getCurrentUserId } from "~/app/_components/getCurrentUserId";
-import { useState, useEffect, use } from "react";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -26,19 +24,7 @@ export default function TicketPage({
   const { data: ticket, isLoading } = api.ticket.getTicketById.useQuery({
     id: ticketId,
   });
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const user = await getCurrentUserId();
-        setCurrentUser(user);
-      } catch (error) {
-        console.error("Fel vid hämtning av användare:", error);
-      }
-    };
-    fetchCurrentUser();
-  }, []);
+  const { data: me } = api.user.me.useQuery();
 
   if (isLoading || !ticket) {
     return (
@@ -49,8 +35,8 @@ export default function TicketPage({
   }
 
   return (
-    <main className="min-h-screen px-6 py-12 text-white">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <main className="main-page-layout">
+      <div className="container">
         <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -113,7 +99,12 @@ export default function TicketPage({
           </div>
 
           <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
-            <ChatBox id={ticket.id} currentUserId={currentUser || undefined} />
+            {ticket.thread?.id && me?.id && (
+              <ChatBox
+                threadId={ticket.thread?.id ?? null}
+                currentUserId={me.id}
+              />
+            )}
           </div>
         </div>
       </div>
