@@ -338,6 +338,7 @@ model Resource {
   category    ResourceCategory @default(OTHER)
   createdBy   User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdById String?
+  isPublished Boolean          @default(true)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   url         String?

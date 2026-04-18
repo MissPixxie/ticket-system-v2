@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 import { HiQuestionMarkCircle } from "react-icons/hi";
 import QuestionCard from "~/app/_components/cards/questionCard";
+import { FaRegQuestionCircle } from "react-icons/fa";
 
 const PAGE_SIZE = 5;
 
@@ -62,7 +63,7 @@ export default function QuestionsPage() {
     <main className="main-page-layout">
       <div className="container">
         <div className="header-container">
-          <HiQuestionMarkCircle className="text-purple-400" size={28} />
+          <FaRegQuestionCircle className="text-purple-400" size={28} />
           <h1 className="page-header">Frågor & Svar</h1>
         </div>
 

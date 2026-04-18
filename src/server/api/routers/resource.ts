@@ -44,21 +44,21 @@ export const resourceRouter = createTRPCRouter({
         },
       });
 
-      await prismaEventService.createEvent({
-        type: "RESOURCE_CREATED",
-        originId: news.id,
-        originType: "RESOURCE",
-        actorId: ctx.session.user.id,
-      });
+      //   await prismaEventService.createEvent({
+      //     type: "RESOURCE_CREATED",
+      //     originId: news.id,
+      //     originType: "RESOURCE",
+      //     actorId: ctx.session.user.id,
+      //   });
 
-      await createAuditLog({
-        type: "RESOURCE_CREATED",
-        severity: "INFO",
-        entityType: "RESOURCE",
-        entityId: news.id,
-        actor: { connect: { id: ctx.session.user.id } },
-        message: `${ctx.session.user.email} created resource "${news.title}"`,
-      });
+      //   await createAuditLog({
+      //     type: "RESOURCE_CREATED",
+      //     severity: "INFO",
+      //     entityType: "RESOURCE",
+      //     entityId: news.id,
+      //     actor: { connect: { id: ctx.session.user.id } },
+      //     message: `${ctx.session.user.email} created resource "${news.title}"`,
+      //   });
 
       return news;
     }),
@@ -98,5 +98,20 @@ export const resourceRouter = createTRPCRouter({
       });
 
       return updatedResource;
+    }),
+  publishResource: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        isPublished: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.resource.update({
+        where: { id: input.id },
+        data: {
+          isPublished: input.isPublished,
+        },
+      });
     }),
 });
