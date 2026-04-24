@@ -15,6 +15,7 @@ export const newsRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
 
       const news = await ctx.db.news.findMany({
+        where: { isPublished: true },
         take: input?.limit ?? 5,
         include: {
           createdBy: {
@@ -68,6 +69,7 @@ export const newsRouter = createTRPCRouter({
         title: z.string().min(1),
         content: z.string().min(1),
         category: z.nativeEnum(NewsCategory),
+        priority: z.nativeEnum(Priority),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -128,6 +130,7 @@ export const newsRouter = createTRPCRouter({
         category: z.nativeEnum(NewsCategory).optional(),
         content: z.string().optional(),
         priority: z.nativeEnum(Priority).optional(),
+        isPublished: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -149,29 +152,11 @@ export const newsRouter = createTRPCRouter({
           category: input.category ?? undefined,
           content: input.content ?? undefined,
           priority: input.priority ?? undefined,
+          isPublished: input.isPublished ?? undefined,
         },
       });
 
       return updatedNews;
-    }),
-
-  // =========================
-  // PUBLISH / UNPUBLISH
-  // =========================
-  publishNews: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        isPublished: z.boolean(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.news.update({
-        where: { id: input.id },
-        data: {
-          isPublished: input.isPublished,
-        },
-      });
     }),
 
   // =========================

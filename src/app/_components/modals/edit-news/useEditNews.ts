@@ -10,9 +10,10 @@ export type Category =
 
 interface EditNewsInput {
   id: string;
-  title: string;
-  content: string;
-  category: Category;
+  title?: string;
+  content?: string;
+  category?: Category;
+  priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 }
 
 export function useEditNews() {

@@ -1,14 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { RiEdit2Fill } from "react-icons/ri";
-import { FaTrashAlt } from "react-icons/fa";
-import { EditSection } from "~/app/_components/modals/edit-news/editSection";
 import NewsCard from "~/app/_components/cards/newsCard";
 import { api } from "~/trpc/react";
 import { MdCampaign } from "react-icons/md";
 
 const PAGE_SIZE = 5;
+
+const priorities = [
+  {
+    value: "LOW",
+    label: "Låg",
+    active: "bg-green-500 border border-green-300 shadow-green-500/30",
+  },
+  {
+    value: "MEDIUM",
+    label: "Medel",
+    active: "bg-yellow-500 border border-yellow-300 shadow-yellow-500/30",
+  },
+  {
+    value: "HIGH",
+    label: "Hög",
+    active: "bg-orange-500 border border-orange-300 shadow-orange-500/30",
+  },
+  {
+    value: "URGENT",
+    label: "Brådskande",
+    active: "bg-red-600 border border-red-400 shadow-red-500/40 animate-pulse",
+  },
+];
 
 export default function NewsPage() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -18,6 +38,9 @@ export default function NewsPage() {
     "NEWS" | "STORE_MANUAL" | "PRODUCT_INFORMATION" | "CAMPAIGN"
   >("NEWS");
   const [content, setContent] = useState("");
+  const [priority, setPriority] = useState<
+    "LOW" | "MEDIUM" | "HIGH" | "URGENT"
+  >("MEDIUM");
 
   const { data: news = [] } = api.news.listNews.useQuery({
     limit: visibleCount,
@@ -43,6 +66,7 @@ export default function NewsPage() {
       title,
       content,
       category,
+      priority,
     });
   };
 
@@ -99,6 +123,26 @@ export default function NewsPage() {
               rows={4}
               className="resize-none rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <div className="flex flex-col gap-2">
+              <span className="text-sm text-white/70">Prioritet</span>
+
+              <div className="flex flex-wrap gap-3">
+                {priorities.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setPriority(p.value as typeof priority)}
+                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                      priority === p.value
+                        ? `scale-105 text-white shadow-lg ${p.active}`
+                        : "bg-white/10 text-white/70 hover:bg-white/20"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <button
               onClick={handleCreateNews}
               className="cursor-pointer self-start rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"

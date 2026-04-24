@@ -4,12 +4,13 @@ import { useState } from "react";
 import EditNewsModal from "./editNewsModal";
 import { useEditNews } from "./useEditNews";
 import { RiEdit2Fill } from "react-icons/ri";
+import type { News } from "@prisma/client";
 
 interface EditSectionProps {
-  id: string;
+  news: News;
 }
 
-export function EditSection({ id }: EditSectionProps) {
+export function EditSection({ news }: EditSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { editNews, isLoading } = useEditNews();
 
@@ -23,10 +24,9 @@ export function EditSection({ id }: EditSectionProps) {
       </button>
 
       <EditNewsModal
-        id={id}
+        news={news}
         isOpen={isOpen}
         onClose={() => {
-          console.log("Closing modal!");
           setIsOpen(false);
         }}
         onSubmit={(data) => {

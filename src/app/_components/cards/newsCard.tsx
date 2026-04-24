@@ -15,35 +15,13 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
   const utils = api.useUtils();
 
   const updateNews = api.news.updateNews.useMutation({
-    onSuccess: (updateNews) => {
-      utils.news.listNews.setData({}, (oldData) => {
-        if (!oldData) return [];
-        return oldData.map((news) =>
-          news.id === updateNews.id ? { ...news, ...updateNews } : news,
-        );
-      });
+    onSuccess: () => {
+      utils.news.listNews.invalidate();
     },
   });
-
-  const publishNews = api.news.publishNews.useMutation({
-    onSuccess: (updateNews) => {
-      utils.news.listNews.setData({}, (oldData) => {
-        if (!oldData) return [];
-        return oldData.map((news) =>
-          news.id === updateNews.id ? { ...news, ...updateNews } : news,
-        );
-      });
-    },
-  });
-
-  const handleUpdateNews = (id: string) => {
-    updateNews.mutate({
-      id,
-    });
-  };
 
   const handleArchiveNews = (id: string) => {
-    publishNews.mutate({
+    updateNews.mutate({
       id,
       isPublished: false,
     });
@@ -79,7 +57,7 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
         >
           <div className="flex gap-2">
             {/* EDIT */}
-            <EditSection id={newsProps.id} />
+            <EditSection news={newsProps} />
 
             {/* DELETE */}
             <button

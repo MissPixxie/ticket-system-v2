@@ -1,5 +1,6 @@
 "use client";
 
+import type { News } from "@prisma/client";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import {
@@ -18,33 +19,33 @@ export type Category =
   | "STORE_MANUAL"
   | "PRODUCT_INFORMATION"
   | "CAMPAIGN";
-export type Priority = "LOW" | "MEDIUM" | "URGENT";
+export type Priority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
 export interface EditNewsData {
   id: string;
-  title: string;
-  content: string;
-  category: Category;
+  title?: string;
+  content?: string;
+  category?: Category;
   priority?: Priority;
 }
 
 interface EditNewsModalProps {
-  id: string;
+  news: News;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: EditNewsData) => void;
 }
 
 const EditNewsModal: React.FC<EditNewsModalProps> = ({
-  id,
+  news,
   isOpen,
   onClose,
   onSubmit,
 }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [priority, setPriority] = useState<Priority>("LOW");
-  const [category, setCategory] = useState<Category>("NEWS");
+  const [title, setTitle] = useState(news.title ?? "");
+  const [content, setContent] = useState(news.content);
+  const [priority, setPriority] = useState<Priority>(news.priority ?? "LOW");
+  const [category, setCategory] = useState<Category>(news.category ?? "NEWS");
   const [isSelected, setIsSelected] = useState<null | number>(null);
 
   if (!isOpen) return null;
@@ -73,7 +74,7 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ id, title, content, category, priority });
+    onSubmit({ id: news.id, title, content, category, priority });
     setTitle("");
     setContent("");
     setCategory("NEWS");
@@ -141,7 +142,8 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
             >
               <option value="LOW">Låg</option>
               <option value="MEDIUM">Medium</option>
-              <option value="URGENT">Hög</option>
+              <option value="HIGH">Hög</option>
+              <option value="URGENT">Mycket Hög</option>
             </select>
           </div>
           <div className="flex justify-end space-x-2 pt-4">
