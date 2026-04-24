@@ -1,29 +1,15 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { EventType, EventOrigin } from "@prisma/client";
 
 export const eventRouter = createTRPCRouter({
   createEvent: protectedProcedure
     .input(
       z.object({
-        type: z.enum([
-          "TICKET_CREATED",
-          "TICKET_STATUS_CHANGED",
-          "TICKET_ASSIGNED",
-          "TICKET_CHANGED_PRIORITY",
-          "MESSAGE_ADDED",
-          "SUGGESTION_CREATED",
-          "SUGGESTION_STATUS_CHANGED",
-          "SUGGESTION_VOTED",
-          "ROLE_CHANGED",
-          "NEWS_CREATED",
-          "NEWS_CHANGED",
-          "NEWS_CHANGED_PRIORITY",
-          "QUESTION_CREATED",
-          "QUESTION_STATUS_CHANGED",
-        ]),
+        type: z.nativeEnum(EventType),
         originId: z.string().min(1),
-        originType: z.enum(["TICKET", "SUGGESTION", "NEWS", "QUESTION"]),
+        originType: z.nativeEnum(EventOrigin),
         metadata: z.record(z.string()).optional(),
       }),
     )

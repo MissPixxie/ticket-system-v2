@@ -10,6 +10,7 @@ import {
 } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { auth } from "~/server/better-auth";
+import { Department } from "@prisma/client";
 
 export const userRouter = createTRPCRouter({
   me: protectedProcedure.query(({ ctx }) => {
@@ -100,9 +101,7 @@ export const userRouter = createTRPCRouter({
         email: z.string().email(),
         password: z.string().min(6),
         roleId: z.string().min(1),
-        departments: z.array(
-          z.enum(["IT", "HR", "CAMPAIGN", "PRODUCT", "CUSTOMERCLUB"]),
-        ),
+        departments: z.array(z.nativeEnum(Department)),
       }),
     )
     .mutation(async ({ ctx, input }) => {

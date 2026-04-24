@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { SubscriptionType } from "@prisma/client";
 
 export const subscriptionRouter = createTRPCRouter({
   createSubscription: protectedProcedure
-    .input(z.object({ id: z.string(), type: z.enum(["TICKET", "SUGGESTION"]) }))
+    .input(z.object({ id: z.string(), type: z.nativeEnum(SubscriptionType) }))
     .mutation(async ({ ctx, input }) => {
 
       return ctx.db.subscription.upsert({
@@ -24,7 +25,7 @@ export const subscriptionRouter = createTRPCRouter({
     }),
 
   removeSubscription: protectedProcedure
-    .input(z.object({ id: z.string(), type: z.enum(["TICKET", "SUGGESTION"]) }))
+    .input(z.object({ id: z.string(), type: z.nativeEnum(SubscriptionType) }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.subscription.delete({
         where: {

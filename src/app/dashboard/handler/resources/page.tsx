@@ -131,7 +131,7 @@ export default function ResourcesPage() {
         {/* RESOURCE LIST */}
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {resources.map((item) => (
-            <ResourcesCard key={item.id} {...item} />
+            <ResourcesCard key={item.id} resourceItem={item} />
           ))}
         </div>
       </div>

@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
-import { ParentType } from "@prisma/client";
+import { ParentType, Department, Priority, Status } from "@prisma/client";
 
 export const ticketRouter = createTRPCRouter({
   listAllTickets: protectedProcedure
@@ -69,9 +69,9 @@ export const ticketRouter = createTRPCRouter({
       z.object({
         title: z.string().min(1),
         issue: z.string().min(1),
-        department: z.enum(["IT", "HR", "CAMPAIGN", "PRODUCT", "CUSTOMERCLUB"]),
+        department: z.nativeEnum(Department),
         isAnonymous: z.boolean().optional(),
-        priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+        priority: z.nativeEnum(Priority).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -117,8 +117,8 @@ export const ticketRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]).optional(),
-        priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+        status: z.nativeEnum(Status).optional(),
+        priority: z.nativeEnum(Priority).optional(),
         assignedToId: z.string().optional(),
       }),
     )

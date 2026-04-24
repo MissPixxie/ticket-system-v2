@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prismaEventService } from "../services/eventService";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { TRPCError } from "@trpc/server";
+import { ResourceCategory } from "@prisma/client";
 
 export const resourceRouter = createTRPCRouter({
   listResources: protectedProcedure
@@ -29,7 +30,7 @@ export const resourceRouter = createTRPCRouter({
       z.object({
         title: z.string().min(1),
         description: z.string().min(1),
-        category: z.enum(["DOCUMENTATION", "TUTORIAL", "INFORMATION", "OTHER"]),
+        category: z.nativeEnum(ResourceCategory),
         url: z.string().url().optional(),
       }),
     )
@@ -69,9 +70,7 @@ export const resourceRouter = createTRPCRouter({
         id: z.string(),
         title: z.string().optional(),
         description: z.string().optional(),
-        category: z
-          .enum(["DOCUMENTATION", "TUTORIAL", "INFORMATION", "OTHER"])
-          .optional(),
+        category: z.nativeEnum(ResourceCategory).optional(),
         url: z.string().url().optional(),
       }),
     )

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prismaEventService } from "../services/eventService";
+import { AuditMessageType } from "@prisma/client";
 
 export const messageRouter = createTRPCRouter({
   listMessages: protectedProcedure
@@ -28,7 +29,7 @@ export const messageRouter = createTRPCRouter({
       z.object({
         threadId: z.string().min(1),
         message: z.string().min(1),
-        type: z.enum(["USER_MESSAGE", "SYSTEM_MESSAGE"]).optional(),
+        type: z.nativeEnum(AuditMessageType).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

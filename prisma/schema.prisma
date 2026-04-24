@@ -236,11 +236,11 @@ model Notification {
 // NEWS & CAMPAIGN MODEL
 
 model News {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   title       String
-  category    Category @default(NEWS)
+  category    NewsCategory @default(NEWS)
   content     String
-  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy   User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdById String?
 
   createdAt DateTime @default(now())
@@ -258,7 +258,7 @@ model News {
   @@index([isPublished])
 }
 
-enum Category {
+enum NewsCategory {
   NEWS
   STORE_MANUAL
   PRODUCT_INFORMATION

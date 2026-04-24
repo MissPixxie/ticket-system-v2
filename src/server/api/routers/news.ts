@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prismaEventService } from "../services/eventService";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { TRPCError } from "@trpc/server";
+import { NewsCategory, Priority } from "@prisma/client";
 
 export const newsRouter = createTRPCRouter({
   // =========================
@@ -66,12 +67,7 @@ export const newsRouter = createTRPCRouter({
       z.object({
         title: z.string().min(1),
         content: z.string().min(1),
-        category: z.enum([
-          "NEWS",
-          "STORE_MANUAL",
-          "PRODUCT_INFORMATION",
-          "CAMPAIGN",
-        ]),
+        category: z.nativeEnum(NewsCategory),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -129,11 +125,9 @@ export const newsRouter = createTRPCRouter({
       z.object({
         id: z.string(),
         title: z.string().optional(),
-        category: z
-          .enum(["NEWS", "STORE_MANUAL", "PRODUCT_INFORMATION", "CAMPAIGN"])
-          .optional(),
+        category: z.nativeEnum(NewsCategory).optional(),
         content: z.string().optional(),
-        priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+        priority: z.nativeEnum(Priority).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
