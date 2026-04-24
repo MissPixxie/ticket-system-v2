@@ -9,7 +9,7 @@ export type Category =
   | "CAMPAIGN";
 
 interface EditNewsInput {
-  newsId: string;
+  id: string;
   title: string;
   content: string;
   category: Category;

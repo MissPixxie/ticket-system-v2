@@ -79,7 +79,7 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
         >
           <div className="flex gap-2">
             {/* EDIT */}
-            <EditSection newsId={newsProps.id} />
+            <EditSection id={newsProps.id} />
 
             {/* DELETE */}
             <button

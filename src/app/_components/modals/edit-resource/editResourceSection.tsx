@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import EditNewsModal from "./editNewsModal";
-import { useEditNews } from "./useEditNews";
+import { useEditResource } from "./useEditResource";
 import { RiEdit2Fill } from "react-icons/ri";
+import EditResourceModal from "./editResourceModal";
+import type { Resource } from "@prisma/client";
 
-interface EditSectionProps {
-  id: string;
+interface EditResourceSectionProps {
+  resource: Resource;
 }
 
-export function EditSection({ id }: EditSectionProps) {
+export function EditResourceSection({ resource }: EditResourceSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { editNews, isLoading } = useEditNews();
+  const { editResource, isLoading } = useEditResource();
 
   return (
     <>
@@ -22,15 +23,14 @@ export function EditSection({ id }: EditSectionProps) {
         <RiEdit2Fill size={18} />
       </button>
 
-      <EditNewsModal
-        id={id}
+      <EditResourceModal
+        resource={resource}
         isOpen={isOpen}
         onClose={() => {
-          console.log("Closing modal!");
           setIsOpen(false);
         }}
         onSubmit={(data) => {
-          editNews(data);
+          editResource(data);
           setIsOpen(false);
         }}
       />

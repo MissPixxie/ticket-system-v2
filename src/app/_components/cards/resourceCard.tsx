@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { FaTrashAlt } from "react-icons/fa";
-import { EditSection } from "../modals/edit-news/editSection";
 import type { RouterOutputs } from "~/trpc/react";
+import { EditResourceSection } from "../modals/edit-resource/editResourceSection";
 
 type Resources = RouterOutputs["resource"]["listResources"][number];
 
@@ -16,21 +16,14 @@ export default function ResourcesCard({ resourceItem }: ResourceCardProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const utils = api.useUtils();
 
-  const publishResource = api.resource.publishResource.useMutation({
-    onSuccess: (updateResource) => {
-      utils.resource.listResources.setData({}, (oldData) => {
-        if (!oldData) return [];
-        return oldData.map((resource) =>
-          resource.id === updateResource.id
-            ? { ...resource, ...updateResource }
-            : resource,
-        );
-      });
+  const unPublishResource = api.resource.updateResource.useMutation({
+    onSuccess: () => {
+      utils.resource.listResources.invalidate();
     },
   });
 
   const handleArchiveNews = (id: string) => {
-    publishResource.mutate({
+    unPublishResource.mutate({
       id,
       isPublished: false,
     });
@@ -67,7 +60,7 @@ export default function ResourcesCard({ resourceItem }: ResourceCardProps) {
         >
           <div className="flex gap-2">
             {/* EDIT */}
-            <EditSection newsId={resourceItem.id} />
+            <EditResourceSection resource={resourceItem} />
 
             {/* DELETE */}
             <button

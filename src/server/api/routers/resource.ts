@@ -10,6 +10,7 @@ export const resourceRouter = createTRPCRouter({
     .input(z.object({ limit: z.number().optional() }))
     .query(async ({ ctx, input }) => {
       const resources = await ctx.db.resource.findMany({
+        where: { isPublished: true },
         take: input?.limit ?? 5,
         include: {
           createdBy: {
@@ -72,6 +73,7 @@ export const resourceRouter = createTRPCRouter({
         description: z.string().optional(),
         category: z.nativeEnum(ResourceCategory).optional(),
         url: z.string().url().optional(),
+        isPublished: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -93,24 +95,10 @@ export const resourceRouter = createTRPCRouter({
           description: input.description ?? undefined,
           category: input.category ?? undefined,
           url: input.url ?? undefined,
+          isPublished: input.isPublished ?? undefined,
         },
       });
 
       return updatedResource;
-    }),
-  publishResource: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        isPublished: z.boolean(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.resource.update({
-        where: { id: input.id },
-        data: {
-          isPublished: input.isPublished,
-        },
-      });
     }),
 });

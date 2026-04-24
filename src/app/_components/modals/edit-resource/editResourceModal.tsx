@@ -1,5 +1,6 @@
 "use client";
 
+import type { Resource } from "@prisma/client";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import {
@@ -13,70 +14,72 @@ import {
 import { ImInfo } from "react-icons/im";
 import { MdCampaign } from "react-icons/md";
 
-export type Category =
-  | "NEWS"
-  | "STORE_MANUAL"
-  | "PRODUCT_INFORMATION"
-  | "CAMPAIGN";
-export type Priority = "LOW" | "MEDIUM" | "URGENT";
+export type Category = "DOCUMENTATION" | "TUTORIAL" | "INFORMATION" | "OTHER";
 
-export interface EditNewsData {
+export interface EditResourceData {
   id: string;
-  title: string;
-  content: string;
-  category: Category;
-  priority?: Priority;
+  title?: string;
+  description?: string;
+  category?: Category;
+  url?: string;
+  isPublished?: boolean;
 }
 
-interface EditNewsModalProps {
-  id: string;
+interface EditResourceModalProps {
+  resource: Resource;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: EditNewsData) => void;
+  onSubmit: (data: EditResourceData) => void;
 }
 
-const EditNewsModal: React.FC<EditNewsModalProps> = ({
-  id,
+const EditResourceModal: React.FC<EditResourceModalProps> = ({
+  resource,
   isOpen,
   onClose,
   onSubmit,
 }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [priority, setPriority] = useState<Priority>("LOW");
-  const [category, setCategory] = useState<Category>("NEWS");
+  const [title, setTitle] = useState(resource.title ?? "");
+  const [description, setDescription] = useState(resource.description ?? "");
+  const [category, setCategory] = useState<Category>(resource.category ?? "OTHER");
+  const [url, setUrl] = useState(resource.url ?? "");
   const [isSelected, setIsSelected] = useState<null | number>(null);
 
   if (!isOpen) return null;
 
   const categorys = [
-    { id: 1, value: "NEWS", label: "NEWS", icon: <MdCampaign size={24} /> },
+    {
+      id: 1,
+      value: "DOCUMENTATION",
+      label: "DOCUMENTATION",
+      icon: <MdCampaign size={24} />,
+    },
     {
       id: 2,
-      value: "STORE_MANUAL",
-      label: "MANUAL",
+      value: "TUTORIAL",
+      label: "TUTORIAL",
       icon: <FaRegFileAlt size={22} />,
     },
     {
       id: 3,
-      value: "PRODUCT_INFORMATION",
+      value: "INFORMATION",
       label: "INFORMATION",
       icon: <ImInfo size={22} />,
     },
     {
       id: 4,
-      value: "CAMPAIGN",
-      label: "CAMPAIGN",
+      value: "OTHER",
+      label: "OTHER",
       icon: <FaShopify size={22} />,
     },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ id, title, content, category, priority });
+    onSubmit({ id: resource.id, title, description, category, url, isPublished: true });
     setTitle("");
-    setContent("");
-    setCategory("NEWS");
+    setDescription("");
+    setCategory("OTHER");
+    setUrl("");
     setIsSelected(null);
   };
 
@@ -124,26 +127,21 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
             onChange={(e) => setTitle(e.target.value)}
             className="rounded-lg border border-black/50 bg-white/5 px-4 py-3 text-gray-200/65 required:border-red-500 required:text-red-500"
           />
-          <label htmlFor="content">Beskriv nyheten</label>
+          <label htmlFor="content">Beskriv Resursen</label>
           <textarea
-            placeholder="Beskriv nyheten"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            placeholder="Beskriv resursen"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
           />
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold">Prioritet</label>
-            <select
-              value={priority}
-              onClick={(e) => e.stopPropagation()}
-              onChange={(e) => setPriority(e.target.value as Priority)}
-              className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
-            >
-              <option value="LOW">Låg</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="URGENT">Hög</option>
-            </select>
-          </div>
+          <label htmlFor="url">URL</label>
+          <input
+            type="text"
+            placeholder="URL"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="rounded-lg border border-black/50 bg-white/5 px-4 py-3 text-gray-200/65 required:border-red-500 required:text-red-500"
+          />
           <div className="flex justify-end space-x-2 pt-4">
             <button
               type="button"
@@ -163,4 +161,4 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
   );
 };
 
-export default EditNewsModal;
+export default EditResourceModal;
