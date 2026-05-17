@@ -68,6 +68,7 @@ enum EventOrigin {
   NEWS
   QUESTION
   RESOURCE
+  OUTGOINGMESSAGE
 }
 
 model Event {
@@ -161,8 +162,9 @@ model Thread {
   ticket   Ticket? @relation(fields: [ticketId], references: [id])
   ticketId String? @unique
 
-  question   Question? @relation(fields: [questionId], references: [id])
-  questionId String?   @unique
+  question        Question?        @relation(fields: [questionId], references: [id])
+  questionId      String?          @unique
+  generalMessages GeneralMessage[]
 
   @@unique([id])
   @@index([id])
@@ -176,11 +178,24 @@ enum MessageType {
   SYSTEM_MESSAGE
 }
 
+model GeneralMessage {
+  id                  String           @id @default(cuid())
+  message             String
+  type                MessageType      @default(USER_MESSAGE)
+  createdAt           DateTime         @default(now())
+  includedDepartments UserDepartment[]
+  includedUsers       User[]           @relation("GeneralMessageRecipients")
+  users               User[]
+  thread              Thread?          @relation(fields: [threadId], references: [id])
+  threadId            String?
+}
+
 model Message {
   id        String      @id @default(cuid())
   message   String
   type      MessageType @default(USER_MESSAGE)
   createdAt DateTime    @default(now())
+  receivers User[]      @relation("MessageReceivers")
 
   createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdById String?
@@ -195,6 +210,7 @@ model Message {
 enum ParentType {
   TICKET
   QUESTION
+  GENERAL
 }
 
 enum SubscriptionType {
@@ -464,10 +480,14 @@ model User {
 
   news News[]
 
-  questions    Question[]
-  resources    Resource[]
-  newsVotes    NewsVote[]
-  newsComments NewsComment[]
+  questions        Question[]
+  resources        Resource[]
+  newsVotes        NewsVote[]
+  newsComments     NewsComment[]
+  generalMessage   GeneralMessage?  @relation(fields: [generalMessageId], references: [id])
+  generalMessageId String?
+  generalMessages  GeneralMessage[] @relation("GeneralMessageRecipients")
+  receivedMessages Message[]        @relation("MessageReceivers")
 
   @@index([id])
   @@index([email])
@@ -479,7 +499,8 @@ model UserDepartment {
   userId     String
   department Department
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  generalMessages GeneralMessage[]
 
   @@unique([userId, department])
 }

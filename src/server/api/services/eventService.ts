@@ -1,33 +1,17 @@
 import { EventEmitter } from "events";
 import { db } from "~/server/db";
 import { createAuditLog } from "./auditLogService";
-import { Severity } from "@prisma/client";
+import { EventType, EventOrigin, Severity } from "@prisma/client";
 
 type EventMetadata = Record<string, any>;
 
 export class PrismaEventService extends EventEmitter {
   async createEvent(params: {
-    type:
-      | "TICKET_CREATED"
-      | "TICKET_STATUS_CHANGED"
-      | "TICKET_ASSIGNED"
-      | "TICKET_CHANGED_PRIORITY"
-      | "MESSAGE_ADDED"
-      | "SUGGESTION_CREATED"
-      | "SUGGESTION_STATUS_CHANGED"
-      | "SUGGESTION_VOTED"
-      | "ROLE_CHANGED"
-      | "NEWS_CREATED"
-      | "NEWS_CHANGED"
-      | "NEWS_CHANGED_PRIORITY"
-      | "QUESTION_CREATED"
-      | "QUESTION_STATUS_CHANGED"
-      | "RESOURCE_CREATED"
-      | "RESOURCE_CHANGED";
+    type: EventType;
     originId: string;
-    originType: "TICKET" | "SUGGESTION" | "NEWS" | "QUESTION" | "RESOURCE";
+    originType: EventOrigin;
     actorId: string;
-    severity?: "INFO" | "WARNING" | "ERROR";
+    severity?: Severity;
     metadata?: EventMetadata;
   }) {
     const { type, originId, originType, actorId, metadata } = params;

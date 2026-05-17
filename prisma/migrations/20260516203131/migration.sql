@@ -76,6 +76,16 @@ CREATE TABLE "Thread" (
 );
 
 -- CreateTable
+CREATE TABLE "GeneralMessage" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "message" TEXT NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'USER_MESSAGE',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "threadId" TEXT,
+    CONSTRAINT "GeneralMessage_threadId_fkey" FOREIGN KEY ("threadId") REFERENCES "Thread" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
 CREATE TABLE "Message" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "message" TEXT NOT NULL,
@@ -156,8 +166,10 @@ CREATE TABLE "Resource" (
     "description" TEXT NOT NULL,
     "category" TEXT NOT NULL DEFAULT 'OTHER',
     "createdById" TEXT,
+    "isPublished" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
+    "url" TEXT,
     CONSTRAINT "Resource_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
@@ -218,7 +230,9 @@ CREATE TABLE "User" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "suggestionId" TEXT,
-    CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "generalMessageId" TEXT,
+    CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "User_generalMessageId_fkey" FOREIGN KEY ("generalMessageId") REFERENCES "GeneralMessage" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -272,6 +286,30 @@ CREATE TABLE "Verification" (
     "expiresAt" DATETIME NOT NULL,
     "createdAt" DATETIME NOT NULL,
     "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_GeneralMessageToUserDepartment" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+    CONSTRAINT "_GeneralMessageToUserDepartment_A_fkey" FOREIGN KEY ("A") REFERENCES "GeneralMessage" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "_GeneralMessageToUserDepartment_B_fkey" FOREIGN KEY ("B") REFERENCES "UserDepartment" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "_GeneralMessageRecipients" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+    CONSTRAINT "_GeneralMessageRecipients_A_fkey" FOREIGN KEY ("A") REFERENCES "GeneralMessage" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "_GeneralMessageRecipients_B_fkey" FOREIGN KEY ("B") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "_MessageReceivers" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+    CONSTRAINT "_MessageReceivers_A_fkey" FOREIGN KEY ("A") REFERENCES "Message" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "_MessageReceivers_B_fkey" FOREIGN KEY ("B") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -332,6 +370,12 @@ CREATE UNIQUE INDEX "Thread_questionId_key" ON "Thread"("questionId");
 
 -- CreateIndex
 CREATE INDEX "Thread_id_idx" ON "Thread"("id");
+
+-- CreateIndex
+CREATE INDEX "Thread_ticketId_idx" ON "Thread"("ticketId");
+
+-- CreateIndex
+CREATE INDEX "Thread_questionId_idx" ON "Thread"("questionId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Thread_id_key" ON "Thread"("id");
@@ -431,6 +475,24 @@ CREATE INDEX "Session_userId_idx" ON "Session"("userId");
 
 -- CreateIndex
 CREATE INDEX "Verification_identifier_idx" ON "Verification"("identifier");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_GeneralMessageToUserDepartment_AB_unique" ON "_GeneralMessageToUserDepartment"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_GeneralMessageToUserDepartment_B_index" ON "_GeneralMessageToUserDepartment"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_GeneralMessageRecipients_AB_unique" ON "_GeneralMessageRecipients"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_GeneralMessageRecipients_B_index" ON "_GeneralMessageRecipients"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_MessageReceivers_AB_unique" ON "_MessageReceivers"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_MessageReceivers_B_index" ON "_MessageReceivers"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_TicketParticipants_AB_unique" ON "_TicketParticipants"("A", "B");

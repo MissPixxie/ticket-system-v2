@@ -18,22 +18,8 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
   const { data: me } = api.user.me.useQuery();
 
   const updateTicket = api.ticket.updateTicket.useMutation({
-    onSuccess: (updatedTicket) => {
-      utils.ticket.listAllTickets.setData(
-        { limit: 20, cursor: null },
-        (oldData) => {
-          if (!oldData) return { tickets: [], nextCursor: null };
-
-          return {
-            ...oldData,
-            tickets: oldData.tickets.map((ticket) =>
-              ticket.id === updatedTicket.id
-                ? { ...ticket, ...updatedTicket }
-                : ticket,
-            ),
-          };
-        },
-      );
+    onSuccess: () => {
+      utils.ticket.listAllTickets.invalidate();
     },
   });
 
@@ -47,7 +33,7 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
   const handleSetPriority = (ticketId: string, priority: string) => {
     updateTicket.mutate({
       id: ticketId,
-      priority: priority as "LOW" | "MEDIUM" | "URGENT",
+      priority: priority as "LOW" | "MEDIUM" | "HIGH" | "URGENT",
     });
   };
 
@@ -96,6 +82,7 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
             >
               <option>LOW</option>
               <option>MEDIUM</option>
+              <option>HIGH</option>
               <option>URGENT</option>
             </select>
           </div>

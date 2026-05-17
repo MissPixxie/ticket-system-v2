@@ -6,6 +6,7 @@ import TicketCard from "./cards/ticketCard";
 import { useSocket } from "../socketProvider";
 import { TicketSection } from "./modals/create-ticket/ticketSection";
 import { PickSection } from "./modals/handler-picker/pickSection";
+import { FaTrashAlt } from "react-icons/fa";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -20,26 +21,25 @@ export function MessagesTable() {
   const utils = api.useUtils();
   const { data: me } = api.user.me.useQuery();
 
-  //   const { data: messages, isLoading } = api.message.listMessages.useQuery({
-  //     threadId,
-  //   });
+  const { data: messages, isLoading } = api.message.listUserMessages.useQuery();
+
+  console.log("Fetched messages:", messages);
 
   //   const sortedMessages = messages ? [...messages].reverse() : [];
 
-  //   const createMessage = api.message.createMessage.useMutation({
-  //     onSuccess: () => {
-  //       console.log("Message created, invalidating messages for id:", threadId);
-  //       utils.message.listMessages.invalidate();
-  //     },
-  //   });
+  const deleteMessage = api.message.deleteMessage.useMutation({
+    onSuccess: () => {
+      utils.message.listUserMessages.invalidate();
+    },
+  });
+
+  const handleDeleteMessage = (messageId: string) => {
+    deleteMessage.mutate({ id: messageId });
+  };
 
   const handleSetFilter = (value: string) => {
     setFilter(value);
   };
-
-  //   if (isLoading) return <p>Laddar meddelanden...</p>;
-  //   if (!messages || messages.length === 0)
-  //     return <p>Inga meddelanden hittades</p>;
 
   return (
     <div className="primary-background mt-15 rounded-2xl shadow-lg/15 backdrop-blur-lg">
@@ -70,48 +70,35 @@ export function MessagesTable() {
 
       {/* TABLE HEADER */}
 
-      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] border-b border-white/10 px-5 py-4 text-sm text-white/70">
+      <div className="grid grid-cols-[1fr_2fr_1fr_auto] border-b border-white/10 px-5 py-4 text-sm text-white/70">
         <div className="font-semibold">Från</div>
-        <div className="font-semibold">Till</div>
-        <div className="font-semibold">Prioritet</div>
+        <div className="font-semibold">Meddelande</div>
         <div className="font-semibold">Datum</div>
       </div>
 
       {/* ROWS */}
-      {/*
-      {visibleTickets?.map((ticket) => (
-        <div key={ticket.id} className="border-t border-white/5">
-          <div
-            className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center px-5 py-4 hover:bg-white/5"
-            onClick={() =>
-              setSelectedTicketId(
-                selectedTicketId === ticket.id ? null : ticket.id,
-              )
-            }
-          >
-            <div>{ticket.title}</div>
-            <div>{ticket.department}</div>
 
-            <div>
-              <span
-                className={`rounded-md px-2 py-1 text-xs ${
-                  priorityClasses[ticket.priority]
-                }`}
-              >
-                {ticket.priority}
-              </span>
+      {messages?.map((message) => (
+        <div key={message.id} className="border-t border-white/5">
+          <div className="grid grid-cols-[1fr_2fr_1fr_auto] border-b border-white/10 px-5 py-4 text-sm text-white/70">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-500 text-xs font-semibold text-white">
+                {message.createdBy?.name?.charAt(0)}
+              </div>
+
+              <span>{message.createdBy?.name}</span>
             </div>
-
-            <div>{ticket.createdAt.toLocaleDateString()}</div>
+            <div>{message.message}</div>
+            <div>{message.createdAt.toLocaleDateString()}</div>
+            <button
+              onClick={() => handleDeleteMessage(message.id)}
+              className="max-w-9 cursor-pointer rounded-lg bg-white/10 p-2 hover:bg-red-500/30"
+            >
+              <FaTrashAlt size={18} />
+            </button>
           </div>
-
-          {selectedTicketId === ticket.id && (
-            <div className="p-5">
-              <TicketCard {...ticket} currentUserId={null} />
-            </div>
-          )}
         </div>
-      ))} */}
+      ))}
     </div>
   );
 }
