@@ -42,7 +42,7 @@ export function MessagesTable() {
   };
 
   return (
-    <div className="primary-background mt-15 rounded-2xl shadow-lg/15 backdrop-blur-lg">
+    <div className="primary-background rounded-2xl shadow-lg/15 backdrop-blur-lg">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 p-5">
         <div className="flex items-center gap-4">
           <select

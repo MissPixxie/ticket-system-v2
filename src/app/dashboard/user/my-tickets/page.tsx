@@ -25,7 +25,6 @@ export default function MyTicketsPage() {
     <main className="main-page-layout">
       <div className="container">
         <h1 className="page-header">Mina Tickets</h1>
-        <TicketSection />
         <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
             <p className="text-sm text-white/60">Totala</p>

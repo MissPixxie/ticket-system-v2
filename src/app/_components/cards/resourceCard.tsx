@@ -5,6 +5,8 @@ import { api } from "~/trpc/react";
 import { FaTrashAlt } from "react-icons/fa";
 import type { RouterOutputs } from "~/trpc/react";
 import { EditResourceSection } from "../modals/edit-resource/editResourceSection";
+import Link from "next/link";
+import { FiExternalLink } from "react-icons/fi";
 
 type Resources = RouterOutputs["resource"]["listResources"][number];
 
@@ -51,6 +53,19 @@ export default function ResourcesCard({ resourceItem }: ResourceCardProps) {
       </p>
 
       <p className="line-clamp-3 text-white/80">{resourceItem.description}</p>
+      {resourceItem.url && (
+        <div className="mt-2 flex gap-1">
+          <Link
+            href={resourceItem.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:underline"
+          >
+            Läs mer
+          </Link>
+          <FiExternalLink size={12} />
+        </div>
+      )}
 
       {/* Expanded panel */}
       {isExpanded && (

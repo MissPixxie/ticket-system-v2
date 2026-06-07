@@ -21,6 +21,8 @@ const ROLE_PERMISSIONS: Record<RoleKey, string[]> = {
 
 type RoleKey = keyof typeof ROLE_MAP;
 
+type FilterType = "all" | "users" | "handlers";
+
 export default function ListUsersPage() {
   const utils = api.useUtils();
   const { data: users, isLoading } = api.user.listAll.useQuery({ limit: 20 });
@@ -29,6 +31,7 @@ export default function ListUsersPage() {
   const [editName, setEditName] = useState("");
   const [editRole, setEditRole] = useState<RoleKey>("USER");
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [filter, setFilter] = useState<FilterType>("all");
 
   const deleteUser = api.user.deleteUser.useMutation({
     onSuccess: async () => {
@@ -39,6 +42,19 @@ export default function ListUsersPage() {
     onError: (error) => {
       toast.error(error.message);
     },
+  });
+
+  const filteredUsers = users?.users?.sort((a, b) => {
+    if (filter === "users") {
+      return (
+        (b.role?.name === "HANDLER" ? 1 : 0) -
+        (a.role?.name === "HANDLER" ? 1 : 0)
+      );
+    } else {
+      return (
+        (b.role?.name === "USER" ? 1 : 0) - (a.role?.name === "USER" ? 1 : 0)
+      );
+    }
   });
 
   const updateUser = api.user.updateUser.useMutation({
@@ -80,7 +96,7 @@ export default function ListUsersPage() {
             </thead>
 
             <tbody>
-              {users.users.map((user) => {
+              {filteredUsers?.map((user) => {
                 const isAdmin = user.role?.name === "ADMIN";
 
                 return (

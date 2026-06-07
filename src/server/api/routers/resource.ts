@@ -77,6 +77,20 @@ export const resourceRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const currentUser = await ctx.db.user.findUnique({
+        where: { id: ctx.session.user.id },
+        include: {
+          role: true,
+        },
+      });
+
+      if (currentUser?.role?.name === "USER") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Du har inte behörighet att uppdatera resurser",
+        });
+      }
+
       const resource = await ctx.db.resource.findUnique({
         where: { id: input.id },
       });

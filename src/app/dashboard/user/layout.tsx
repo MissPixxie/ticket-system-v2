@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import { MdCampaign } from "react-icons/md";
 import { FaRegLightbulb } from "react-icons/fa6";
 import { ImBooks } from "react-icons/im";
+import Sidebar from "~/app/_components/sidebar";
 
 export default async function UserLayout({
   children,
@@ -34,7 +35,7 @@ export default async function UserLayout({
     {
       id: "home",
       label: "Hem",
-      route: "/dashboard/user/",
+      route: "/dashboard/user",
       icon: <IoMdHome size={22} />,
     },
     {
@@ -79,31 +80,8 @@ export default async function UserLayout({
     <div>
       <Header />
       <div className="flex flex-row gap-10 bg-linear-to-b from-[#2e026d] to-[#15162c]">
-        <aside className="primary-background min-h-screen w-72 border-r border-white/10 backdrop-blur-xl">
-          <div className="flex flex-col pt-6 text-white">
-            <div className="mb-6 px-6 text-sm font-semibold tracking-widest text-white/40 uppercase">
-              Navigation
-            </div>
+        <Sidebar menuItems={menuItems} />
 
-            {menuItems.map((item) => (
-              <Link
-                key={item.id}
-                href={item.route ?? "#"}
-                className="group text-md flex w-full items-center gap-3 px-6 py-4 font-medium transition-all duration-200 hover:bg-white/10"
-              >
-                {item.icon && (
-                  <span className="text-lg text-white/70 transition group-hover:text-white">
-                    {item.icon}
-                  </span>
-                )}
-
-                <span className="transition group-hover:translate-x-1">
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </aside>
         <main className="w-full">{children}</main>
       </div>
     </div>

@@ -129,8 +129,12 @@ export default function UserHome() {
                   href={`/dashboard/user/my-tickets/${ticket.id}`}
                   className="flex justify-between rounded-lg bg-white/5 px-3 py-2 transition hover:bg-white/10"
                 >
-                  <span>{ticket.id}</span>
                   <span>{ticket.title}</span>
+                  <span>
+                    {ticket.issue.length > 10
+                      ? `${ticket.issue.slice(0, 10)}...`
+                      : ticket.issue}
+                  </span>
                   <span className="text-white/60">{ticket.status}</span>
                 </Link>
               ))}

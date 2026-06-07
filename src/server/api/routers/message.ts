@@ -260,7 +260,7 @@ export const messageRouter = createTRPCRouter({
       return newMessage;
     }),
 
-    deleteMessage: protectedProcedure
+  deleteMessage: protectedProcedure
     .input(
       z.object({
         id: z.string().min(1),
@@ -278,4 +278,18 @@ export const messageRouter = createTRPCRouter({
         where: { id: input.id },
       });
     }),
+
+  getUsersToMessage: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        departments: {
+          select: {
+            department: true,
+          },
+        },
+      },
+    });
+  }),
 });

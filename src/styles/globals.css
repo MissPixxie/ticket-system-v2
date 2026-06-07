@@ -26,6 +26,8 @@
     padding-top: 3rem;
     padding-bottom: 3rem;
     color: #ffffff;
+    max-width: 80rem;
+    margin: auto;
   }
 
   .container {

@@ -6,6 +6,7 @@ import TicketCard from "./cards/ticketCard";
 import { useSocket } from "../socketProvider";
 import { TicketSection } from "./modals/create-ticket/ticketSection";
 import { PickSection } from "./modals/handler-picker/pickSection";
+import Link from "next/link";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -27,7 +28,6 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
   const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({
     limit: 20,
   });
-  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
   const { socket } = useSocket();
@@ -135,75 +135,67 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
 
       {visibleTickets?.map((ticket) => (
         <div key={ticket.id} className="border-t border-white/5">
-          <div
-            className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center px-5 py-4 hover:bg-white/5"
-            onClick={() =>
-              setSelectedTicketId(
-                selectedTicketId === ticket.id ? null : ticket.id,
-              )
-            }
-          >
-            <div>{ticket.title}</div>
+          <div className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center px-5 py-4 hover:bg-white/5">
+            <Link
+              href={`/dashboard/user/my-tickets/${ticket.id}`}
+              className="contents"
+            >
+              <div>{ticket.title}</div>
 
-            <div>{ticket.department}</div>
+              <div>{ticket.department}</div>
 
-            <div>
-              <span
-                className={`rounded-md px-2 py-1 text-xs ${
-                  statusClasses[ticket.status]
-                }`}
-              >
-                {ticket.status.replace("_", " ")}
-              </span>
-            </div>
+              <div>
+                <span
+                  className={`rounded-md px-2 py-1 text-xs ${
+                    statusClasses[ticket.status]
+                  }`}
+                >
+                  {ticket.status.replace("_", " ")}
+                </span>
+              </div>
 
-            <div>
-              <span
-                className={`rounded-md px-2 py-1 text-xs ${
-                  priorityClasses[ticket.priority]
-                }`}
-              >
-                {ticket.priority}
-              </span>
-            </div>
+              <div>
+                <span
+                  className={`rounded-md px-2 py-1 text-xs ${
+                    priorityClasses[ticket.priority]
+                  }`}
+                >
+                  {ticket.priority}
+                </span>
+              </div>
 
-            <div>{ticket.createdAt.toLocaleDateString()}</div>
+              <div>{ticket.createdAt.toLocaleDateString()}</div>
 
-            <div>
-              {(() => {
-                // Förutsatt att du har currentUserRole som "USER" | "HANDLER" | "ADMIN"
-                if (!ticket.assignedTo) {
-                  switch (currentUserRole) {
-                    case "USER":
-                      return <span>ingen</span>;
-                    case "HANDLER":
-                      return (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSetStatus(ticket.id);
-                          }}
-                          className="submit-button"
-                        >
-                          Acceptera
-                        </button>
-                      );
-                    case "ADMIN":
-                      return <PickSection ticketId={ticket.id} />;
+              <div>
+                {(() => {
+                  // Förutsatt att du har currentUserRole som "USER" | "HANDLER" | "ADMIN"
+                  if (!ticket.assignedTo) {
+                    switch (currentUserRole) {
+                      case "USER":
+                        return <span>ingen</span>;
+                      case "HANDLER":
+                        return (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSetStatus(ticket.id);
+                            }}
+                            className="submit-button"
+                          >
+                            Acceptera
+                          </button>
+                        );
+                      case "ADMIN":
+                        return <PickSection ticketId={ticket.id} />;
+                    }
+                  } else {
+                    // Om ticket redan har någon assignedTo
+                    return <span>{ticket.assignedTo.name}</span>;
                   }
-                } else {
-                  // Om ticket redan har någon assignedTo
-                  return <span>{ticket.assignedTo.name}</span>;
-                }
-              })()}
-            </div>
+                })()}
+              </div>
+            </Link>
           </div>
-
-          {selectedTicketId === ticket.id && (
-            <div className="p-5">
-              <TicketCard {...ticket} currentUserId={null} />
-            </div>
-          )}
         </div>
       ))}
 

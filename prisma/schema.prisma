@@ -43,6 +43,14 @@ model AuditLog {
   @@index([createdAt])
 }
 
+enum EventParentType {
+  TICKET
+  SUGGESTION
+  NEWS
+  QUESTION
+  RESOURCE
+}
+
 enum EventType {
   TICKET_CREATED
   TICKET_STATUS_CHANGED

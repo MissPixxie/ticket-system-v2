@@ -6,6 +6,7 @@ import { HiSpeakerphone, HiOutlineDocumentText } from "react-icons/hi";
 import { MdCampaign } from "react-icons/md";
 import SkeletonNewsCard from "~/app/_components/skeletonComponents/cards/skeletonNewsCard";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { TfiCommentAlt } from "react-icons/tfi";
 
 const PAGE_SIZE = 5;
 
@@ -97,12 +98,11 @@ export default function NewsPage() {
 
             return (
               <div
-                key={news.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleNews(news.id);
-                }}
-                className="card"
+                className={`cursor-pointer rounded-2xl p-6 text-left shadow-lg/15 transition-colors duration-200 ${
+                  selectedNewsId === news.id
+                    ? "bg-white/10"
+                    : "bg-white/5 hover:bg-white/10"
+                }`}
               >
                 {/* HEADER */}
                 <div className="flex items-center justify-between">
@@ -116,47 +116,60 @@ export default function NewsPage() {
                   {new Date(news.createdAt).toLocaleDateString()}
                 </div>
                 {/* VOTE SECTION */}
-                <div className="mt-4 flex items-center gap-3">
-                  <span className="text-xs text-white/60">
-                    Var den här informationen tydlig?
-                  </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      vote.mutate({ id: news.id, type: "UP" });
-                    }}
-                    className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1 hover:bg-white/10"
-                  >
-                    <FaThumbsUp
-                      className={
-                        news.userVote === "UP"
-                          ? "text-green-400"
-                          : "text-white/50"
-                      }
-                    />
+                <div>
+                  <div className="mt-4 flex items-center gap-3">
+                    <span className="text-xs text-white/60">
+                      Var den här informationen tydlig?
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        vote.mutate({ id: news.id, type: "UP" });
+                      }}
+                      className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1 hover:bg-white/10"
+                    >
+                      <FaThumbsUp
+                        className={
+                          news.userVote === "UP"
+                            ? "text-green-400"
+                            : "text-white/50"
+                        }
+                      />
 
-                    <span className="text-sm text-white/70">
-                      {news.upVotes ?? 0}
+                      <span className="text-sm text-white/70">
+                        {news.upVotes ?? 0}
+                      </span>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        vote.mutate({ id: news.id, type: "DOWN" });
+                      }}
+                      className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1 hover:bg-white/10"
+                    >
+                      <FaThumbsDown
+                        className={
+                          news.userVote === "DOWN"
+                            ? "text-red-500"
+                            : "text-white/50"
+                        }
+                      />
+                      <span className="text-sm text-white/70">
+                        {news.downVotes ?? 0}
+                      </span>
+                    </button>
+                  </div>
+                  <div className="flex flex-row items-center gap-3">
+                    <span className="text-xs text-white/60">
+                      Lämna en kommentar
                     </span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      vote.mutate({ id: news.id, type: "DOWN" });
-                    }}
-                    className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1 hover:bg-white/10"
-                  >
-                    <FaThumbsDown
-                      className={
-                        news.userVote === "DOWN"
-                          ? "text-red-500"
-                          : "text-white/50"
-                      }
+                    <TfiCommentAlt
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleNews(news.id);
+                      }}
                     />
-                    <span className="text-sm text-white/70">
-                      {news.downVotes ?? 0}
-                    </span>
-                  </button>
+                  </div>
                 </div>
 
                 <div
@@ -172,10 +185,10 @@ export default function NewsPage() {
                             key={msg.id}
                             className="border-b border-white/10 py-2"
                           >
-                            <p>{msg.content}</p>
                             <span className="text-xs text-white/40">
                               {msg.user?.name ?? "Anonym"}
                             </span>
+                            <p>{msg.content}</p>
                           </div>
                         ))
                       ) : (
