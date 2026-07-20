@@ -4,6 +4,7 @@ import { useState } from "react";
 import NewsCard from "~/app/_components/cards/newsCard";
 import { api } from "~/trpc/react";
 import { MdCampaign } from "react-icons/md";
+import { GenerateTagsButton } from "~/app/_components/ai/generateTags";
 
 const PAGE_SIZE = 5;
 
@@ -41,6 +42,7 @@ export default function NewsPage() {
   const [priority, setPriority] = useState<
     "LOW" | "MEDIUM" | "HIGH" | "URGENT"
   >("MEDIUM");
+  const [tags, setTags] = useState<string[]>([]);
 
   const { data: news = [] } = api.news.listNews.useQuery({
     limit: visibleCount,
@@ -123,24 +125,44 @@ export default function NewsPage() {
               rows={4}
               className="resize-none rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <div className="flex flex-col gap-2">
-              <span className="text-sm text-white/70">Prioritet</span>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-2">
+                <span className="text-sm text-white/70">Prioritet</span>
 
-              <div className="flex flex-wrap gap-3">
-                {priorities.map((p) => (
-                  <button
-                    key={p.value}
-                    type="button"
-                    onClick={() => setPriority(p.value as typeof priority)}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                      priority === p.value
-                        ? `scale-105 text-white shadow-lg ${p.active}`
-                        : "bg-white/10 text-white/70 hover:bg-white/20"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+                <div className="flex flex-wrap gap-3">
+                  {priorities.map((p) => (
+                    <button
+                      key={p.value}
+                      type="button"
+                      onClick={() => setPriority(p.value as typeof priority)}
+                      className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                        priority === p.value
+                          ? `scale-105 text-white shadow-lg ${p.active}`
+                          : "bg-white/10 text-white/70 hover:bg-white/20"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex w-100 flex-col items-end gap-3">
+                <GenerateTagsButton
+                  text={`${title} ${content}`}
+                  onGenerated={setTags}
+                />
+                {tags.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-purple-500/20 px-3 py-1 text-sm text-purple-200"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             <button

@@ -11,6 +11,8 @@ import { auditLogRouter } from "./routers/auditLog";
 import { newsRouter } from "./routers/news";
 import { questionRouter } from "./routers/question";
 import { resourceRouter } from "./routers/resource";
+import { tagRouter } from "./routers/tag";
+import { aiRouter } from "./routers/ai";
 
 /**
  * This is the primary router for your server.
@@ -30,6 +32,8 @@ export const appRouter = createTRPCRouter({
   news: newsRouter,
   question: questionRouter,
   resource: resourceRouter,
+  tag: tagRouter,
+  ai: aiRouter,
 });
 
 // export type definition of API

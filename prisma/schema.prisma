@@ -51,6 +51,15 @@ enum EventParentType {
   RESOURCE
 }
 
+// Ska source ersätta eventtype?
+enum Source {
+  TICKET
+  SUGGESTION
+  NEWS
+  QUESTION
+  RESOURCE
+}
+
 enum EventType {
   TICKET_CREATED
   TICKET_STATUS_CHANGED
@@ -127,6 +136,7 @@ model Suggestion {
   votes       Vote[]
   voteCount   Int            @default(0)
   subscribers Subscription[]
+  tags        Tag[]
 
   @@index([status])
   @@index([suggestionBoxId])
@@ -153,6 +163,7 @@ model Question {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   thread      Thread?
+  tags        Tag[]
 
   @@index([id])
   @@index([createdAt])
@@ -278,6 +289,7 @@ model News {
   upVotes   Int           @default(0)
   downVotes Int           @default(0)
   comments  NewsComment[]
+  tags      Tag[]
 
   @@index([isPublished])
 }
@@ -366,6 +378,7 @@ model Resource {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   url         String?
+  tags        Tag[]
 
   @@index([id])
   @@index([category])
@@ -406,6 +419,7 @@ model Ticket {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   solvedAt    DateTime?
+  tags        Tag[]
 
   createdBy       User?   @relation("TicketsCreated", fields: [createdById], references: [id], onDelete: SetNull)
   createdById     String?
@@ -421,6 +435,17 @@ model Ticket {
   @@index([assignedToId])
   @@index([status])
   @@index([department])
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  name String @unique
+
+  resources   Resource[]
+  news        News[]
+  questions   Question[]
+  suggestions Suggestion[]
+  tickets     Ticket[]
 }
 
 model Post {

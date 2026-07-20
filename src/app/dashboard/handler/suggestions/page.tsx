@@ -1,14 +1,28 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { api } from "~/trpc/react";
 import SuggestionCard from "~/app/_components/cards/suggestionCard";
-import { FaRegLightbulb } from "react-icons/fa6";
-
+import { FaRegClock, FaRegLightbulb } from "react-icons/fa6";
+import SkeletonSuggestionCard from "~/app/_components/skeletonComponents/cards/skeletonSuggestionCard";
 import { AnimatePresence, motion } from "framer-motion";
+import { GoDotFill, GoTrophy } from "react-icons/go";
+import { RiArrowUpDoubleFill } from "react-icons/ri";
+
+type FilterType = "latest" | "popular" | "status";
+
+const statusStyles = {
+  SENT: "bg-gray-500/20 text-gray-300",
+  UNDER_REVIEW: "bg-yellow-500/20 text-yellow-300",
+  APPROVED: "bg-blue-500/20 text-blue-300",
+  IMPLEMENTED: "bg-green-500/20 text-green-300",
+  REJECTED: "bg-red-500/20 text-red-300",
+};
 
 export default function SuggestionsHandlerPage() {
   const utils = api.useUtils();
+
+  const [filter, setFilter] = useState<FilterType>("latest");
 
   const { data: suggestions = [], isLoading } =
     api.suggestionBox.listSuggestions.useQuery();
@@ -40,6 +54,26 @@ export default function SuggestionsHandlerPage() {
     </motion.div>
   );
 
+  const sortedSuggestions = suggestions?.sort((a, b) => {
+    if (filter === "latest") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+
+    if (filter === "popular") {
+      return b.voteCount - a.voteCount;
+    }
+
+    const order = {
+      SENT: 0,
+      UNDER_REVIEW: 1,
+      APPROVED: 2,
+      IMPLEMENTED: 3,
+      REJECTED: 4,
+    };
+
+    return order[a.status] - order[b.status];
+  });
+
   if (isLoading) {
     return (
       <main className="main-page-layout">
@@ -57,89 +91,90 @@ export default function SuggestionsHandlerPage() {
 
           <h1 className="page-header">Förslag från butikerna</h1>
         </div>
+        {/* FILTER */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => setFilter("latest")}
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+              filter === "latest"
+                ? "bg-white/20"
+                : "bg-white/5 hover:bg-white/10"
+            }`}
+          >
+            <FaRegClock />
+            Senaste
+          </button>
 
-        {/* ACTIVE */}
-        <section className="mb-10">
-          <h2 className="mb-4 text-sm font-semibold tracking-wide text-white/60 uppercase">
-            Aktiva förslag
-          </h2>
+          <button
+            onClick={() => setFilter("popular")}
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+              filter === "popular"
+                ? "bg-white/20"
+                : "bg-white/5 hover:bg-white/10"
+            }`}
+          >
+            <GoTrophy />
+            Mest röster
+          </button>
 
-          <AnimatePresence mode="popLayout">
-            <div className="grid gap-6">
-              {active.map((s) => (
-                <MotionCard key={s.id} s={s} />
-              ))}
+          <button
+            onClick={() => setFilter("status")}
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+              filter === "status"
+                ? "bg-white/20"
+                : "bg-white/5 hover:bg-white/10"
+            }`}
+          >
+            <GoDotFill />
+            Status
+          </button>
+        </div>
+        {/* LIST */}
+        {isLoading && (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <SkeletonSuggestionCard key={i} />
+            ))}
+          </div>
+        )}
+        <div className="space-y-4">
+          {!isLoading && sortedSuggestions?.length === 0 && (
+            <p className="text-sm text-white/60">Inga idéer än</p>
+          )}
+
+          {sortedSuggestions?.map((suggestion) => (
+            <div
+              key={suggestion.id}
+              className="flex gap-6 rounded-xl bg-white/5 p-4 shadow-lg/15 hover:bg-white/10"
+            >
+              <div className="flex flex-row place-content-center items-center justify-center">
+                <RiArrowUpDoubleFill size={26} className={"text-gray-500"} />
+
+                <span className="text-sm text-white/70">
+                  {suggestion.voteCount}
+                </span>
+              </div>
+              {/* CONTENT */}
+              <div className="flex-1">
+                <p>{suggestion.content}</p>
+
+                <div className="mt-2 text-xs text-white/60">
+                  {suggestion.user?.name ?? "Anonym"} ·{" "}
+                  {new Date(suggestion.createdAt).toLocaleDateString()}
+                </div>
+              </div>
+
+              {/* STATUS */}
+              <span
+                className={`self-start rounded-full px-3 py-1 text-xs ${
+                  statusStyles[suggestion.status]
+                }`}
+              >
+                {suggestion.status}
+              </span>
             </div>
-          </AnimatePresence>
-        </section>
-
-        {/* UNDER REVIEW */}
-        {underReview.length > 0 && (
-          <section className="mb-10">
-            <h2 className="mb-4 text-sm font-semibold tracking-wide text-white/60 uppercase">
-              Under granskning
-            </h2>
-
-            <AnimatePresence mode="popLayout">
-              <div className="grid gap-6">
-                {underReview.map((s) => (
-                  <MotionCard key={s.id} s={s} />
-                ))}
-              </div>
-            </AnimatePresence>
-          </section>
-        )}
-
-        {/* APPROVED */}
-        {approved.length > 0 && (
-          <section className="mb-10">
-            <h2 className="mb-4 text-sm font-semibold tracking-wide text-white/60 uppercase">
-              Godkända förslag
-            </h2>
-
-            <AnimatePresence mode="popLayout">
-              <div className="grid gap-6">
-                {approved.map((s) => (
-                  <MotionCard key={s.id} s={s} />
-                ))}
-              </div>
-            </AnimatePresence>
-          </section>
-        )}
-
-        {/* IMPLEMENTED */}
-        {implemented.length > 0 && (
-          <section className="mb-10">
-            <h2 className="mb-4 text-sm font-semibold tracking-wide text-white/60 uppercase">
-              Implementerade förslag
-            </h2>
-
-            <AnimatePresence mode="popLayout">
-              <div className="grid gap-6">
-                {implemented.map((s) => (
-                  <MotionCard key={s.id} s={s} />
-                ))}
-              </div>
-            </AnimatePresence>
-          </section>
-        )}
-
-        {/* REJECTED */}
-        {rejected.length > 0 && (
-          <section className="mb-10">
-            <h2 className="mb-4 text-sm font-semibold tracking-wide text-white/60 uppercase">
-              Avslagna förslag
-            </h2>
-
-            <AnimatePresence mode="popLayout">
-              <div className="grid gap-6 opacity-70">
-                {rejected.map((s) => (
-                  <MotionCard key={s.id} s={s} />
-                ))}
-              </div>
-            </AnimatePresence>
-          </section>
-        )}
+          ))}
+        </div>
       </div>
     </main>
   );
