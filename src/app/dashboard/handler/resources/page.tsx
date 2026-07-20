@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 import { ImBooks } from "react-icons/im";
 import ResourcesCard from "~/app/_components/cards/resourceCard";
+import { GenerateTagsButton } from "~/app/_components/ai/generateTags";
 
 export default function ResourcesPage() {
   const utils = api.useUtils();
@@ -14,6 +15,7 @@ export default function ResourcesPage() {
     "DOCUMENTATION" | "TUTORIAL" | "INFORMATION" | "OTHER"
   >("OTHER");
   const [url, setUrl] = useState<string>("");
+  const [tags, setTags] = useState<string[]>([]);
   const { data: resources = [], isLoading } =
     api.resource.listResources.useQuery({ limit: 5 });
 
@@ -122,6 +124,24 @@ export default function ResourcesPage() {
             {urlError && (
               <p className="mt-2 text-sm text-red-500">{urlError}</p>
             )}
+            <div className="flex w-100 flex-col items-end gap-3">
+              <GenerateTagsButton
+                text={`${title} ${description}`}
+                onGenerated={setTags}
+              />
+              {tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-purple-500/20 px-3 py-1 text-sm text-purple-200"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
             <button onClick={handleCreate} className="submit-button">
               Skapa resurs
             </button>

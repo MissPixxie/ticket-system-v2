@@ -34,6 +34,7 @@ export const newsRouter = createTRPCRouter({
               },
             },
           },
+          tags: true,
         },
         orderBy: { createdAt: "desc" },
       });
@@ -60,6 +61,24 @@ export const newsRouter = createTRPCRouter({
       }));
     }),
 
+  getNewsById: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().min(1),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const news = await ctx.db.news.findUnique({
+        where: { id: input.id },
+        include: {
+          createdBy: true,
+          tags: true,
+        },
+      });
+
+      return news;
+    }),
+
   // =========================
   // CREATE NEWS
   // =========================
@@ -70,6 +89,7 @@ export const newsRouter = createTRPCRouter({
         content: z.string().min(1),
         category: z.nativeEnum(NewsCategory),
         priority: z.nativeEnum(Priority),
+        tags: z.array(z.string()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -78,7 +98,19 @@ export const newsRouter = createTRPCRouter({
           title: input.title,
           content: input.content,
           category: input.category,
+          priority: input.priority,
           createdById: ctx.session.user.id,
+          tags: {
+            connectOrCreate:
+              input.tags?.map((tag) => ({
+                where: {
+                  name: tag,
+                },
+                create: {
+                  name: tag,
+                },
+              })) ?? [],
+          },
         },
         include: {
           createdBy: {
@@ -97,24 +129,25 @@ export const newsRouter = createTRPCRouter({
               },
             },
           },
+          tags: true,
         },
       });
 
-      await prismaEventService.createEvent({
-        type: "NEWS_CREATED",
-        originId: news.id,
-        originType: "NEWS",
-        actorId: ctx.session.user.id,
-      });
+      // await prismaEventService.createEvent({
+      //   type: "NEWS_CREATED",
+      //   originId: news.id,
+      //   originType: "NEWS",
+      //   actorId: ctx.session.user.id,
+      // });
 
-      await createAuditLog({
-        type: "NEWS_CREATED",
-        severity: "INFO",
-        entityType: "NEWS",
-        entityId: news.id,
-        actor: { connect: { id: ctx.session.user.id } },
-        message: `${ctx.session.user.email} created news "${news.title}"`,
-      });
+      // await createAuditLog({
+      //   type: "NEWS_CREATED",
+      //   severity: "INFO",
+      //   entityType: "NEWS",
+      //   entityId: news.id,
+      //   actor: { connect: { id: ctx.session.user.id } },
+      //   message: `${ctx.session.user.email} created news "${news.title}"`,
+      // });
 
       return { ...news, hasVoted: false, userVote: null };
     }),
@@ -131,6 +164,7 @@ export const newsRouter = createTRPCRouter({
         content: z.string().optional(),
         priority: z.nativeEnum(Priority).optional(),
         isPublished: z.boolean().optional(),
+        tags: z.array(z.string()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -153,6 +187,18 @@ export const newsRouter = createTRPCRouter({
           content: input.content ?? undefined,
           priority: input.priority ?? undefined,
           isPublished: input.isPublished ?? undefined,
+          tags: {
+            set: [],
+            connectOrCreate:
+              input.tags?.map((tag) => ({
+                where: {
+                  name: tag,
+                },
+                create: {
+                  name: tag,
+                },
+              })) ?? [],
+          },
         },
       });
 

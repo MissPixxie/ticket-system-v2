@@ -5,6 +5,7 @@ import NewsCard from "~/app/_components/cards/newsCard";
 import { api } from "~/trpc/react";
 import { MdCampaign } from "react-icons/md";
 import { GenerateTagsButton } from "~/app/_components/ai/generateTags";
+import Link from "next/link";
 
 const PAGE_SIZE = 5;
 
@@ -69,6 +70,7 @@ export default function NewsPage() {
       content,
       category,
       priority,
+      tags,
     });
   };
 
@@ -176,7 +178,12 @@ export default function NewsPage() {
         {/* Lista nyhetskort */}
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {news.map((item) => (
-            <NewsCard key={item.id} {...item} />
+            <Link
+              href={`/dashboard/handler/news/${item.id}`}
+              className="contents"
+            >
+              <NewsCard key={item.id} {...item} />
+            </Link>
           ))}
         </div>
       </div>

@@ -4,6 +4,7 @@ import { Geist } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 import { SocketProvider } from "./socketProvider";
 import { getSession } from "~/server/better-auth/server";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Ticket System",
@@ -27,6 +28,12 @@ export default async function RootLayout({
         <TRPCReactProvider>
           <SocketProvider userId={session?.user?.id ?? null}>
             {children}
+            <Toaster
+              position="bottom-right"
+              richColors
+              closeButton
+              theme="dark"
+            />
           </SocketProvider>
         </TRPCReactProvider>
       </body>
