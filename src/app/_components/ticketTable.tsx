@@ -54,17 +54,43 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
     setFilter(value);
   };
 
+  const getTicketUrl = (ticketId: string) => {
+    switch (currentUserRole) {
+      case "USER":
+        return `/dashboard/user/my-tickets/${ticketId}`;
+
+      case "HANDLER":
+        return `/dashboard/handler/tickets/${ticketId}`;
+
+      case "ADMIN":
+        return `/dashboard/admin/tickets/${ticketId}`;
+    }
+  };
+
   const filteredTickets = tickets?.tickets.filter((ticket) => {
     const userId = me?.id;
+
+    if (
+      currentUserRole === "HANDLER" &&
+      ticket.assignedTo &&
+      ticket.assignedTo.id !== userId
+    ) {
+      return false;
+    }
+
     switch (filter) {
       case "MINA":
         return ticket.assignedTo?.id === userId;
+
       case "OPEN":
         return ticket.status === "OPEN";
+
       case "IN_PROGRESS":
         return ticket.status === "IN_PROGRESS";
+
       case "CLOSED":
         return ticket.status === "CLOSED";
+
       default:
         return true;
     }
@@ -136,10 +162,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
       {visibleTickets?.map((ticket) => (
         <div key={ticket.id} className="border-t border-white/5">
           <div className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center px-5 py-4 hover:bg-white/5">
-            <Link
-              href={`/dashboard/user/my-tickets/${ticket.id}`}
-              className="contents"
-            >
+            <Link href={getTicketUrl(ticket.id)} className="contents">
               <div>{ticket.title}</div>
 
               <div>{ticket.department}</div>
