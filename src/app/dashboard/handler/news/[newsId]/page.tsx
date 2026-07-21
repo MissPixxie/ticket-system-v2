@@ -7,6 +7,8 @@ import { TiDocumentText } from "react-icons/ti";
 import { use, useEffect, useState } from "react";
 import { GenerateTagsButton } from "~/app/_components/ai/generateTags";
 import { toast } from "sonner";
+import { FaTrashAlt } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -41,7 +43,7 @@ export default function NewsPage({
   >("LOW");
 
   const [isPublished, setIsPublished] = useState(true);
-  const [isPinned, setIsPinned] = useState(false);
+  const router = useRouter();
 
   const updateNews = api.news.updateNews.useMutation({
     onSuccess: () => {
@@ -58,6 +60,20 @@ export default function NewsPage({
     },
   });
 
+  const removeNews = api.news.archiveNews.useMutation({
+    onSuccess: () => {
+      utils.news.listNews.invalidate();
+      router.push("/dashboard/handler/news");
+    },
+  });
+
+  const handleArchiveNews = (id: string) => {
+    removeNews.mutate({
+      id,
+      isPublished: false,
+    });
+  };
+
   useEffect(() => {
     if (!news) return;
 
@@ -66,7 +82,6 @@ export default function NewsPage({
     setCategory(news.category);
     setPriority(news.priority);
     setIsPublished(news.isPublished);
-    setIsPinned(news.isPinned);
     setTags(news.tags.map((tag) => tag.name));
   }, [news]);
 
@@ -96,6 +111,12 @@ export default function NewsPage({
               Ändra innehåll, taggar och inställningar.
             </p>
           </div>
+          <button
+            onClick={() => handleArchiveNews(news.id)}
+            className="cursor-pointer rounded-lg bg-white/10 p-3 hover:bg-red-500/30"
+          >
+            <FaTrashAlt size={18} />
+          </button>
         </div>
         <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
           <div className="space-y-6">
@@ -153,11 +174,10 @@ export default function NewsPage({
               </div>
             </div>
             <div className="flex w-100 flex-col gap-3">
-              <GenerateTagsButton
-                text={`${title} ${content}`}
-                onGenerated={setTags}
-              />
-              {tags.length > 0 && (
+              <label className="mb-2 block text-sm font-medium text-white/70">
+                Taggar:
+              </label>
+              {tags.length > 0 ? (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <span
@@ -167,6 +187,13 @@ export default function NewsPage({
                       {tag}
                     </span>
                   ))}
+                </div>
+              ) : (
+                <div>
+                  <GenerateTagsButton
+                    text={`${title} ${content}`}
+                    onGenerated={setTags}
+                  />
                 </div>
               )}
             </div>

@@ -205,6 +205,35 @@ export const newsRouter = createTRPCRouter({
       return updatedNews;
     }),
 
+  archiveNews: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        isPublished: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const news = await ctx.db.news.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!news) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "News hittades inte",
+        });
+      }
+
+      const updatedNews = await ctx.db.news.update({
+        where: { id: input.id },
+        data: {
+          isPublished: input.isPublished ?? undefined,
+        },
+      });
+
+      return updatedNews;
+    }),
+
   // =========================
   // ADD COMMENT
   // =========================

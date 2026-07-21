@@ -48,27 +48,6 @@ export default function NewsCard({ ...newsProps }: NewsCardProps) {
       </p>
 
       <p className="line-clamp-3 text-white/80">{newsProps.content}</p>
-
-      {/* Expanded panel */}
-      {isExpanded && (
-        <div
-          className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-3 text-white/90"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex gap-2">
-            {/* EDIT */}
-            <EditSection news={newsProps} />
-
-            {/* DELETE */}
-            <button
-              onClick={() => handleArchiveNews(newsProps.id)}
-              className="cursor-pointer rounded-lg bg-white/10 p-2 hover:bg-red-500/30"
-            >
-              <FaTrashAlt size={18} />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

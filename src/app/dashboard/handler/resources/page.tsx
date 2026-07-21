@@ -51,6 +51,7 @@ export default function ResourcesPage() {
       description,
       category,
       url,
+      tags,
     });
   };
 
@@ -64,14 +65,14 @@ export default function ResourcesPage() {
 
   return (
     <main className="main-page-layout">
-      <div className="container">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
         <div className="header-container">
           <ImBooks className="text-purple-400" size={36} />
           <h1 className="page-header">Resurser & dokumentation</h1>
         </div>
 
         {/* CREATE FORM */}
-        <div className="mb-10 rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
+        <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
           <h2 className="mb-4 text-lg font-semibold">Skapa ny resurs</h2>
 
           <div className="flex flex-col gap-4">
@@ -79,7 +80,7 @@ export default function ResourcesPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Titel"
-              className="rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             <textarea
@@ -87,7 +88,7 @@ export default function ResourcesPage() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Beskrivning"
               rows={3}
-              className="rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="resize-none rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
             />
             <select
               value={category}
@@ -119,30 +120,40 @@ export default function ResourcesPage() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Länk till dokument (URL)"
-              className="rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
             />
             {urlError && (
               <p className="mt-2 text-sm text-red-500">{urlError}</p>
             )}
-            <div className="flex w-100 flex-col items-end gap-3">
-              <GenerateTagsButton
-                text={`${title} ${description}`}
-                onGenerated={setTags}
-              />
-              {tags.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-purple-500/20 px-3 py-1 text-sm text-purple-200"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+            <div className="flex justify-between">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-white/70">
+                  Taggar:
+                </label>
+                {tags.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-purple-500/20 px-3 py-1 text-sm text-purple-200"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="self-end">
+                <GenerateTagsButton
+                  text={`${title} ${description}`}
+                  onGenerated={setTags}
+                />
+              </div>
             </div>
-            <button onClick={handleCreate} className="submit-button">
+            <button
+              onClick={handleCreate}
+              className="cursor-pointer self-start rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+            >
               Skapa resurs
             </button>
           </div>

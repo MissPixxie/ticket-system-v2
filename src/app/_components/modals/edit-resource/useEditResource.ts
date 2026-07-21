@@ -11,6 +11,7 @@ interface EditResourceInput {
   category?: Category;
   url?: string;
   isPublished?: boolean;
+  tags?: string[];
 }
 
 export function useEditResource() {

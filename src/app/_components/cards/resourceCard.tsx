@@ -24,7 +24,7 @@ export default function ResourcesCard({ resourceItem }: ResourceCardProps) {
     },
   });
 
-  const handleArchiveNews = (id: string) => {
+  const handleArchiveResource = (id: string) => {
     unPublishResource.mutate({
       id,
       isPublished: false,
@@ -68,25 +68,23 @@ export default function ResourcesCard({ resourceItem }: ResourceCardProps) {
       )}
 
       {/* Expanded panel */}
-      {isExpanded && (
-        <div
-          className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-3 text-white/90"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex gap-2">
-            {/* EDIT */}
-            <EditResourceSection resource={resourceItem} />
+      <div
+        className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-3 text-white/90"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex gap-2">
+          {/* EDIT */}
+          <EditResourceSection resource={resourceItem} />
 
-            {/* DELETE */}
-            <button
-              onClick={() => handleArchiveNews(resourceItem.id)}
-              className="cursor-pointer rounded-lg bg-white/10 p-2 hover:bg-red-500/30"
-            >
-              <FaTrashAlt size={18} />
-            </button>
-          </div>
+          {/* DELETE */}
+          <button
+            onClick={() => handleArchiveResource(resourceItem.id)}
+            className="cursor-pointer rounded-lg bg-white/10 p-2 hover:bg-red-500/30"
+          >
+            <FaTrashAlt size={18} />
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }

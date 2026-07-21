@@ -19,6 +19,7 @@ export const resourceRouter = createTRPCRouter({
               name: true,
             },
           },
+          tags: true,
         },
         orderBy: { createdAt: "desc" },
       });
@@ -33,6 +34,7 @@ export const resourceRouter = createTRPCRouter({
         description: z.string().min(1),
         category: z.nativeEnum(ResourceCategory),
         url: z.string().url().optional(),
+        tags: z.array(z.string()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -43,6 +45,17 @@ export const resourceRouter = createTRPCRouter({
           category: input.category,
           createdById: ctx.session.user.id,
           url: input.url,
+          tags: {
+            connectOrCreate:
+              input.tags?.map((tag) => ({
+                where: {
+                  name: tag,
+                },
+                create: {
+                  name: tag,
+                },
+              })) ?? [],
+          },
         },
       });
 
@@ -74,6 +87,7 @@ export const resourceRouter = createTRPCRouter({
         category: z.nativeEnum(ResourceCategory).optional(),
         url: z.string().url().optional(),
         isPublished: z.boolean().optional(),
+        tags: z.array(z.string()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -110,6 +124,18 @@ export const resourceRouter = createTRPCRouter({
           category: input.category ?? undefined,
           url: input.url ?? undefined,
           isPublished: input.isPublished ?? undefined,
+          tags: {
+            set: [],
+            connectOrCreate:
+              input.tags?.map((tag) => ({
+                where: {
+                  name: tag,
+                },
+                create: {
+                  name: tag,
+                },
+              })) ?? [],
+          },
         },
       });
 

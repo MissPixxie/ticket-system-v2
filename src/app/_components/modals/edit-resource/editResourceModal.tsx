@@ -1,6 +1,5 @@
 "use client";
 
-import type { Resource } from "@prisma/client";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import {
@@ -13,6 +12,10 @@ import {
 } from "react-icons/fa";
 import { ImInfo } from "react-icons/im";
 import { MdCampaign } from "react-icons/md";
+import type { RouterOutputs } from "~/trpc/react";
+import { GenerateTagsButton } from "../../ai/generateTags";
+
+type Resource = RouterOutputs["resource"]["listResources"][number];
 
 export type Category = "DOCUMENTATION" | "TUTORIAL" | "INFORMATION" | "OTHER";
 
@@ -23,6 +26,7 @@ export interface EditResourceData {
   category?: Category;
   url?: string;
   isPublished?: boolean;
+  tags?: string[];
 }
 
 interface EditResourceModalProps {
@@ -40,8 +44,13 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
 }) => {
   const [title, setTitle] = useState(resource.title ?? "");
   const [description, setDescription] = useState(resource.description ?? "");
-  const [category, setCategory] = useState<Category>(resource.category ?? "OTHER");
+  const [category, setCategory] = useState<Category>(
+    resource.category ?? "OTHER",
+  );
   const [url, setUrl] = useState(resource.url ?? "");
+  const [tags, setTags] = useState<string[]>(
+    resource.tags.map((tag) => tag.name),
+  );
   const [isSelected, setIsSelected] = useState<null | number>(null);
 
   if (!isOpen) return null;
@@ -75,7 +84,15 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ id: resource.id, title, description, category, url, isPublished: true });
+    onSubmit({
+      id: resource.id,
+      title,
+      description,
+      category,
+      url,
+      isPublished: true,
+      tags,
+    });
     setTitle("");
     setDescription("");
     setCategory("OTHER");
@@ -142,6 +159,30 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
             onChange={(e) => setUrl(e.target.value)}
             className="rounded-lg border border-black/50 bg-white/5 px-4 py-3 text-gray-200/65 required:border-red-500 required:text-red-500"
           />
+          <div className="flex w-100 flex-col gap-3">
+            <label className="mb-2 block text-sm font-medium text-white/70">
+              Taggar:
+            </label>
+            {tags.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-purple-500/20 px-3 py-1 text-sm text-purple-200"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div>
+                <GenerateTagsButton
+                  text={`${title} ${description}`}
+                  onGenerated={setTags}
+                />
+              </div>
+            )}
+          </div>
           <div className="flex justify-end space-x-2 pt-4">
             <button
               type="button"

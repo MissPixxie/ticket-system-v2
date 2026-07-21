@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useEditResource } from "./useEditResource";
 import { RiEdit2Fill } from "react-icons/ri";
 import EditResourceModal from "./editResourceModal";
-import type { Resource } from "@prisma/client";
+import type { RouterOutputs } from "~/trpc/react";
+
+type Resource = RouterOutputs["resource"]["listResources"][number];
 
 interface EditResourceSectionProps {
   resource: Resource;
