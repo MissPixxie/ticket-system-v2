@@ -75,7 +75,7 @@ export default function SuggestionsPage() {
       <div className="primary-background w-full max-w-5xl rounded-2xl p-8 shadow-lg/15 backdrop-blur-lg">
         {/* HEADER */}
         <div className="mb-8 flex items-center gap-3">
-          <FaLightbulb className="text-yellow-400" size={22} />
+          <FaLightbulb className="text-purple-400" size={22} />
 
           <div>
             <h1 className="page-header">Idé & Förbättringsförslag</h1>

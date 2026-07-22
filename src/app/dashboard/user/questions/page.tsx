@@ -32,6 +32,15 @@ export default function QuestionPage() {
     },
   );
 
+  const { data: similarQuestions } = api.question.findSimilarQuestions.useQuery(
+    {
+      text: newMessage,
+    },
+    {
+      enabled: newMessage.length > 10,
+    },
+  );
+
   const createQuestion = api.question.createQuestion.useMutation({
     onSuccess: async () => {
       await utils.question.listQuestions.invalidate();
@@ -112,6 +121,17 @@ export default function QuestionPage() {
             rows={4}
             className="w-full resize-none rounded-2xl border border-white/5 bg-black/20 p-4 text-sm text-white transition outline-none placeholder:text-white/30 focus:border-purple-500/40 focus:ring-2 focus:ring-purple-500/20"
           />
+          {similarQuestions && similarQuestions.length > 0 && (
+            <div className="rounded-xl bg-purple-500/10 p-4">
+              <h3>Liknande frågor hittades</h3>
+
+              {similarQuestions.map((q) => (
+                <div key={q.id} className="mt-2">
+                  {q.question}
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="mt-4 flex justify-end">
             <button onClick={handleSend} className="submit-button">
@@ -140,15 +160,11 @@ export default function QuestionPage() {
                         {question.question}
                       </h2>
 
-                      <div className="mt-2 flex items-center gap-2 text-xs text-white/40">
-                        <span>{question.createdBy?.name}</span>
-
-                        <span>•</span>
-
-                        <span>
-                          {new Date(question.createdAt).toLocaleDateString()}
-                        </span>
-                        <span>•</span>
+                      <div className="mt-2 self-start text-xs text-white/40">
+                        {question.createdBy?.name
+                          ? `${question.createdBy.name} · `
+                          : "Anonym · "}
+                        {new Date(question.createdAt).toLocaleDateString()}
                       </div>
                     </div>
 

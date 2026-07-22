@@ -137,6 +137,7 @@ model Suggestion {
   voteCount   Int            @default(0)
   subscribers Subscription[]
   tags        Tag[]
+  embedding   String?
 
   @@index([status])
   @@index([suggestionBoxId])
@@ -164,6 +165,7 @@ model Question {
   updatedAt   DateTime @updatedAt
   thread      Thread?
   tags        Tag[]
+  embedding   String?
 
   @@index([id])
   @@index([createdAt])
@@ -290,6 +292,7 @@ model News {
   downVotes Int           @default(0)
   comments  NewsComment[]
   tags      Tag[]
+  embedding String?
 
   @@index([isPublished])
 }

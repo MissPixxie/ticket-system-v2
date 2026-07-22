@@ -4,6 +4,8 @@ import { prismaEventService } from "../services/eventService";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { TRPCError } from "@trpc/server";
 import { ParentType } from "@prisma/client";
+import { createEmbedding } from "~/server/ai/aiService";
+import { cosineSimilarity } from "../../ai/embeddingSimilarity";
 
 export const questionRouter = createTRPCRouter({
   listQuestions: protectedProcedure
@@ -38,13 +40,16 @@ export const questionRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const embedding = await createEmbedding(input.question);
+
       const question = await ctx.db.question.create({
         data: {
           question: input.question,
+          embedding: JSON.stringify(embedding),
           createdById: ctx.session.user.id,
           thread: {
             create: {
-              type: ParentType.TICKET,
+              type: ParentType.QUESTION,
             },
           },
         },
@@ -52,6 +57,7 @@ export const questionRouter = createTRPCRouter({
           thread: true,
         },
       });
+
       //   await prismaEventService.createEvent({
       //     type: "NEWS_CREATED",
       //     originId: news.newsId,
@@ -70,6 +76,45 @@ export const questionRouter = createTRPCRouter({
 
       return question;
     }),
+
+  findSimilarQuestions: protectedProcedure
+    .input(
+      z.object({
+        text: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const embedding = await createEmbedding(input.text);
+
+      const questions = await ctx.db.question.findMany({
+        where: {
+          embedding: {
+            not: null,
+          },
+        },
+
+        include: {
+          thread: {
+            include: {
+              messages: true,
+            },
+          },
+        },
+      });
+
+      const results = questions.map((q) => {
+        const oldEmbedding = JSON.parse(q.embedding!);
+
+        return {
+          ...q,
+
+          similarity: cosineSimilarity(embedding, oldEmbedding),
+        };
+      });
+
+      return results.sort((a, b) => b.similarity - a.similarity).slice(0, 5);
+    }),
+
   // addMessage: protectedProcedure
   //   .input(
   //     z.object({

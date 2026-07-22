@@ -7,6 +7,7 @@ import { MdCampaign } from "react-icons/md";
 import SkeletonNewsCard from "~/app/_components/skeletonComponents/cards/skeletonNewsCard";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { TfiCommentAlt } from "react-icons/tfi";
+import { FiSearch } from "react-icons/fi";
 
 const PAGE_SIZE = 5;
 
@@ -15,6 +16,7 @@ export default function NewsPage() {
   const { data: news = [], isLoading } = api.news.listNews.useQuery({
     limit: visibleCount,
   });
+  const [search, setSearch] = useState("");
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState<Record<string, string>>({});
   const utils = api.useUtils();
@@ -84,6 +86,20 @@ export default function NewsPage() {
     );
   }
 
+  const filteredNews = news.filter((n) => {
+    const searchText = search.toLowerCase();
+
+    const titleMatch = n.title.toLowerCase().includes(searchText);
+
+    const contentMatch = n.content.toLowerCase().includes(searchText);
+
+    const tagMatch = n.tags?.some((tag) =>
+      tag.name.toLowerCase().includes(searchText),
+    );
+
+    return titleMatch || contentMatch || tagMatch;
+  });
+
   return (
     <main className="main-page-layout">
       <div className="container">
@@ -91,9 +107,22 @@ export default function NewsPage() {
           <MdCampaign className="text-purple-400" size={36} />
           <h1 className="page-header">Nyheter</h1>
         </div>
+        <div className="relative mt-6">
+          <FiSearch
+            className="absolute top-1/2 left-4 -translate-y-1/2 text-white/40"
+            size={18}
+          />
 
+          <input
+            type="text"
+            placeholder="Sök bland nyheter..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pr-4 pl-11 text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-500 focus:bg-white/10"
+          />
+        </div>
         <div className="mt-4 space-y-3">
-          {news.map((news) => {
+          {filteredNews.map((news) => {
             const isOpen = selectedNewsId === news.id;
 
             return (

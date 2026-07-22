@@ -1,37 +1,55 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "~/trpc/react";
 import { HiQuestionMarkCircle } from "react-icons/hi";
 import QuestionCard from "~/app/_components/cards/questionCard";
-import { FaRegQuestionCircle } from "react-icons/fa";
+import { api } from "~/trpc/react";
+import { FaChevronDown } from "react-icons/fa6";
 import { FiSearch } from "react-icons/fi";
 
 const PAGE_SIZE = 5;
 
-export default function QuestionsPage() {
+export default function QuestionPage() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
     null,
   );
   const [newMessage, setNewMessage] = useState("");
   const [search, setSearch] = useState("");
   const utils = api.useUtils();
-  const { data: questions = [], isLoading } =
-    api.question.listQuestions.useQuery({
-      limit: visibleCount,
-    });
+
   const { data: me } = api.user.me.useQuery();
 
+  const {
+    data: questions = [],
+    isLoading,
+    isFetching,
+  } = api.question.listQuestions.useQuery(
+    {
+      limit: visibleCount,
+    },
+    {
+      placeholderData: (prev) => prev,
+    },
+  );
+
+  const { data: similarQuestions } = api.question.findSimilarQuestions.useQuery(
+    {
+      text: newMessage,
+    },
+    {
+      enabled: newMessage.length > 10,
+    },
+  );
+
   const createQuestion = api.question.createQuestion.useMutation({
-    onSuccess: () => {
-      utils.question.listQuestions.invalidate();
+    onSuccess: async () => {
+      await utils.question.listQuestions.invalidate();
       setNewMessage("");
     },
   });
 
-  const hasMore = questions?.length === visibleCount;
+  const hasMore = questions.length === visibleCount;
 
   const toggleQuestions = (id: string) => {
     setSelectedQuestionId((prev) => (prev === id ? null : id));
@@ -45,6 +63,16 @@ export default function QuestionsPage() {
     setVisibleCount(PAGE_SIZE);
   };
 
+  const handleSend = () => {
+    if (!newMessage.trim()) return;
+
+    createQuestion.mutate({
+      question: newMessage,
+    });
+
+    setNewMessage("");
+  };
+
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center text-white/70">
@@ -53,7 +81,7 @@ export default function QuestionsPage() {
     );
   }
 
-  if (!questions || questions.length === 0) {
+  if (questions.length === 0) {
     return (
       <main className="flex min-h-screen items-center justify-center text-white/70">
         Inga frågor hittades
@@ -66,14 +94,17 @@ export default function QuestionsPage() {
   );
 
   return (
-    <main className="main-page-layout">
-      <div className="container">
-        <div className="header-container">
-          <FaRegQuestionCircle className="text-purple-400" size={28} />
-          <h1 className="page-header">Frågor & Svar</h1>
-        </div>
+    <main className="min-h-screen px-6 py-10 text-white">
+      <div className="mx-auto max-w-5xl">
+        {/* HEADER */}
+        <div className="mb-8 flex items-center gap-4">
+          <HiQuestionMarkCircle className="text-purple-400" size={26} />
 
-        <div className="relative mt-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Frågor & Svar</h1>
+          </div>
+        </div>
+        <div className="relative mt-4 w-100">
           <FiSearch
             className="absolute top-1/2 left-4 -translate-y-1/2 text-white/40"
             size={18}
@@ -87,30 +118,44 @@ export default function QuestionsPage() {
             className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pr-4 pl-11 text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-500 focus:bg-white/10"
           />
         </div>
-        <div className="mt-4 space-y-3">
+        {/* QUESTIONS */}
+        <div className="mt-4 space-y-4">
           {filteredQuestions.map((question) => {
+            const isOpen = selectedQuestionId === question.id;
+
             return (
-              <div className="card">
+              <div
+                key={question.id}
+                className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 shadow-xl backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.07]"
+              >
                 <button
-                  className="w-full"
-                  onClick={() => {
-                    toggleQuestions(question.id);
-                  }}
+                  onClick={() => toggleQuestions(question.id)}
+                  className="w-full p-5 text-left transition"
                 >
-                  <div className="flex flex-col gap-2">
-                    <div className="flex-1 self-start">
-                      <h2 className="font-medium">{question.question}</h2>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-base font-semibold text-white">
+                        {question.question}
+                      </h2>
+
+                      <div className="mt-2 self-start text-xs text-white/40">
+                        {question.createdBy?.name
+                          ? `${question.createdBy.name} · `
+                          : "Anonym · "}
+                        {new Date(question.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
-                    <div className="self-start text-xs text-white/40">
-                      {question.createdBy?.name
-                        ? `${question.createdBy.name} · `
-                        : "Anonym · "}
-                      {new Date(question.createdAt).toLocaleDateString()}
+
+                    <div
+                      className={`mt-1 text-white/40 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} `}
+                    >
+                      <FaChevronDown size={20} />
                     </div>
                   </div>
                 </button>
-                {selectedQuestionId === question.id && (
-                  <div className="p-5">
+
+                {isOpen && (
+                  <div className="border-t border-white/5 p-5">
                     <QuestionCard
                       {...question}
                       currentUserId={me?.id ?? null}
@@ -120,26 +165,33 @@ export default function QuestionsPage() {
               </div>
             );
           })}
-          <div className="flex justify-center gap-3">
-            {hasMore && (
-              <button
-                onClick={loadMore}
-                className="rounded-lg bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
-              >
-                Visa fler
-              </button>
-            )}
-
-            {visibleCount > PAGE_SIZE && (
-              <button
-                onClick={showLess}
-                className="rounded-lg bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
-              >
-                Visa mindre
-              </button>
-            )}
-          </div>
         </div>
+
+        {/* PAGINATION */}
+        <div className="mt-8 flex justify-center gap-3">
+          {hasMore && (
+            <button
+              onClick={loadMore}
+              className="rounded-xl border border-white/5 bg-white/5 px-5 py-2 text-sm transition hover:bg-white/10"
+            >
+              Visa fler
+            </button>
+          )}
+
+          {visibleCount > PAGE_SIZE && (
+            <button
+              onClick={showLess}
+              className="rounded-xl border border-white/5 bg-white/5 px-5 py-2 text-sm transition hover:bg-white/10"
+            >
+              Visa mindre
+            </button>
+          )}
+        </div>
+        {isFetching && (
+          <p className="text-center text-sm text-white/50">
+            Laddar fler frågor...
+          </p>
+        )}
       </div>
     </main>
   );
