@@ -104,7 +104,7 @@ export default function TicketsPage() {
           </div>
         </div>
 
-        <TicketTable currentUserId={null} currentUserRole="ADMIN" />
+        <TicketTable currentUserRole="ADMIN" />
       </div>
     </main>
   );

@@ -173,42 +173,29 @@ model Question {
 
 // MESSAGE ENUMS & MODEL
 
-model Thread {
-  id        String     @id @default(cuid())
-  type      ParentType
-  createdAt DateTime   @default(now())
+model Conversation {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  title     String?
+  messages  Message[]
 
-  messages Message[]
+  participants User[] @relation("ConversationParticipants")
 
-  ticket   Ticket? @relation(fields: [ticketId], references: [id])
-  ticketId String? @unique
-
-  question        Question?        @relation(fields: [questionId], references: [id])
-  questionId      String?          @unique
-  generalMessages GeneralMessage[]
-
-  @@unique([id])
   @@index([id])
-  @@index([ticketId])
-  @@index([questionId])
 }
 
-enum MessageType {
-  USER_MESSAGE
-  HANDLER_MESSAGE
-  SYSTEM_MESSAGE
-}
+model ConversationParticipant {
+  id             String @id @default(cuid())
+  conversationId String
+  userId         String
 
-model GeneralMessage {
-  id                  String           @id @default(cuid())
-  message             String
-  type                MessageType      @default(USER_MESSAGE)
-  createdAt           DateTime         @default(now())
-  includedDepartments UserDepartment[]
-  includedUsers       User[]           @relation("GeneralMessageRecipients")
-  users               User[]
-  thread              Thread?          @relation(fields: [threadId], references: [id])
-  threadId            String?
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
 }
 
 model Message {
@@ -227,6 +214,44 @@ model Message {
   @@unique([id])
   @@index([threadId])
 }
+
+// model Thread {
+//   id        String     @id @default(cuid())
+//   type      ParentType
+//   createdAt DateTime   @default(now())
+
+//   messages Message[]
+
+//   ticket   Ticket? @relation(fields: [ticketId], references: [id])
+//   ticketId String? @unique
+
+//   question        Question?        @relation(fields: [questionId], references: [id])
+//   questionId      String?          @unique
+//   generalMessages GeneralMessage[]
+
+//   @@unique([id])
+//   @@index([id])
+//   @@index([ticketId])
+//   @@index([questionId])
+// }
+
+// enum MessageType {
+//   USER_MESSAGE
+//   HANDLER_MESSAGE
+//   SYSTEM_MESSAGE
+// }
+
+// model GeneralMessage {
+//   id                  String           @id @default(cuid())
+//   message             String
+//   type                MessageType      @default(USER_MESSAGE)
+//   createdAt           DateTime         @default(now())
+//   includedDepartments UserDepartment[]
+//   includedUsers       User[]           @relation("GeneralMessageRecipients")
+//   users               User[]
+//   thread              Thread?          @relation(fields: [threadId], references: [id])
+//   threadId            String?
+// }
 
 enum ParentType {
   TICKET

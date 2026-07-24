@@ -6,6 +6,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import { toast } from "sonner";
 import { useState } from "react";
 import { UserSection } from "~/app/_components/modals/create-user/userSection";
+import { FiSearch } from "react-icons/fi";
 
 const ROLE_MAP = {
   USER: "cmmqzjj6l0006k0u9lwzfyu3l",
@@ -32,6 +33,7 @@ export default function ListUsersPage() {
   const [editRole, setEditRole] = useState<RoleKey>("USER");
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>("all");
+  const [search, setSearch] = useState("");
 
   const deleteUser = api.user.deleteUser.useMutation({
     onSuccess: async () => {
@@ -44,18 +46,28 @@ export default function ListUsersPage() {
     },
   });
 
-  const filteredUsers = users?.users?.sort((a, b) => {
-    if (filter === "users") {
+  const filteredUsers = users?.users
+    ?.filter((user) => {
+      const searchText = search.toLowerCase();
+
       return (
-        (b.role?.name === "HANDLER" ? 1 : 0) -
-        (a.role?.name === "HANDLER" ? 1 : 0)
+        user.name?.toLowerCase().includes(searchText) ||
+        user.email?.toLowerCase().includes(searchText) ||
+        user.role?.name.toLowerCase().includes(searchText)
       );
-    } else {
+    })
+    .sort((a, b) => {
+      if (filter === "users") {
+        return (
+          (b.role?.name === "HANDLER" ? 1 : 0) -
+          (a.role?.name === "HANDLER" ? 1 : 0)
+        );
+      }
+
       return (
         (b.role?.name === "USER" ? 1 : 0) - (a.role?.name === "USER" ? 1 : 0)
       );
-    }
-  });
+    });
 
   const updateUser = api.user.updateUser.useMutation({
     onSuccess: async () => {
@@ -77,11 +89,27 @@ export default function ListUsersPage() {
   return (
     <main className="flex min-h-screen justify-center px-6 py-12 text-white">
       <div className="w-full max-w-6xl rounded-2xl bg-white/5 p-6 backdrop-blur-lg">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-wide">Användare</h1>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold tracking-wide">Användare</h1>
 
-          <div className="flex items-center gap-3">
-            <UserSection />
+            <div className="flex items-center gap-3">
+              <UserSection />
+            </div>
+          </div>
+          <div className="relative mt-6 mb-6">
+            <FiSearch
+              className="absolute top-1/2 left-4 -translate-y-1/2 text-white/40"
+              size={18}
+            />
+
+            <input
+              type="text"
+              placeholder="Sök bland användare..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pr-4 pl-11 text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-500 focus:bg-white/10"
+            />
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -153,69 +181,77 @@ export default function ListUsersPage() {
                     {editingUserId === user.id && (
                       <tr className="bg-white/5">
                         <td colSpan={4} className="px-4 py-6">
-                          <div className="flex flex-col gap-4 md:flex-row md:items-end">
-                            <input
-                              value={editName}
-                              onChange={(e) => setEditName(e.target.value)}
-                              className="rounded-lg bg-white/10 px-4 py-2"
-                              placeholder="Namn"
-                            />
+                          <div className="flex flex-wrap gap-4 md:flex-row md:items-end">
+                            <div className="flex w-full justify-between">
+                              <div className="flex items-start gap-6">
+                                <input
+                                  value={editName}
+                                  onChange={(e) => setEditName(e.target.value)}
+                                  className="rounded-lg bg-white/10 px-4 py-2"
+                                  placeholder="Namn"
+                                />
 
-                            <select
-                              value={editRole}
-                              onChange={(e) =>
-                                setEditRole(e.target.value as RoleKey)
-                              }
-                              disabled={isAdmin}
-                              className={`cursor-pointer rounded-lg px-4 py-2 ${
-                                isAdmin
-                                  ? "cursor-not-allowed bg-white/5 text-white/30"
-                                  : "bg-white/10"
-                              }`}
-                            >
-                              <option value="USER" className="text-black">
-                                User
-                              </option>
-                              <option value="HANDLER" className="text-black">
-                                Handler
-                              </option>
-                              <option value="ADMIN" className="text-black">
-                                Admin
-                              </option>
-                            </select>
-                            {/* BEHÖRIGHETER */}
-                            <div className="rounded-lg bg-white/5 p-3">
-                              <p className="mb-2 text-center text-xs tracking-wide text-white/60 uppercase">
-                                Behörigheter
-                              </p>
+                                <select
+                                  value={editRole}
+                                  onChange={(e) =>
+                                    setEditRole(e.target.value as RoleKey)
+                                  }
+                                  disabled={isAdmin}
+                                  className={`cursor-pointer rounded-lg px-4 py-2 ${
+                                    isAdmin
+                                      ? "cursor-not-allowed bg-white/5 text-white/30"
+                                      : "bg-white/10"
+                                  }`}
+                                >
+                                  <option value="USER" className="text-black">
+                                    User
+                                  </option>
+                                  <option
+                                    value="HANDLER"
+                                    className="text-black"
+                                  >
+                                    Handler
+                                  </option>
+                                  <option value="ADMIN" className="text-black">
+                                    Admin
+                                  </option>
+                                </select>
+                              </div>
+                              {/* BEHÖRIGHETER */}
+                              <div className="rounded-lg bg-white/5 p-3">
+                                <p className="mb-2 text-center text-xs tracking-wide text-white/60 uppercase">
+                                  Behörigheter
+                                </p>
 
-                              <ul className="space-y-1 text-sm text-white/80">
-                                {ROLE_PERMISSIONS[editRole].map(
-                                  (permission) => (
-                                    <li
-                                      key={permission}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-                                      {permission}
-                                    </li>
-                                  ),
-                                )}
-                              </ul>
+                                <ul className="space-y-1 text-sm text-white/80">
+                                  {ROLE_PERMISSIONS[editRole].map(
+                                    (permission) => (
+                                      <li
+                                        key={permission}
+                                        className="flex items-center gap-2"
+                                      >
+                                        <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                                        {permission}
+                                      </li>
+                                    ),
+                                  )}
+                                </ul>
+                              </div>
                             </div>
-
-                            <button
-                              onClick={() =>
-                                updateUser.mutate({
-                                  id: user.id,
-                                  name: editName,
-                                  roleId: ROLE_MAP[editRole],
-                                })
-                              }
-                              className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2"
-                            >
-                              Spara
-                            </button>
+                            <div className="flex w-full justify-end">
+                              <button
+                                onClick={() =>
+                                  updateUser.mutate({
+                                    id: user.id,
+                                    name: editName,
+                                    roleId: ROLE_MAP[editRole],
+                                  })
+                                }
+                                className="cursor-pointer self-end rounded-lg bg-blue-600 px-4 py-2"
+                              >
+                                Spara
+                              </button>
+                            </div>
                           </div>
                         </td>
                       </tr>
