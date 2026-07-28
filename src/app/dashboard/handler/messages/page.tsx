@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { api } from "~/trpc/react";
-import { MessagesTable } from "~/app/_components/messagesTable";
+import { api, type RouterOutputs } from "~/trpc/react";
+import { ConversationTable } from "~/app/_components/conversationTable";
 import { LuMessageSquareText, LuSearch, LuUsers } from "react-icons/lu";
-
 import { Department } from "@prisma/client";
 
 import {
@@ -100,9 +99,9 @@ export default function MessagePage() {
   /**
    * CREATE MESSAGE
    */
-  const createMessage = api.message.createThread.useMutation({
+  const createConversation = api.message.createConversation.useMutation({
     onSuccess: async () => {
-      await utils.message.listUserMessages.invalidate();
+      await utils.message.listUserConversations.invalidate();
 
       setNewMessage("");
       setSelectedDepartments([]);
@@ -117,8 +116,7 @@ export default function MessagePage() {
   const handleSend = () => {
     if (!newMessage.trim()) return;
 
-    createMessage.mutate({
-      type: "GENERAL",
+    createConversation.mutate({
       message: newMessage,
       receiverDepartments: selectedDepartments,
       receivers: selectedUsers.map((u) => u.id),
@@ -354,10 +352,12 @@ export default function MessagePage() {
 
                 <button
                   onClick={handleSend}
-                  disabled={createMessage.isPending}
+                  disabled={createConversation.isPending}
                   className="rounded-2xl bg-blue-600 px-6 py-3 font-medium text-white transition-all hover:scale-[1.02] hover:bg-blue-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {createMessage.isPending ? "Skickar..." : "Skicka meddelande"}
+                  {createConversation.isPending
+                    ? "Skickar..."
+                    : "Skicka meddelande"}
                 </button>
               </div>
             </div>
@@ -366,7 +366,7 @@ export default function MessagePage() {
           {/* RIGHT SIDE */}
           <div className="space-y-6">
             {/* MESSAGES */}
-            <MessagesTable />
+            <ConversationTable />
           </div>
         </div>
       </div>

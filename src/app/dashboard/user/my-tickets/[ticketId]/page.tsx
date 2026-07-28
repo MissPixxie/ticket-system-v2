@@ -168,10 +168,9 @@ export default function TicketPage({
           </div>
 
           <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            {ticket.thread?.id && me?.id && (
+            {ticket.conversation?.id && (
               <ChatBox
-                threadId={ticket.thread?.id ?? null}
-                currentUserId={me.id}
+                conversationId={ticket.conversation?.id ?? null}
               />
             )}
           </div>

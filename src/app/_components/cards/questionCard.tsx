@@ -15,10 +15,9 @@ export default function QuestionCard({
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
-        {currentUserId && questionProps.thread?.id && (
+        {currentUserId && questionProps.conversation?.id && (
           <ChatBox
-            threadId={questionProps.thread.id}
-            currentUserId={currentUserId}
+            conversationId={questionProps.conversation.id}
           />
         )}
       </div>

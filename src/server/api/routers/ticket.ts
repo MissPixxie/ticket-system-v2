@@ -21,7 +21,7 @@ export const ticketRouter = createTRPCRouter({
         include: {
           createdBy: true,
           assignedTo: true,
-          thread: { select: { id: true } },
+          conversation: { select: { id: true } },
         },
       });
 
@@ -40,7 +40,7 @@ export const ticketRouter = createTRPCRouter({
       include: {
         createdBy: true,
         assignedTo: true,
-        thread: { select: { id: true } },
+        conversation: { select: { id: true } },
       },
     });
   }),
@@ -57,14 +57,14 @@ export const ticketRouter = createTRPCRouter({
         include: {
           createdBy: true,
           assignedTo: true,
-          thread: { select: { id: true } },
+          conversation: { select: { id: true } },
         },
       });
 
       return ticket;
     }),
 
-  create: protectedProcedure
+  createTicket: protectedProcedure
     .input(
       z.object({
         title: z.string().min(1),
@@ -80,35 +80,37 @@ export const ticketRouter = createTRPCRouter({
           title: input.title,
           issue: input.issue,
           department: input.department,
-          createdById: ctx.session.user.id,
+          createdBy: {
+            connect: {
+              id: ctx.session.user.id,
+            },
+          },
           isAnonymous: input.isAnonymous ?? false,
           priority: input.priority ?? "LOW",
-          thread: {
-            create: {
-              type: ParentType.TICKET,
-            },
+          conversation: {
+            create: {},
           },
         },
         include: {
-          thread: true,
+          conversation: true,
         },
       });
 
-      await prismaEventService.createEvent({
-        type: "TICKET_CREATED",
-        originId: ticket.id,
-        originType: "TICKET",
-        actorId: ctx.session.user.id,
-      });
+      // await prismaEventService.createEvent({
+      //   type: "TICKET_CREATED",
+      //   originId: ticket.id,
+      //   originType: "TICKET",
+      //   actorId: ctx.session.user.id,
+      // });
 
-      await createAuditLog({
-        type: "TICKET_CREATED",
-        severity: "INFO",
-        entityType: "TICKET",
-        entityId: ticket.id,
-        actor: { connect: { id: ctx.session.user.id } },
-        message: `${ctx.session.user.email} created ticket "${ticket.title}"`,
-      });
+      // await createAuditLog({
+      //   type: "TICKET_CREATED",
+      //   severity: "INFO",
+      //   entityType: "TICKET",
+      //   entityId: ticket.id,
+      //   actor: { connect: { id: ctx.session.user.id } },
+      //   message: `${ctx.session.user.email} created ticket "${ticket.title}"`,
+      // });
 
       return ticket;
     }),
@@ -208,26 +210,6 @@ export const ticketRouter = createTRPCRouter({
           message: `Ticket assigned to ${input.assignedToId}`,
         });
       }
-
-      return updatedTicket;
-    }),
-
-  inviteUserToTicket: protectedProcedure
-    .input(z.object({ ticketId: z.string(), userId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const updatedTicket = await ctx.db.ticket.update({
-        where: { id: input.ticketId },
-        data: { participants: { connect: { id: input.userId } } },
-      });
-
-      await createAuditLog({
-        type: "TICKET_USER_INVITED",
-        severity: "INFO",
-        entityType: "TICKET",
-        entityId: input.ticketId,
-        actor: { connect: { id: ctx.session.user.id } },
-        message: `${ctx.session.user.email} invited user ${input.userId} to ticket`,
-      });
 
       return updatedTicket;
     }),

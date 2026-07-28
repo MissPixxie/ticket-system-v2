@@ -8,6 +8,13 @@ import SkeletonCard from "./skeletonComponents/cards/skeletonCampaignCard";
 export default function CampaignList() {
   const { data: news, isLoading } = api.news.listNews.useQuery({ limit: 5 });
   const [openNewsId, setOpenNewsId] = useState<string | null>(null);
+  const { data: selectedNews } = api.news.getNewsById.useQuery(
+    { id: openNewsId! },
+    {
+      enabled: !!openNewsId,
+    },
+  );
+
   const [messageInput, setMessageInput] = useState<Record<string, string>>({});
   const [showAll, setShowAll] = useState(false);
   const utils = api.useUtils();
@@ -20,7 +27,7 @@ export default function CampaignList() {
     setOpenNewsId((prev) => (prev === id ? null : id));
   };
 
-  const sendMessage = api.news.addMessage.useMutation({
+  const sendMessage = api.news.updateNews.useMutation({
     onSuccess: async () => {
       await utils.news.listNews.invalidate();
     },
@@ -144,15 +151,15 @@ export default function CampaignList() {
                     <div className="rounded-xl bg-black/20 p-4 text-sm text-white/70">
                       <p className="mb-2 font-medium text-white">Meddelanden</p>
 
-                      {news.comments?.length ? (
-                        news.comments.map((msg) => (
+                      {selectedNews?.conversation?.messages?.length ? (
+                        selectedNews.conversation.messages.map((msg) => (
                           <div
                             key={msg.id}
                             className="border-b border-white/10 py-2"
                           >
                             <p>{msg.content}</p>
                             <span className="text-xs text-white/40">
-                              {msg.user?.name ?? "Anonym"}
+                              {msg.sender?.name ?? "Anonym"}
                             </span>
                           </div>
                         ))

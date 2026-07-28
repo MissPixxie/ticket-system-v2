@@ -52,8 +52,11 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
         </p>
       </div>
       <div className="flex flex-col gap-4">
-        {me?.id && ticketProps.thread?.id && (
-          <ChatBox threadId={ticketProps.thread.id} currentUserId={me.id} />
+        {me?.id && ticketProps.conversation?.id && (
+          <ChatBox
+            conversationId={ticketProps.conversation.id}
+            currentUserId={me.id}
+          />
         )}
         <div className="mt-4 flex flex-row gap-4">
           <div className="flex flex-col gap-2">

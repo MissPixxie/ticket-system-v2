@@ -122,22 +122,29 @@ model SuggestionBox {
 }
 
 model Suggestion {
-  id          String           @id @default(cuid())
+  id String @id @default(cuid())
+
   content     String
   createdAt   DateTime         @default(now())
   status      SuggestionStatus @default(SENT)
   isAnonymous Boolean          @default(false)
-  user        User?            @relation("SuggestionOwner", fields: [userId], references: [id], onDelete: SetNull)
-  userId      String?
+
+  user   User?   @relation("SuggestionOwner", fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
 
   suggestionBox   SuggestionBox @relation(fields: [suggestionBoxId], references: [id])
   suggestionBoxId String
 
-  votes       Vote[]
-  voteCount   Int            @default(0)
+  votes     Vote[]
+  voteCount Int    @default(0)
+
   subscribers Subscription[]
-  tags        Tag[]
-  embedding   String?
+
+  tags      Tag[]
+  embedding String?
+
+  conversationId String?       @unique
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
 
   @@index([status])
   @@index([suggestionBoxId])
@@ -145,10 +152,12 @@ model Suggestion {
 }
 
 model Vote {
-  id           String     @id @default(cuid())
-  type         String
-  user         User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId       String?
+  id   String @id @default(cuid())
+  type String
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+
   suggestion   Suggestion @relation(fields: [suggestionId], references: [id])
   suggestionId String
 
@@ -157,41 +166,72 @@ model Vote {
 }
 
 model Question {
-  id          String   @id @default(cuid())
-  question    String
-  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  thread      Thread?
-  tags        Tag[]
-  embedding   String?
+  id String @id @default(cuid())
 
-  @@index([id])
+  question String
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversationId String?       @unique
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
+
+  tags Tag[]
+
+  embedding String?
+
   @@index([createdAt])
+  @@index([createdById])
 }
 
 // MESSAGE ENUMS & MODEL
 
+enum ConversationRole {
+  MEMBER
+  ADMIN
+}
+
 model Conversation {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  title     String?
-  messages  Message[]
+  id String @id @default(cuid())
 
-  participants User[] @relation("ConversationParticipants")
+  title String?
 
-  @@index([id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+
+  participants ConversationParticipant[]
+
+  ticket Ticket?
+
+  question Question?
+
+  suggestion Suggestion?
+
+  news News?
+
+  @@index([createdAt])
 }
 
 model ConversationParticipant {
-  id             String @id @default(cuid())
-  conversationId String
-  userId         String
+  id String @id @default(cuid())
 
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role ConversationRole @default(MEMBER)
+
+  lastReadAt DateTime?
+
+  joinedAt DateTime  @default(now())
+  hiddenAt DateTime?
 
   @@unique([conversationId, userId])
   @@index([conversationId])
@@ -199,59 +239,27 @@ model ConversationParticipant {
 }
 
 model Message {
-  id        String      @id @default(cuid())
-  message   String
-  type      MessageType @default(USER_MESSAGE)
-  createdAt DateTime    @default(now())
-  receivers User[]      @relation("MessageReceivers")
+  id String @id @default(cuid())
 
-  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String?
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-  thread   Thread? @relation(fields: [threadId], references: [id])
-  threadId String?
+  senderId String?
+  sender   User?   @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
 
-  @@unique([id])
-  @@index([threadId])
+  type    MessageType @default(USER_MESSAGE)
+  content String
+
+  createdAt DateTime @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
 }
 
-// model Thread {
-//   id        String     @id @default(cuid())
-//   type      ParentType
-//   createdAt DateTime   @default(now())
-
-//   messages Message[]
-
-//   ticket   Ticket? @relation(fields: [ticketId], references: [id])
-//   ticketId String? @unique
-
-//   question        Question?        @relation(fields: [questionId], references: [id])
-//   questionId      String?          @unique
-//   generalMessages GeneralMessage[]
-
-//   @@unique([id])
-//   @@index([id])
-//   @@index([ticketId])
-//   @@index([questionId])
-// }
-
-// enum MessageType {
-//   USER_MESSAGE
-//   HANDLER_MESSAGE
-//   SYSTEM_MESSAGE
-// }
-
-// model GeneralMessage {
-//   id                  String           @id @default(cuid())
-//   message             String
-//   type                MessageType      @default(USER_MESSAGE)
-//   createdAt           DateTime         @default(now())
-//   includedDepartments UserDepartment[]
-//   includedUsers       User[]           @relation("GeneralMessageRecipients")
-//   users               User[]
-//   thread              Thread?          @relation(fields: [threadId], references: [id])
-//   threadId            String?
-// }
+enum MessageType {
+  USER_MESSAGE
+  SYSTEM_MESSAGE
+}
 
 enum ParentType {
   TICKET
@@ -298,26 +306,34 @@ model Notification {
 // NEWS & CAMPAIGN MODEL
 
 model News {
-  id          String       @id @default(cuid())
-  title       String
-  category    NewsCategory @default(NEWS)
-  content     String
-  createdBy   User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  id String @id @default(cuid())
+
+  title    String
+  category NewsCategory @default(NEWS)
+  content  String
+
   createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  isPinned    Boolean  @default(false)
-  isPublished Boolean  @default(true)
-  priority    Priority @default(LOW)
+  isPinned    Boolean @default(false)
+  isPublished Boolean @default(true)
 
-  votes     NewsVote[]
-  upVotes   Int           @default(0)
-  downVotes Int           @default(0)
-  comments  NewsComment[]
-  tags      Tag[]
+  priority Priority @default(LOW)
+
+  votes NewsVote[]
+
+  upVotes   Int @default(0)
+  downVotes Int @default(0)
+
+  tags Tag[]
+
   embedding String?
+
+  conversationId String?       @unique
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
 
   @@index([isPublished])
 }
@@ -346,19 +362,6 @@ model NewsVote {
 enum VoteType {
   UP
   DOWN
-}
-
-model NewsComment {
-  id        String   @id @default(cuid())
-  content   String
-  userId    String?
-  newsId    String
-  createdAt DateTime @default(now())
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-  news News  @relation(fields: [newsId], references: [id], onDelete: Cascade)
-
-  @@index([newsId])
 }
 
 // model CAMPAIGN {
@@ -436,29 +439,40 @@ enum Priority {
 }
 
 model Ticket {
-  id          String     @id @default(cuid())
-  title       String
-  issue       String
-  image       String?
-  isAnonymous Boolean    @default(false)
-  department  Department
-  status      Status     @default(OPEN)
-  priority    Priority   @default(LOW)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  solvedAt    DateTime?
-  tags        Tag[]
+  id String @id @default(cuid())
 
-  createdBy       User?   @relation("TicketsCreated", fields: [createdById], references: [id], onDelete: SetNull)
-  createdById     String?
-  assignedTo      User?   @relation("TicketsHandled", fields: [assignedToId], references: [id])
-  assignedToId    String?
-  participants    User[]  @relation("TicketParticipants")
-  thread          Thread?
+  title String
+  issue String
+
+  image String?
+
+  isAnonymous Boolean @default(false)
+
+  department Department
+
+  status Status @default(OPEN)
+
+  priority Priority @default(LOW)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  solvedAt DateTime?
+
+  createdById String?
+  createdBy   User?   @relation("TicketsCreated", fields: [createdById], references: [id], onDelete: SetNull)
+
+  assignedToId String?
+  assignedTo   User?   @relation("TicketsHandled", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  tags Tag[]
+
+  conversationId String?       @unique
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
+
   signedByUser    Boolean @default(false)
   signedByHandler Boolean @default(false)
 
-  @@unique([id])
   @@index([createdById])
   @@index([assignedToId])
   @@index([status])
@@ -476,17 +490,17 @@ model Tag {
   tickets     Ticket[]
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// model Post {
+//   id        Int      @id @default(autoincrement())
+//   name      String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
+//   createdBy   User   @relation(fields: [createdById], references: [id])
+//   createdById String
 
-  @@index([name])
-}
+//   @@index([name])
+// }
 
 // USER & ROLES
 model Role {
@@ -506,49 +520,51 @@ model Permission {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String?  @unique
-  password      String?
+  id String @id @default(cuid())
+
+  name     String?
+  email    String? @unique
+  password String?
+
   emailVerified Boolean? @default(false)
   image         String?
-  role          Role?    @relation(fields: [roleId], references: [id])
-  roleId        String?
+
+  roleId String?
+  role   Role?   @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+
+  ticketsCreated Ticket[] @relation("TicketsCreated")
+  ticketsHandled Ticket[] @relation("TicketsHandled")
+
+  conversationParticipants ConversationParticipant[]
+  messagesSent             Message[]                 @relation("MessageSender")
+
+  suggestionId String?
+  suggestions  Suggestion[] @relation("SuggestionOwner")
+
+  news      News[]
+  newsVotes NewsVote[]
+
+  questions Question[]
+  resources Resource[]
+
   // POSTGRES VERSION
   // departments Department[]
 
   // SQLITE VERSION
-  departments    UserDepartment[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @default(now()) @updatedAt
-  sessions       Session[]
-  accounts       Account[]
-  ticketsCreated Ticket[]         @relation("TicketsCreated")
-  ticketsHandled Ticket[]         @relation("TicketsHandled")
-  messages       Message[]
-  posts          Post[]
-  votes          Vote[]
-  notifications  Notification[]
+  departments UserDepartment[]
 
+  votes         Vote[]
+  notifications Notification[]
   events        Event[]
   subscriptions Subscription[]
-  suggestionId  String?
-
-  suggestions          Suggestion[] @relation("SuggestionOwner")
-  ticketsParticipating Ticket[]     @relation("TicketParticipants")
 
   auditLogs AuditLog[]
-
-  news News[]
-
-  questions        Question[]
-  resources        Resource[]
-  newsVotes        NewsVote[]
-  newsComments     NewsComment[]
-  generalMessage   GeneralMessage?  @relation(fields: [generalMessageId], references: [id])
-  generalMessageId String?
-  generalMessages  GeneralMessage[] @relation("GeneralMessageRecipients")
-  receivedMessages Message[]        @relation("MessageReceivers")
 
   @@index([id])
   @@index([email])
@@ -560,8 +576,7 @@ model UserDepartment {
   userId     String
   department Department
 
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  generalMessages GeneralMessage[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, department])
 }

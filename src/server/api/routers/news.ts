@@ -15,8 +15,13 @@ export const newsRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
 
       const news = await ctx.db.news.findMany({
-        where: { isPublished: true },
-        take: input?.limit ?? 5,
+        where: {
+          isPublished: true,
+        },
+        take: input.limit ?? 5,
+        orderBy: {
+          createdAt: "desc",
+        },
         include: {
           createdBy: {
             select: {
@@ -24,19 +29,13 @@ export const newsRouter = createTRPCRouter({
               name: true,
             },
           },
-          comments: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
+          conversation: {
+            select: {
+              id: true,
             },
           },
           tags: true,
         },
-        orderBy: { createdAt: "desc" },
       });
 
       const votes = await ctx.db.newsVote.findMany({
@@ -68,15 +67,71 @@ export const newsRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
       const news = await ctx.db.news.findUnique({
-        where: { id: input.id },
+        where: {
+          id: input.id,
+        },
         include: {
-          createdBy: true,
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          conversation: {
+            include: {
+              participants: {
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+              messages: {
+                orderBy: {
+                  createdAt: "asc",
+                },
+                include: {
+                  sender: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
           tags: true,
         },
       });
 
-      return news;
+      if (!news) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Nyheten hittades inte",
+        });
+      }
+
+      const vote = await ctx.db.newsVote.findUnique({
+        where: {
+          userId_newsId: {
+            userId,
+            newsId: news.id,
+          },
+        },
+      });
+
+      return {
+        ...news,
+        hasVoted: !!vote,
+        userVote: vote?.type ?? null,
+      };
     }),
 
   // =========================
@@ -99,7 +154,17 @@ export const newsRouter = createTRPCRouter({
           content: input.content,
           category: input.category,
           priority: input.priority,
-          createdById: ctx.session.user.id,
+
+          createdBy: {
+            connect: {
+              id: ctx.session.user.id,
+            },
+          },
+
+          conversation: {
+            create: {},
+          },
+
           tags: {
             connectOrCreate:
               input.tags?.map((tag) => ({
@@ -111,25 +176,6 @@ export const newsRouter = createTRPCRouter({
                 },
               })) ?? [],
           },
-        },
-        include: {
-          createdBy: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          comments: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-          tags: true,
         },
       });
 
@@ -149,7 +195,11 @@ export const newsRouter = createTRPCRouter({
       //   message: `${ctx.session.user.email} created news "${news.title}"`,
       // });
 
-      return { ...news, hasVoted: false, userVote: null };
+      return {
+        ...news,
+        hasVoted: false,
+        userVote: null,
+      };
     }),
 
   // =========================
@@ -200,6 +250,15 @@ export const newsRouter = createTRPCRouter({
               })) ?? [],
           },
         },
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          tags: true,
+        },
       });
 
       return updatedNews;
@@ -235,30 +294,7 @@ export const newsRouter = createTRPCRouter({
     }),
 
   // =========================
-  // ADD COMMENT
-  // =========================
-  addMessage: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        content: z.string().min(1),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.newsComment.create({
-        data: {
-          content: input.content,
-          newsId: input.id,
-          userId: ctx.session.user.id,
-        },
-        include: {
-          user: true,
-        },
-      });
-    }),
-
-  // =========================
-  // VOTE (OPTIMERAD TOGGLE)
+  // VOTE
   // =========================
 
   voteNews: protectedProcedure
@@ -342,118 +378,4 @@ export const newsRouter = createTRPCRouter({
 
       return { added: true };
     }),
-  // upVoteNews: protectedProcedure
-  //   .input(
-  //     z.object({
-  //       id: z.string(),
-  //     }),
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     const existingVote = await ctx.db.newsVote.findUnique({
-  //       where: {
-  //         userId_newsId: {
-  //           userId: ctx.session.user.id,
-  //           newsId: input.id,
-  //         },
-  //       },
-  //     });
-
-  //     if (existingVote) {
-  //       await ctx.db.newsVote.delete({
-  //         where: {
-  //           id: existingVote.id,
-  //         },
-  //       });
-  //       if (existingVote.type === "UP") {
-  //         await ctx.db.news.update({
-  //           where: { id: input.id },
-  //           data: {
-  //             upVotes: {
-  //               decrement: 1,
-  //             },
-  //           },
-  //         });
-  //       } else if (existingVote.type === "DOWN") {
-  //         await ctx.db.news.update({
-  //           where: { id: input.id },
-  //           data: {
-  //             downVotes: {
-  //               decrement: 1,
-  //             },
-  //           },
-  //         });
-  //       }
-
-  //       return { removed: true };
-  //     } else {
-  //       await ctx.db.news.update({
-  //         where: { id: input.id },
-  //         data: {
-  //           upVotes: {
-  //             increment: 1,
-  //           },
-  //         },
-  //       });
-  //       await ctx.db.newsVote.create({
-  //         data: {
-  //           userId: ctx.session.user.id,
-  //           newsId: input.id,
-  //           type: "UP",
-  //         },
-  //       });
-  //       return { added: true };
-  //     }
-  //   }),
-
-  // downVoteNews: protectedProcedure
-  //   .input(
-  //     z.object({
-  //       id: z.string(),
-  //     }),
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     const existingVote = await ctx.db.newsVote.findUnique({
-  //       where: {
-  //         userId_newsId: {
-  //           userId: ctx.session.user.id,
-  //           newsId: input.id,
-  //         },
-  //       },
-  //     });
-
-  //     if (existingVote) {
-  //       await ctx.db.news.update({
-  //         where: { id: input.id },
-  //         data: {
-  //           downVotes: {
-  //             decrement: 1,
-  //           },
-  //         },
-  //       });
-  //       await ctx.db.newsVote.delete({
-  //         where: {
-  //           id: existingVote.id,
-  //         },
-  //       });
-
-  //       return { removed: true };
-  //     } else {
-  //       await ctx.db.news.update({
-  //         where: { id: input.id },
-  //         data: {
-  //           downVotes: {
-  //             increment: 1,
-  //           },
-  //         },
-  //       });
-  //       await ctx.db.newsVote.create({
-  //         data: {
-  //           userId: ctx.session.user.id,
-  //           newsId: input.id,
-  //           type: "DOWN",
-  //         },
-  //       });
-  //       return { added: true };
-  //     }
-  //   }),
 });

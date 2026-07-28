@@ -12,10 +12,12 @@ export function useInviteUser() {
   const utils = api.useUtils();
   const { socket } = useSocket();
 
-  const mutation = api.ticket.inviteUserToTicket.useMutation({
-    async onSuccess(ticket) {
-      await utils.ticket.invalidate();
-      socket?.emit("join:room", ticket.id);
+  const mutation = api.message.inviteUser.useMutation({
+    async onSuccess(conversation) {
+      await utils.message.listMessages.invalidate({
+        conversationId: conversation.id,
+      });
+      socket?.emit("join:room", conversation.id);
     },
   });
 

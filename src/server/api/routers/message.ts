@@ -1,281 +1,237 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { prismaEventService } from "../services/eventService";
-import { AuditMessageType, MessageType } from "@prisma/client";
-import { ParentType, Department } from "@prisma/client";
+import { ConversationRole, Department, MessageType } from "@prisma/client";
+import { createAuditLog } from "../services/auditLogService";
 
 export const messageRouter = createTRPCRouter({
   listMessages: protectedProcedure
     .input(
       z.object({
-        threadId: z.string().min(1),
+        conversationId: z.string().min(1),
       }),
     )
     .query(async ({ ctx, input }) => {
       return ctx.db.message.findMany({
         where: {
-          threadId: input.threadId,
-        },
-        include: {
-          createdBy: true,
+          conversationId: input.conversationId,
         },
         orderBy: {
           createdAt: "asc",
         },
+        include: {
+          sender: true,
+        },
       });
     }),
 
-  listUserMessages: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.message.findMany({
+  listUserConversations: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.conversation.findMany({
       where: {
-        receivers: {
+        participants: {
           some: {
-            id: ctx.session.user.id,
+            userId: ctx.session.user.id,
+            hiddenAt: null,
           },
         },
       },
       include: {
-        createdBy: true,
+        participants: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        messages: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+          include: {
+            sender: true,
+          },
+        },
       },
     });
   }),
 
+  getMessageById: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().min(1),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const message = await ctx.db.message.findUnique({
+        where: { id: input.id },
+        include: {
+          sender: true,
+        },
+      });
+
+      return message;
+    }),
+
   createMessage: protectedProcedure
     .input(
       z.object({
-        threadId: z.string().min(1).optional(),
-        message: z.string().min(1),
-        type: z.nativeEnum(AuditMessageType).optional(),
-        receivers: z.string().optional(),
-        receiverDepartments: z.array(z.nativeEnum(Department)).optional(),
+        conversationId: z.string().min(1),
+        content: z.string().min(1),
+        type: z.nativeEnum(MessageType).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const thread = await ctx.db.thread.findUnique({
-        where: { id: input.threadId },
-      });
-
-      if (!thread) {
-        throw new Error("Thread hittades inte");
-      }
-      let originId: string;
-      let originType: "TICKET" | "QUESTION" | "OUTGOINGMESSAGE";
-
-      if (thread?.ticketId) {
-        originId = thread.ticketId;
-        originType = "TICKET";
-      } else if (thread?.questionId) {
-        originId = thread.questionId;
-        originType = "QUESTION";
-      } else {
-        originId = thread.id;
-        originType = "OUTGOINGMESSAGE";
-      }
-
-      if (input.receiverDepartments) {
-        const users = await ctx.db.user.findMany({
+      const message = await ctx.db.$transaction(async (tx) => {
+        const participant = await tx.conversationParticipant.findUnique({
           where: {
-            departments: {
-              some: {
-                department: {
-                  in: input.receiverDepartments,
-                },
-              },
+            conversationId_userId: {
+              conversationId: input.conversationId,
+              userId: ctx.session.user.id,
             },
           },
-          select: { id: true },
         });
 
-        const newMessage = await ctx.db.message.create({
-          data: {
-            threadId: input.threadId,
-            message: input.message,
-            createdById: ctx.session.user.id,
-            type: input.type ?? "USER_MESSAGE",
-            receivers: {
-              connect: users.map((user) => ({ id: user.id })),
+        if (!participant) {
+          await tx.conversationParticipant.create({
+            data: {
+              conversationId: input.conversationId,
+              userId: ctx.session.user.id,
             },
+          });
+        }
+
+        await tx.conversationParticipant.updateMany({
+          where: {
+            conversationId: input.conversationId,
+          },
+          data: {
+            hiddenAt: null,
+          },
+        });
+
+        const message = await tx.message.create({
+          data: {
+            conversationId: input.conversationId,
+            senderId: ctx.session.user.id,
+            content: input.content,
+            type: input.type ?? MessageType.USER_MESSAGE,
           },
           include: {
-            createdBy: true,
+            sender: true,
           },
         });
 
-        return newMessage;
-      }
+        await tx.conversation.update({
+          where: {
+            id: input.conversationId,
+          },
+          data: {},
+        });
 
-      const newMessage = await ctx.db.message.create({
-        data: {
-          threadId: input.threadId,
-          message: input.message,
-          createdById: ctx.session.user.id,
-          type: input.type ?? "USER_MESSAGE",
-        },
-        include: {
-          createdBy: true,
-        },
+        return message;
       });
 
-      await prismaEventService.createEvent({
-        type: "MESSAGE_ADDED",
-        originId,
-        originType,
-        actorId: ctx.session.user.id,
-        metadata: {
-          messageId: newMessage.id,
-        },
-      });
-
-      return newMessage;
+      return message;
     }),
 
-  createThread: protectedProcedure
+  createConversation: protectedProcedure
     .input(
       z.object({
-        type: z.nativeEnum(ParentType),
         message: z.string().min(1),
         receivers: z.array(z.string()).optional(),
         receiverDepartments: z.array(z.nativeEnum(Department)).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const newThread = await ctx.db.thread.create({
-        data: {
-          type: input.type,
-        },
-      });
-
-      if (input.receiverDepartments) {
-        const users = await ctx.db.user.findMany({
-          where: {
-            departments: {
-              some: {
-                department: {
-                  in: input.receiverDepartments,
+      const departmentUsers = input.receiverDepartments?.length
+        ? await ctx.db.user.findMany({
+            where: {
+              departments: {
+                some: {
+                  department: {
+                    in: input.receiverDepartments,
+                  },
                 },
               },
             },
-          },
-          select: { id: true },
-        });
+            select: {
+              id: true,
+            },
+          })
+        : [];
 
-        const newMessage = await ctx.db.message.create({
+      const participantIds = new Set<string>();
+
+      participantIds.add(ctx.session.user.id);
+
+      departmentUsers.forEach((user) => participantIds.add(user.id));
+
+      input.receivers?.forEach((id) => participantIds.add(id));
+
+      return await ctx.db.$transaction(async (tx) => {
+        const conversation = await tx.conversation.create({
           data: {
-            threadId: newThread.id,
-            message: input.message,
-            createdById: ctx.session.user.id,
-            receivers: {
-              connect: users.map((user) => ({ id: user.id })),
+            participants: {
+              create: Array.from(participantIds).map((userId) => ({
+                userId,
+                role:
+                  userId === ctx.session.user.id
+                    ? ConversationRole.ADMIN
+                    : ConversationRole.MEMBER,
+              })),
             },
           },
-          include: {
-            createdBy: true,
+        });
+
+        await tx.message.create({
+          data: {
+            conversationId: conversation.id,
+            senderId: ctx.session.user.id,
+            content: input.message,
+            type: MessageType.USER_MESSAGE,
           },
         });
 
-        return newMessage;
-      }
-
-      if (input.receivers) {
-        const newMessage = await ctx.db.message.create({
-          data: {
-            threadId: newThread.id,
-            message: input.message,
-            createdById: ctx.session.user.id,
-            receivers: {
-              connect: input.receivers.map((user) => ({ id: user })),
+        return await tx.conversation.findUniqueOrThrow({
+          where: {
+            id: conversation.id,
+          },
+          include: {
+            participants: {
+              include: {
+                user: true,
+              },
+            },
+            messages: {
+              include: {
+                sender: true,
+              },
             },
           },
-          include: {
-            createdBy: true,
-          },
         });
-
-        return newMessage;
-      }
+      });
     }),
 
-  createOutgoingMessage: protectedProcedure
+  deleteConversation: protectedProcedure
     .input(
       z.object({
-        threadId: z.string().min(1).optional(),
-        message: z.string().min(1),
-        includedDepartments: z.array(z.nativeEnum(Department)).optional(),
-        includedUsers: z.array(z.string()).optional(),
+        conversationId: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      let thread = await ctx.db.thread.findUnique({
-        where: { id: input.threadId },
-      });
-
-      if (!thread) {
-        thread = await ctx.db.thread.create({
-          data: {
-            type: ParentType.GENERAL,
-          },
-        });
-
-        const newMessage = await ctx.db.generalMessage.create({
-          data: {
-            message: input.message,
-            createdById: ctx.session.user.id,
-            threadId: thread.id,
-            includedDepartments: {
-              create:
-                input.includedDepartments?.map((dept) => ({
-                  department: dept,
-                  userId: ctx.session.user.id,
-                })) ?? [],
-            },
-            includedUsers: {
-              connect:
-                input.includedUsers?.map((userId) => ({ id: userId })) ?? [],
-            },
-          },
-        });
-
-        return newMessage;
-      }
-
-      const newMessage = await ctx.db.generalMessage.create({
-        data: {
-          message: input.message,
-          createdById: ctx.session.user.id,
-          threadId: thread.id,
-          includedDepartments: {
-            create:
-              input.includedDepartments?.map((dept) => ({
-                department: dept,
-                userId: ctx.session.user.id,
-              })) ?? [],
-          },
-          includedUsers: {
-            connect:
-              input.includedUsers?.map((userId) => ({ id: userId })) ?? [],
+      await ctx.db.conversationParticipant.update({
+        where: {
+          conversationId_userId: {
+            conversationId: input.conversationId,
+            userId: ctx.session.user.id,
           },
         },
-      });
-
-      return newMessage;
-    }),
-
-  deleteMessage: protectedProcedure
-    .input(
-      z.object({
-        id: z.string().min(1),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const message = await ctx.db.message.findUnique({
-        where: { id: input.id },
-      });
-      if (!message) {
-        throw new Error("Message not found");
-      }
-
-      return await ctx.db.message.delete({
-        where: { id: input.id },
+        data: {
+          hiddenAt: new Date(),
+        },
       });
     }),
 
@@ -292,4 +248,15 @@ export const messageRouter = createTRPCRouter({
       },
     });
   }),
+
+  inviteUser: protectedProcedure
+    .input(z.object({ conversationId: z.string(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const updatedConversation = await ctx.db.conversation.update({
+        where: { id: input.conversationId },
+        data: { participants: { connect: { id: input.userId } } },
+      });
+
+      return updatedConversation;
+    }),
 });

@@ -4,38 +4,40 @@ import { useState, useEffect } from "react";
 import { api, type RouterOutputs } from "~/trpc/react";
 import { useSocket } from "../socketProvider";
 
-type TicketList = RouterOutputs["ticket"]["listAllTickets"];
-type Ticket = TicketList["tickets"][number];
-
 interface ChatBoxProps {
-  threadId: string;
-  currentUserId: string | undefined;
+  conversationId: string;
 }
 
-export default function ChatBox({ threadId, currentUserId }: ChatBoxProps) {
+export default function ChatBox({ conversationId }: ChatBoxProps) {
   const { socket } = useSocket();
   const [newMessage, setNewMessage] = useState("");
 
   const utils = api.useUtils();
+  const { data: me } = api.user.me.useQuery();
 
   const { data: messages, isLoading } = api.message.listMessages.useQuery({
-    threadId,
+    conversationId: conversationId,
   });
 
-  const sortedMessages = messages ? [...messages].reverse() : [];
+  const sortedMessages = messages ?? [];
 
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {
-      console.log("Message created, invalidating messages for id:", threadId);
+      console.log(
+        "Message created, invalidating messages for id:",
+        conversationId,
+      );
+
       utils.message.listMessages.invalidate();
+      utils.message.listUserConversations.invalidate();
     },
   });
 
   useEffect(() => {
     if (!socket) return;
 
-    const handler = (msg: { id: string }) => {
-      if (msg.id === threadId) {
+    const handler = (msg: { conversationId: string }) => {
+      if (msg.conversationId === conversationId) {
         utils.message.listMessages.invalidate();
       }
     };
@@ -44,13 +46,13 @@ export default function ChatBox({ threadId, currentUserId }: ChatBoxProps) {
     return () => {
       socket.off("chat:message", handler);
     };
-  }, [socket, threadId, utils.message.listMessages]);
+  }, [socket, conversationId, utils.message.listMessages]);
 
   const handleSend = () => {
     if (!newMessage.trim()) return;
 
-    createMessage.mutate({ threadId, message: newMessage });
-    socket?.emit("chat:message", { threadId });
+    createMessage.mutate({ conversationId, content: newMessage });
+    socket?.emit("chat:message", { conversationId });
     setNewMessage("");
   };
 
@@ -58,7 +60,7 @@ export default function ChatBox({ threadId, currentUserId }: ChatBoxProps) {
     <div className="flex flex-col gap-4">
       <h3 className="text-lg font-semibold">Meddelanden</h3>
 
-      <div className="flex max-h-64 flex-col-reverse gap-3 overflow-y-auto rounded-lg bg-black/30 p-4">
+      <div className="flex max-h-64 flex-col gap-3 overflow-y-auto rounded-lg bg-black/30 p-4">
         {isLoading ? (
           <p className="animate-pulse text-sm opacity-60">
             Laddar meddelanden...
@@ -70,7 +72,7 @@ export default function ChatBox({ threadId, currentUserId }: ChatBoxProps) {
             )}
 
             {sortedMessages.map((msg) => {
-              const isMine = msg.createdBy?.id === currentUserId;
+              const isMine = msg.sender?.id === me?.id;
 
               return (
                 <div
@@ -85,7 +87,7 @@ export default function ChatBox({ threadId, currentUserId }: ChatBoxProps) {
                     {msg.createdAt.toLocaleDateString()} ·{" "}
                     {msg.createdAt.toLocaleTimeString()}
                   </div>
-                  {msg.message}
+                  {msg.content}
                 </div>
               );
             })}
