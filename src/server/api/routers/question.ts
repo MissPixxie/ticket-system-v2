@@ -22,16 +22,70 @@ export const questionRouter = createTRPCRouter({
           createdBy: {
             select: { id: true, name: true },
           },
-          conversation: {
-            include: {
-              messages: {},
-            },
-          },
         },
         orderBy: { createdAt: "desc" },
       });
 
       return questions;
+    }),
+
+  getQuestionById: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().min(1),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const question = await ctx.db.question.findUnique({
+        where: {
+          id: input.id,
+        },
+        include: {
+          createdBy: {
+            select: {
+              name: true,
+            },
+          },
+          conversation: {
+            include: {
+              participants: {
+                include: {
+                  user: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+              messages: {
+                orderBy: {
+                  createdAt: "asc",
+                },
+                include: {
+                  sender: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          tags: true,
+        },
+      });
+
+      if (!question) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Frågan hittades inte",
+        });
+      }
+
+      return question;
     }),
 
   createQuestion: protectedProcedure
@@ -57,22 +111,6 @@ export const questionRouter = createTRPCRouter({
           },
         },
       });
-
-      //   await prismaEventService.createEvent({
-      //     type: "NEWS_CREATED",
-      //     originId: news.newsId,
-      //     originType: "NEWS",
-      //     actorId: ctx.session.user.id,
-      //   });
-
-      //   await createAuditLog({
-      //     type: "NEWS_CREATED",
-      //     severity: "INFO",
-      //     entityType: "NEWS",
-      //     entityId: news.newsId,
-      //     actor: { connect: { id: ctx.session.user.id } },
-      //     message: `${ctx.session.user.email} created ticket "${news.title}"`,
-      //   });
 
       return question;
     }),

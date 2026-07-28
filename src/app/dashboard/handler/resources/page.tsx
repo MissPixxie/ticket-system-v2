@@ -42,7 +42,12 @@ export default function ResourcesPage() {
   });
 
   const handleCreate = () => {
-    if (!title || !url) return;
+    if (!title.trim()) return;
+
+    if (!url.trim()) {
+      setUrlError("Du måste ange en URL.");
+      return;
+    }
 
     if (!isValidUrl(url)) return;
 
@@ -120,7 +125,11 @@ export default function ResourcesPage() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Länk till dokument (URL)"
-              className="rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
+              className={`rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 ${
+                urlError
+                  ? "ring-2 ring-red-500 focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              }`}
             />
             {urlError && (
               <p className="mt-2 text-sm text-red-500">{urlError}</p>

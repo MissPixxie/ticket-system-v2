@@ -1,15 +1,10 @@
 import { db } from "~/server/db";
 
 export async function seedSuggestions() {
-  const existing = await db.suggestion.findFirst();
-
-  if (existing) return;
-
-  // Hämta suggestionBox (krävs i din modell)
   const box = await db.suggestionBox.findFirst();
-  if (!box)
+  if (!box) {
     throw new Error("SuggestionBox must exist before seeding suggestions");
-
+  }
   await db.suggestion.createMany({
     data: [
       {

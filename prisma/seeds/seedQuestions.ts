@@ -1,10 +1,6 @@
 import { db } from "~/server/db";
 
 export async function seedQuestions() {
-  const existing = await db.question.findFirst();
-
-  if (existing) return;
-
   const questions = [
     {
       id: "q1",

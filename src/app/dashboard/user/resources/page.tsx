@@ -6,6 +6,7 @@ import SkeletonResourcesCard from "~/app/_components/skeletonComponents/cards/sk
 import Link from "next/link";
 import { FiExternalLink, FiSearch } from "react-icons/fi";
 import { useState } from "react";
+import { ImBooks } from "react-icons/im";
 
 export default function ResourcesPage() {
   const { data: resources, isLoading } = api.resource.listResources.useQuery({
@@ -31,9 +32,9 @@ export default function ResourcesPage() {
     <main className="main-page-layout">
       <div className="container">
         <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <HiOutlineDocumentText className="text-purple-400" size={28} />
-            <h1 className="page-header">Butiksresurser</h1>
+          <div className="header-container">
+            <ImBooks className="text-purple-400" size={36} />
+            <h1 className="page-header">Resurser & dokumentation</h1>
           </div>
           <div className="relative mt-6">
             <FiSearch

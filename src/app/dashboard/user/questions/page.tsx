@@ -9,13 +9,18 @@ import { FaChevronDown } from "react-icons/fa6";
 const PAGE_SIZE = 5;
 
 export default function QuestionPage() {
+  const utils = api.useUtils();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
     null,
   );
+  const { data: selectedQuestion } = api.question.getQuestionById.useQuery(
+    { id: selectedQuestionId! },
+    {
+      enabled: !!selectedQuestionId,
+    },
+  );
   const [newMessage, setNewMessage] = useState("");
-
-  const utils = api.useUtils();
 
   const { data: me } = api.user.me.useQuery();
 
@@ -176,12 +181,9 @@ export default function QuestionPage() {
                   </div>
                 </button>
 
-                {isOpen && (
+                {isOpen && selectedQuestionId && (
                   <div className="border-t border-white/5 p-5">
-                    <QuestionCard
-                      {...question}
-                      currentUserId={me?.id ?? null}
-                    />
+                    <QuestionCard selectedQuestionId={selectedQuestionId} />
                   </div>
                 )}
               </div>

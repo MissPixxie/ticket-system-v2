@@ -194,6 +194,7 @@ export const newsRouter = createTRPCRouter({
       //   actor: { connect: { id: ctx.session.user.id } },
       //   message: `${ctx.session.user.email} created news "${news.title}"`,
       // });
+      console.log(news);
 
       return {
         ...news,

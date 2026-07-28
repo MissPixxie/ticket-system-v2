@@ -67,6 +67,12 @@ export default function TicketPage({
     <main className="main-page-layout">
       <div className="container">
         <div className="flex flex-col gap-4 rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg md:flex-row md:items-center md:justify-between">
+          <button
+            onClick={() => history.back()}
+            className="text-sm text-white/60 transition hover:text-white"
+          >
+            ← Tillbaka
+          </button>
           <div>
             <h1 className="text-2xl font-bold">{ticket.title}</h1>
             <p className="text-sm text-white/60">{ticket.department}</p>
@@ -169,9 +175,7 @@ export default function TicketPage({
 
           <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
             {ticket.conversation?.id && (
-              <ChatBox
-                conversationId={ticket.conversation?.id ?? null}
-              />
+              <ChatBox conversationId={ticket.conversation?.id ?? null} />
             )}
           </div>
         </div>

@@ -5,6 +5,14 @@ import { seedSuggestions } from "./seeds/seedSuggestions";
 import { seedQuestions } from "./seeds/seedQuestions";
 
 async function main() {
+  await db.user.deleteMany();
+  await db.role.deleteMany();
+  await db.permission.deleteMany();
+  await db.question.deleteMany();
+  await db.news.deleteMany();
+  await db.suggestion.deleteMany();
+  await db.conversation.deleteMany();
+
   await db.permission.createMany({
     data: [
       { name: "CREATE_TICKET" },
