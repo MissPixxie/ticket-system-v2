@@ -8,7 +8,14 @@ import {
   FaShopify,
   FaShoppingCart,
   FaUsers,
+  FaEdit,
+  FaTrash,
+  FaSearchPlus,
 } from "react-icons/fa";
+import { UploadImageButton } from "../../cloudinaryUpload/uploadImageButton";
+import { CldImage } from "next-cloudinary";
+import { ImagePreviewModal } from "../imagePreviewModal";
+import { EditImageButton } from "../../cloudinaryUpload/feEdit";
 
 export type Department = "IT" | "HR" | "CAMPAIGN" | "PRODUCT" | "CUSTOMERCLUB";
 export type Priority = "LOW" | "MEDIUM" | "URGENT";
@@ -19,6 +26,7 @@ export interface CreateTicketData {
   department: Department;
   isAnonymous?: boolean;
   priority?: Priority;
+  imagePublicId?: string;
 }
 
 interface CreateTicketModalProps {
@@ -38,6 +46,8 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   const [priority, setPriority] = useState<Priority>("LOW");
   const [department, setDepartment] = useState<Department>("IT");
   const [isSelected, setIsSelected] = useState<null | number>(null);
+  const [imagePublicId, setImagePublicId] = useState("");
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
 
   if (!isOpen) return null;
 
@@ -77,7 +87,14 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ title, issue, department, isAnonymous, priority });
+    onSubmit({
+      title,
+      issue,
+      department,
+      isAnonymous,
+      priority,
+      imagePublicId,
+    });
     setTitle("");
     setIssue("");
     setDepartment("IT");
@@ -119,7 +136,6 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             </div>
           ))}
         </div>
-
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-2">
           <label htmlFor="title">Titel</label>
           <input
@@ -136,6 +152,59 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             onChange={(e) => setIssue(e.target.value)}
             className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
           />
+          <label className="mt-3 text-sm font-semibold">Bilaga</label>
+
+          {!imagePublicId ? (
+            <UploadImageButton
+              onUpload={(publicId) => {
+                setImagePublicId(publicId);
+              }}
+            />
+          ) : (
+            <div className="space-y-3">
+              <div
+                className="group relative overflow-hidden rounded-2xl"
+                onClick={() => setIsPreviewOpen(true)}
+              >
+                <CldImage
+                  src={imagePublicId}
+                  width={600}
+                  height={400}
+                  alt="Förhandsvisning"
+                  className="w-full object-cover transition duration-300 group-hover:scale-105"
+                />
+                <div className="absolute top-3 right-3 z-20 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  <EditImageButton
+                    onUpload={(publicId) => setImagePublicId(publicId)}
+                  />
+
+                  <button
+                    type="button"
+                    className="rounded-full bg-black/50 p-2 text-white transition hover:bg-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("Trash clicked");
+                      setImagePublicId("");
+                    }}
+                  >
+                    <FaTrash size={16} />
+                  </button>
+                </div>
+                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
+                  <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white opacity-0 backdrop-blur-sm transition duration-300 group-hover:opacity-100">
+                    <FaSearchPlus size={22} />
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setImagePublicId("")}
+                className="text-sm text-purple-300 transition hover:text-purple-200"
+              >
+                Byt bild
+              </button>
+            </div>
+          )}
           <div className="flex items-center gap-2 text-sm text-white">
             <input
               type="checkbox"
@@ -168,6 +237,13 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
           </div>
         </form>
       </div>
+      {isPreviewOpen && (
+        <ImagePreviewModal
+          isOpen={isPreviewOpen}
+          imagePublicId={imagePublicId}
+          onClose={() => setIsPreviewOpen(false)}
+        />
+      )}
     </div>,
     document.body,
   );

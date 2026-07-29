@@ -72,28 +72,30 @@ export const ticketRouter = createTRPCRouter({
         department: z.nativeEnum(Department),
         isAnonymous: z.boolean().optional(),
         priority: z.nativeEnum(Priority).optional(),
+        imagePublicId: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const embeddingText = `
-      Title: ${input.title}
+      // const embeddingText = `
+      // Title: ${input.title}
 
-      Issue: ${input.issue}
+      // Issue: ${input.issue}
 
-      Department: ${input.department}
+      // Department: ${input.department}
 
-      Priority: ${input.priority}
+      // Priority: ${input.priority}
 
-      `;
+      // `;
 
-      const embedding = await createEmbedding(embeddingText);
+      // const embedding = await createEmbedding(embeddingText);
 
       const ticket = await ctx.db.ticket.create({
         data: {
           title: input.title,
           issue: input.issue,
           department: input.department,
-          embedding: JSON.stringify(embedding),
+          //embedding: JSON.stringify(embedding),
+          imagePublicId: input.imagePublicId,
           createdBy: {
             connect: {
               id: ctx.session.user.id,

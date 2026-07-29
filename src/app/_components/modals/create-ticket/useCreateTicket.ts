@@ -16,7 +16,7 @@ export function useCreateTicket() {
   const utils = api.useUtils();
   const { socket } = useSocket();
 
-  const mutation = api.ticket.create.useMutation({
+  const mutation = api.ticket.createTicket.useMutation({
     async onSuccess(ticket) {
       await utils.ticket.invalidate();
       socket?.emit("join:room", ticket.id);

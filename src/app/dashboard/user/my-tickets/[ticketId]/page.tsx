@@ -5,6 +5,7 @@ import ChatBox from "~/app/_components/chatBox";
 import { InviteSection } from "~/app/_components/modals/invite-user/inviteSection";
 import { TiDocumentText } from "react-icons/ti";
 import { use } from "react";
+import { CldImage } from "next-cloudinary";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -173,10 +174,26 @@ export default function TicketPage({
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            {ticket.conversation?.id && (
-              <ChatBox conversationId={ticket.conversation?.id ?? null} />
-            )}
+          <div className="flex flex-col gap-5">
+            <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+              <h2 className="mb-4 text-lg font-semibold">Bilaga</h2>
+              {ticket.imagePublicId ? (
+                <CldImage
+                  src={ticket.imagePublicId}
+                  width={200}
+                  height={200}
+                  alt="Test"
+                  className="w-full rounded-lg border border-white/10 object-cover"
+                />
+              ) : (
+                <p>Inga bilder ännu</p>
+              )}
+            </div>
+            <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+              {ticket.conversation?.id && (
+                <ChatBox conversationId={ticket.conversation?.id ?? null} />
+              )}
+            </div>
           </div>
         </div>
       </div>

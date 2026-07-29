@@ -16,12 +16,6 @@ export default function MyTicketsPage() {
     );
   }
 
-  const total = tickets?.length ?? 0;
-  const open = tickets?.filter((t) => t.status === "OPEN").length ?? 0;
-  const progress =
-    tickets?.filter((t) => t.status === "IN_PROGRESS").length ?? 0;
-  const closed = tickets?.filter((t) => t.status === "CLOSED").length ?? 0;
-
   return (
     <main className="main-page-layout">
       <div className="container">

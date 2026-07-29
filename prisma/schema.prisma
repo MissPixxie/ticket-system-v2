@@ -445,7 +445,7 @@ model Ticket {
   title String
   issue String
 
-  image String?
+  imagePublicId String?
 
   isAnonymous Boolean @default(false)
 

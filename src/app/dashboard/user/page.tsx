@@ -8,6 +8,8 @@ import { useState } from "react";
 import CreateTicketModal from "~/app/_components/modals/create-ticket/createTicketModal";
 import Link from "next/link";
 import CampaignList from "~/app/_components/campaignList";
+import { CldImage } from "next-cloudinary";
+import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
 
 export default function UserHome() {
   const { data: tickets } = api.ticket.listUserTickets.useQuery();
@@ -17,7 +19,7 @@ export default function UserHome() {
   const { createTicket, isLoading } = useCreateTicket();
   const [openNewsId, setOpenNewsId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState<Record<string, string>>({});
-
+  const [imagePublicId, setImagePublicId] = useState("");
   const openTickets = tickets?.filter((t) => t.status === "OPEN").length ?? 0;
 
   const inProgress =
@@ -32,28 +34,6 @@ export default function UserHome() {
   };
 
   const utils = api.useUtils();
-
-  const sendMessage = api.news.addMessage.useMutation({
-    onSuccess: async () => {
-      await utils.news.listNews.invalidate();
-    },
-  });
-
-  const handleSendMessage = (id: string) => {
-    const content = messageInput[id];
-
-    if (!content?.trim()) return;
-
-    sendMessage.mutate({
-      id,
-      content,
-    });
-
-    setMessageInput((prev) => ({
-      ...prev,
-      [id]: "",
-    }));
-  };
 
   const vote = api.news.voteNews.useMutation({
     onSuccess: async () => {
@@ -75,7 +55,6 @@ export default function UserHome() {
           </p>
         </div>
         <CampaignList />
-
         {/* QUICK ACTIONS */}
         <div>
           <h1 className="text-xl font-semibold tracking-wide text-white">
