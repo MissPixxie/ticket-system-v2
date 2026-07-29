@@ -109,7 +109,12 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
 
   if (isLoading) return <p>Laddar tickets...</p>;
   if (!tickets || tickets.tickets.length === 0)
-    return <p>Inga tickets hittades</p>;
+    return (
+      <div className="flex justify-between">
+        <p>Inga tickets hittades</p>
+        <TicketSection />
+      </div>
+    );
 
   return (
     <div className="primary-background mt-15 rounded-2xl shadow-lg/15 backdrop-blur-lg">

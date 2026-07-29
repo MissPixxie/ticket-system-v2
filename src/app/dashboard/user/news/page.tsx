@@ -49,7 +49,7 @@ export default function CampaignList() {
   // }
 
   return (
-    <main className="text-white">
+    <main className="main-page-layout">
       <div>
         <div className="header-container">
           <MdCampaign className="text-purple-400" size={36} />
@@ -65,7 +65,7 @@ export default function CampaignList() {
                   key={news.id}
                   className="flex gap-5"
                 >
-                  <div className="card">
+                  <div className="card w-full">
                     {/* HEADER */}
                     <div className="flex items-center justify-between">
                       <h2 className="font-medium">{news.title}</h2>

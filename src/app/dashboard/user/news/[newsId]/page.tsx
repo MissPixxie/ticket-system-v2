@@ -34,52 +34,36 @@ export default function NewsPage({
       </main>
     );
   }
-  console.log(news);
-  console.log("conversationId:", news.conversationId);
+
   return (
     <main className="main-page-layout">
       <div className="container">
         <button
           onClick={() => history.back()}
-          className="text-sm text-white/60 transition hover:text-white"
+          className="self-start text-sm text-white/60 transition hover:text-white"
         >
           ← Tillbaka
         </button>
-        <div className="flex flex-col gap-4 rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg md:flex-row md:items-center md:justify-between">
-          <div>
+        <div className="flex gap-4 rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg md:flex-row md:justify-between">
+          <div className="">
             <h1 className="text-2xl font-bold">{news.title}</h1>
-          </div>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
-            <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-              <h2 className="mb-3 text-lg font-semibold">Beskrivning</h2>
-              <p className="text-white/80">{news.content}</p>
-            </div>
-
-            <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-              <h2 className="mb-4 text-lg font-semibold">Information</h2>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-sm text-white/60">Skapad av</p>
-                  <p>{news.createdBy?.name}</p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-white/60">Skapad</p>
-                  <p>{new Date(news.createdAt).toLocaleString()}</p>
-                </div>
+            <div className="flex gap-5">
+              <div className="flex gap-2 text-sm text-white/60">
+                <p>Skapad av:</p>
+                <p>{news.createdBy?.name ? news.createdBy?.name : "Anonym"}</p>
+              </div>
+              <div className="flex gap-2 text-sm text-white/60">
+                <p>Skapad:</p>
+                <p>{new Date(news.createdAt).toLocaleString()}</p>
               </div>
             </div>
+            <p className="mt-5 text-white/80">{news.content}</p>
           </div>
-
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            {news.conversationId && (
-              <ChatBox conversationId={news.conversationId} />
-            )}
-          </div>
+        </div>
+        <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+          {news.conversationId && (
+            <ChatBox conversationId={news.conversationId} />
+          )}
         </div>
       </div>
     </main>

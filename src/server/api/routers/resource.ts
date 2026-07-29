@@ -4,6 +4,7 @@ import { prismaEventService } from "../services/eventService";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { TRPCError } from "@trpc/server";
 import { ResourceCategory } from "@prisma/client";
+import { createEmbedding } from "~/server/ai/createEmbedding";
 
 export const resourceRouter = createTRPCRouter({
   listResources: protectedProcedure
@@ -38,11 +39,24 @@ export const resourceRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const embeddingText = `
+      Title: ${input.title}
+
+            Description: ${input.description}
+
+      Category: ${input.category}
+
+      Tags: ${(input.tags ?? []).join(", ")}
+      `;
+
+      const embedding = await createEmbedding(embeddingText);
+
       const news = await ctx.db.resource.create({
         data: {
           title: input.title,
           description: input.description,
           category: input.category,
+          embedding: JSON.stringify(embedding),
           createdById: ctx.session.user.id,
           url: input.url,
           tags: {
@@ -107,6 +121,9 @@ export const resourceRouter = createTRPCRouter({
 
       const resource = await ctx.db.resource.findUnique({
         where: { id: input.id },
+        include: {
+          tags: true,
+        },
       });
 
       if (!resource) {
@@ -116,12 +133,32 @@ export const resourceRouter = createTRPCRouter({
         });
       }
 
+      const title = input.title ?? resource.title;
+      const description = input.description ?? resource.description;
+      const category = input.category ?? resource.category;
+
+      // Om inga nya taggar skickats in använder vi de gamla
+      const tags = input.tags ?? resource.tags.map((t) => t.name);
+
+      const embeddingText = `
+      Title: ${title}
+
+      Description: ${description}
+
+      Category: ${category}
+
+      Tags: ${tags.join(", ")}
+      `;
+
+      const embedding = await createEmbedding(embeddingText);
+
       const updatedResource = await ctx.db.resource.update({
         where: { id: input.id },
         data: {
           title: input.title ?? undefined,
           description: input.description ?? undefined,
           category: input.category ?? undefined,
+          embedding: JSON.stringify(embedding),
           url: input.url ?? undefined,
           isPublished: input.isPublished ?? undefined,
           tags: {

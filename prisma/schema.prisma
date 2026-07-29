@@ -410,6 +410,7 @@ model Resource {
   updatedAt   DateTime         @updatedAt
   url         String?
   tags        Tag[]
+  embedding   String?
 
   @@index([id])
   @@index([category])
@@ -465,7 +466,8 @@ model Ticket {
   assignedToId String?
   assignedTo   User?   @relation("TicketsHandled", fields: [assignedToId], references: [id], onDelete: SetNull)
 
-  tags Tag[]
+  tags      Tag[]
+  embedding String?
 
   conversationId String?       @unique
   conversation   Conversation? @relation(fields: [conversationId], references: [id])

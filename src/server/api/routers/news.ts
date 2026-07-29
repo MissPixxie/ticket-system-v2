@@ -4,6 +4,7 @@ import { prismaEventService } from "../services/eventService";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { TRPCError } from "@trpc/server";
 import { NewsCategory, Priority } from "@prisma/client";
+import { createEmbedding } from "~/server/ai/createEmbedding";
 
 export const newsRouter = createTRPCRouter({
   // =========================
@@ -148,10 +149,26 @@ export const newsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const embeddingText = `
+Title: ${input.title}
+
+Category: ${input.category}
+
+Priority: ${input.priority}
+
+Tags: ${(input.tags ?? []).join(", ")}
+
+Content:
+${input.content}
+`;
+
+      const embedding = await createEmbedding(embeddingText);
+
       const news = await ctx.db.news.create({
         data: {
           title: input.title,
           content: input.content,
+          embedding: JSON.stringify(embedding),
           category: input.category,
           priority: input.priority,
 
@@ -221,6 +238,9 @@ export const newsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const news = await ctx.db.news.findUnique({
         where: { id: input.id },
+        include: {
+          tags: true,
+        },
       });
 
       if (!news) {
@@ -230,12 +250,36 @@ export const newsRouter = createTRPCRouter({
         });
       }
 
+      const title = input.title ?? news.title;
+      const content = input.content ?? news.content;
+      const category = input.category ?? news.category;
+      const priority = input.priority ?? news.priority;
+
+      // Om inga nya taggar skickats in använder vi de gamla
+      const tags = input.tags ?? news.tags.map((t) => t.name);
+
+      const embeddingText = `
+Title: ${title}
+
+Category: ${category}
+
+Priority: ${priority}
+
+Tags: ${tags.join(", ")}
+
+Content:
+${content}
+`;
+
+      const embedding = await createEmbedding(embeddingText);
+
       const updatedNews = await ctx.db.news.update({
         where: { id: input.id },
         data: {
           title: input.title ?? undefined,
           category: input.category ?? undefined,
           content: input.content ?? undefined,
+          embedding: JSON.stringify(embedding),
           priority: input.priority ?? undefined,
           isPublished: input.isPublished ?? undefined,
           tags: {

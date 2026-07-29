@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { generateTags } from "~/server/ai/aiService";
+import { generateTags } from "~/server/ai/generateTags";
 
 export const aiRouter = createTRPCRouter({
   generateTags: protectedProcedure

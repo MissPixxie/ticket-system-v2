@@ -4,6 +4,7 @@ import { createAuditLog } from "~/server/api/services/auditLogService";
 import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
 import { SuggestionStatus } from "@prisma/client";
+import { createEmbedding } from "~/server/ai/createEmbedding";
 
 export const suggestionBoxRouter = createTRPCRouter({
   listSuggestions: protectedProcedure.query(async ({ ctx }) => {
@@ -58,11 +59,14 @@ export const suggestionBoxRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const embedding = await createEmbedding(input.content);
+
       const suggestionBox = await ctx.db.suggestionBox.findFirstOrThrow();
       const suggestion = await ctx.db.suggestion.create({
         data: {
           content: input.content,
           suggestionBoxId: suggestionBox.id,
+          embedding: JSON.stringify(embedding),
           userId: ctx.session.user.id,
           isAnonymous: input.isAnonymous ?? false,
         },

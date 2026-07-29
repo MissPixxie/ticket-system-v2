@@ -29,28 +29,6 @@ export default function MyTicketsPage() {
           <TiTicket className="text-purple-400" size={36} />
           <h1 className="page-header">Mina tickets</h1>
         </div>
-        <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            <p className="text-sm text-white/60">Totala</p>
-            <p className="mt-2 text-3xl font-bold">{total}</p>
-          </div>
-
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            <p className="text-sm text-white/60">Öppna</p>
-            <p className="mt-2 text-3xl font-bold text-blue-400">{open}</p>
-          </div>
-
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            <p className="text-sm text-white/60">Pågående</p>
-            <p className="mt-2 text-3xl font-bold text-amber-400">{progress}</p>
-          </div>
-
-          <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-            <p className="text-sm text-white/60">Stängda</p>
-            <p className="mt-2 text-3xl font-bold text-green-400">{closed}</p>
-          </div>
-        </div>
-
         <TicketTable currentUserRole="USER" />
       </div>
     </main>

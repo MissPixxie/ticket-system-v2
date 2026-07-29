@@ -4,6 +4,7 @@ import { createAuditLog } from "~/server/api/services/auditLogService";
 import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
 import { ParentType, Department, Priority, Status } from "@prisma/client";
+import { createEmbedding } from "~/server/ai/createEmbedding";
 
 export const ticketRouter = createTRPCRouter({
   listAllTickets: protectedProcedure
@@ -40,7 +41,6 @@ export const ticketRouter = createTRPCRouter({
       include: {
         createdBy: true,
         assignedTo: true,
-        conversation: { select: { id: true } },
       },
     });
   }),
@@ -75,11 +75,25 @@ export const ticketRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const embeddingText = `
+      Title: ${input.title}
+
+      Issue: ${input.issue}
+
+      Department: ${input.department}
+
+      Priority: ${input.priority}
+
+      `;
+
+      const embedding = await createEmbedding(embeddingText);
+
       const ticket = await ctx.db.ticket.create({
         data: {
           title: input.title,
           issue: input.issue,
           department: input.department,
+          embedding: JSON.stringify(embedding),
           createdBy: {
             connect: {
               id: ctx.session.user.id,
