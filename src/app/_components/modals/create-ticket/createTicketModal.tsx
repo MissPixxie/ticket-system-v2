@@ -196,13 +196,6 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                   </span>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setImagePublicId("")}
-                className="text-sm text-purple-300 transition hover:text-purple-200"
-              >
-                Byt bild
-              </button>
             </div>
           )}
           <div className="flex items-center gap-2 text-sm text-white">

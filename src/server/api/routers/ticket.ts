@@ -138,6 +138,7 @@ export const ticketRouter = createTRPCRouter({
         status: z.nativeEnum(Status).optional(),
         priority: z.nativeEnum(Priority).optional(),
         assignedToId: z.string().optional(),
+        imagePublicId: z.string().nullable().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -158,6 +159,7 @@ export const ticketRouter = createTRPCRouter({
           status: input.status,
           priority: input.priority,
           assignedToId: input.assignedToId,
+          imagePublicId: input.imagePublicId,
         },
       });
 

@@ -156,10 +156,7 @@ export default function QuestionPage() {
 
                 {isOpen && (
                   <div className="border-t border-white/5 p-5">
-                    <QuestionCard
-                      {...question}
-                      currentUserId={me?.id ?? null}
-                    />
+                    <QuestionCard selectedQuestionId={selectedQuestionId} />
                   </div>
                 )}
               </div>

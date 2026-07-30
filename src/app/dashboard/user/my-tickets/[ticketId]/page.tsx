@@ -4,8 +4,12 @@ import { api } from "~/trpc/react";
 import ChatBox from "~/app/_components/chatBox";
 import { InviteSection } from "~/app/_components/modals/invite-user/inviteSection";
 import { TiDocumentText } from "react-icons/ti";
-import { use } from "react";
+import { use, useState } from "react";
 import { CldImage } from "next-cloudinary";
+import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
+import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
+import { FaSearchPlus, FaTrash } from "react-icons/fa";
+import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -30,7 +34,8 @@ export default function TicketPage({
   const { data: ticket, isLoading } = api.ticket.getTicketById.useQuery({
     id: ticketId,
   });
-
+  const [imagePublicId, setImagePublicId] = useState("");
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
   const { data: me } = api.user.me.useQuery();
   const utils = api.useUtils();
   //const { socket } = useSocket();
@@ -177,16 +182,60 @@ export default function TicketPage({
           <div className="flex flex-col gap-5">
             <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
               <h2 className="mb-4 text-lg font-semibold">Bilaga</h2>
-              {ticket.imagePublicId ? (
-                <CldImage
-                  src={ticket.imagePublicId}
-                  width={200}
-                  height={200}
-                  alt="Test"
-                  className="w-full rounded-lg border border-white/10 object-cover"
+
+              {!ticket.imagePublicId ? (
+                <UploadImageButton
+                  onUpload={(publicId) => {
+                    updateTicket.mutate({
+                      id: ticket.id,
+                      imagePublicId: publicId,
+                    });
+                  }}
                 />
               ) : (
-                <p>Inga bilder ännu</p>
+                <div className="space-y-3">
+                  <div
+                    className="group relative overflow-hidden rounded-2xl"
+                    onClick={() => setIsPreviewOpen(true)}
+                  >
+                    <CldImage
+                      src={ticket.imagePublicId}
+                      width={600}
+                      height={400}
+                      alt="Förhandsvisning"
+                      className="w-full cursor-pointer object-cover transition duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 right-3 z-20 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <EditImageButton
+                        onUpload={(publicId) => {
+                          updateTicket.mutate({
+                            id: ticket.id,
+                            imagePublicId: publicId,
+                          });
+                        }}
+                      />
+
+                      <button
+                        type="button"
+                        className="rounded-full bg-black/50 p-2 text-white transition hover:bg-red-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateTicket.mutate({
+                            id: ticket.id,
+                            imagePublicId: null,
+                          });
+                        }}
+                      >
+                        <FaTrash size={16} />
+                      </button>
+                    </div>
+                    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
+                      <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white opacity-0 backdrop-blur-sm transition duration-300 group-hover:opacity-100">
+                        <FaSearchPlus size={22} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
             <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
@@ -197,6 +246,13 @@ export default function TicketPage({
           </div>
         </div>
       </div>
+      {isPreviewOpen && (
+        <ImagePreviewModal
+          isOpen={isPreviewOpen}
+          imagePublicId={ticket.imagePublicId!}
+          onClose={() => setIsPreviewOpen(false)}
+        />
+      )}
     </main>
   );
 }

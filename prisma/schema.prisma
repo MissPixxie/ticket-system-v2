@@ -330,7 +330,8 @@ model News {
 
   tags Tag[]
 
-  embedding String?
+  embedding     String?
+  imagePublicId String?
 
   conversationId String?       @unique
   conversation   Conversation? @relation(fields: [conversationId], references: [id])

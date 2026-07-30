@@ -16,6 +16,10 @@ export function UploadImageButton({ onUpload, children }: Props) {
         const info = result.info;
 
         if (info && typeof info === "object" && "public_id" in info) {
+          setTimeout(() => {
+            document.body.style.overflow = "";
+          }, 300);
+
           onUpload(info.public_id as string);
         }
       }}

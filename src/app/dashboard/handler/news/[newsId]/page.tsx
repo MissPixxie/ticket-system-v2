@@ -7,8 +7,12 @@ import { TiDocumentText } from "react-icons/ti";
 import { use, useEffect, useState } from "react";
 import { GenerateTagsButton } from "~/app/_components/ai/generateTags";
 import { toast } from "sonner";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaSearchPlus, FaTrash, FaTrashAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { CldImage } from "next-cloudinary";
+import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
+import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
+import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -33,6 +37,7 @@ export default function NewsPage({
   //const { socket } = useSocket();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [imagePublicId, setImagePublicId] = useState<string | null>(null);
   const [category, setCategory] = useState<
     "NEWS" | "STORE_MANUAL" | "PRODUCT_INFORMATION" | "CAMPAIGN"
   >("NEWS");
@@ -41,7 +46,7 @@ export default function NewsPage({
   const [priority, setPriority] = useState<
     "LOW" | "MEDIUM" | "HIGH" | "URGENT"
   >("LOW");
-
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
   const [isPublished, setIsPublished] = useState(true);
   const router = useRouter();
 
@@ -83,6 +88,7 @@ export default function NewsPage({
     setPriority(news.priority);
     setIsPublished(news.isPublished);
     setTags(news.tags.map((tag) => tag.name));
+    setImagePublicId(news.imagePublicId);
   }, [news]);
 
   if (isLoading || !news) {
@@ -173,29 +179,91 @@ export default function NewsPage({
                 </select>
               </div>
             </div>
-            <div className="flex w-100 flex-col gap-3">
-              <label className="mb-2 block text-sm font-medium text-white/70">
-                Taggar:
-              </label>
-              {tags.length > 0 ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-purple-500/20 px-3 py-1 text-sm text-purple-200"
+            <div className="flex justify-between">
+              <div className="flex w-100 flex-col gap-3">
+                <label className="mb-2 block text-sm font-medium text-white/70">
+                  Taggar:
+                </label>
+                {tags.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-purple-500/20 px-3 py-1 text-sm text-purple-200"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div>
+                    <GenerateTagsButton
+                      text={`${title} ${content}`}
+                      onGenerated={setTags}
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="w-full">
+                <h2 className="mb-4 text-lg font-semibold">Bilaga</h2>
+
+                {!news.imagePublicId ? (
+                  <div className="w-100">
+                    <UploadImageButton
+                      onUpload={(publicId) => {
+                        updateNews.mutate({
+                          id: news.id,
+                          imagePublicId: publicId,
+                        });
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div
+                      className="group relative overflow-hidden rounded-2xl"
+                      onClick={() => setIsPreviewOpen(true)}
                     >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <div>
-                  <GenerateTagsButton
-                    text={`${title} ${content}`}
-                    onGenerated={setTags}
-                  />
-                </div>
-              )}
+                      <CldImage
+                        src={news.imagePublicId}
+                        width={600}
+                        height={400}
+                        alt="Förhandsvisning"
+                        className="w-full object-cover transition duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute top-3 right-3 z-20 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                        <EditImageButton
+                          onUpload={(publicId) => {
+                            updateNews.mutate({
+                              id: news.id,
+                              imagePublicId: publicId,
+                            });
+                          }}
+                        />
+
+                        <button
+                          type="button"
+                          className="rounded-full bg-black/50 p-2 text-white transition hover:bg-red-500"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateNews.mutate({
+                              id: news.id,
+                              imagePublicId: null,
+                            });
+                          }}
+                        >
+                          <FaTrash size={16} />
+                        </button>
+                      </div>
+                      <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
+                        <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white opacity-0 backdrop-blur-sm transition duration-300 group-hover:opacity-100">
+                          <FaSearchPlus size={22} />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-white/70">
@@ -221,6 +289,7 @@ export default function NewsPage({
                     priority,
                     isPublished,
                     tags,
+                    imagePublicId,
                   })
                 }
               >
@@ -230,6 +299,13 @@ export default function NewsPage({
           </div>
         </div>
       </div>
+      {isPreviewOpen && (
+        <ImagePreviewModal
+          isOpen={isPreviewOpen}
+          imagePublicId={news.imagePublicId!}
+          onClose={() => setIsPreviewOpen(false)}
+        />
+      )}
     </main>
   );
 }

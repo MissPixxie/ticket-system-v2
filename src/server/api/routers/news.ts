@@ -81,6 +81,7 @@ export const newsRouter = createTRPCRouter({
               name: true,
             },
           },
+
           conversation: {
             include: {
               participants: {
@@ -108,6 +109,7 @@ export const newsRouter = createTRPCRouter({
               },
             },
           },
+
           tags: true,
         },
       });
@@ -146,31 +148,33 @@ export const newsRouter = createTRPCRouter({
         category: z.nativeEnum(NewsCategory),
         priority: z.nativeEnum(Priority),
         tags: z.array(z.string()).optional(),
+        imagePublicId: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const embeddingText = `
-Title: ${input.title}
+      //       const embeddingText = `
+      // Title: ${input.title}
 
-Category: ${input.category}
+      // Category: ${input.category}
 
-Priority: ${input.priority}
+      // Priority: ${input.priority}
 
-Tags: ${(input.tags ?? []).join(", ")}
+      // Tags: ${(input.tags ?? []).join(", ")}
 
-Content:
-${input.content}
-`;
+      // Content:
+      // ${input.content}
+      // `;
 
-      const embedding = await createEmbedding(embeddingText);
+      //       const embedding = await createEmbedding(embeddingText);
 
       const news = await ctx.db.news.create({
         data: {
           title: input.title,
           content: input.content,
-          embedding: JSON.stringify(embedding),
+          //  embedding: JSON.stringify(embedding),
           category: input.category,
           priority: input.priority,
+          imagePublicId: input.imagePublicId,
 
           createdBy: {
             connect: {
@@ -233,6 +237,7 @@ ${input.content}
         priority: z.nativeEnum(Priority).optional(),
         isPublished: z.boolean().optional(),
         tags: z.array(z.string()).optional(),
+        imagePublicId: z.string().nullable().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -258,20 +263,20 @@ ${input.content}
       // Om inga nya taggar skickats in använder vi de gamla
       const tags = input.tags ?? news.tags.map((t) => t.name);
 
-      const embeddingText = `
-Title: ${title}
+      //       const embeddingText = `
+      // Title: ${title}
 
-Category: ${category}
+      // Category: ${category}
 
-Priority: ${priority}
+      // Priority: ${priority}
 
-Tags: ${tags.join(", ")}
+      // Tags: ${tags.join(", ")}
 
-Content:
-${content}
-`;
+      // Content:
+      // ${content}
+      // `;
 
-      const embedding = await createEmbedding(embeddingText);
+      //       const embedding = await createEmbedding(embeddingText);
 
       const updatedNews = await ctx.db.news.update({
         where: { id: input.id },
@@ -279,9 +284,10 @@ ${content}
           title: input.title ?? undefined,
           category: input.category ?? undefined,
           content: input.content ?? undefined,
-          embedding: JSON.stringify(embedding),
+          //embedding: JSON.stringify(embedding),
           priority: input.priority ?? undefined,
           isPublished: input.isPublished ?? undefined,
+          imagePublicId: input.imagePublicId,
           tags: {
             set: [],
             connectOrCreate:
