@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useCreateUser } from "./useCreateUser";
 import CreateUserModal from "./createUserModal";
 import { FaUserPlus } from "react-icons/fa6";
-import { ROLE_MAP } from "~/app/constants/roles";
 
 export function UserSection() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +28,7 @@ export function UserSection() {
             name: data.name,
             email: data.email,
             password: data.password,
-            roleId: ROLE_MAP[data.role],
+            role: data.role,
             departments: data.departments,
           });
 

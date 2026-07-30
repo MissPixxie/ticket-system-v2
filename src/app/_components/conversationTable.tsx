@@ -76,12 +76,20 @@ export function ConversationTable() {
 
         <div className="grid grid-cols-[1fr_2fr_1fr_auto] border-b border-white/10 px-5 py-4 text-sm text-white/70">
           <div className="font-semibold">Från</div>
-          <div className="font-semibold">Meddelande</div>
+          <div className="font-semibold">Senaste meddelandet</div>
           <div className="font-semibold">Datum</div>
         </div>
 
         {conversations?.map((conversation) => {
           const latestMessage = conversation.messages[0];
+
+          console.log({
+            loggedInUser: me?.id,
+            loggedInName: me?.name,
+            messageSender: latestMessage?.sender?.id,
+            messageSenderName: latestMessage?.sender?.name,
+            message: latestMessage?.content,
+          });
 
           return (
             <div
@@ -92,10 +100,16 @@ export function ConversationTable() {
               <div className="grid grid-cols-[1fr_2fr_1fr_auto] border-b border-white/10 px-5 py-4 text-sm text-white/70">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-500 text-xs font-semibold text-white">
-                    {latestMessage?.sender?.name?.charAt(0)}
+                    {latestMessage?.sender?.id === me?.id
+                      ? "D"
+                      : latestMessage?.sender?.name?.charAt(0)}
                   </div>
 
-                  <span>{latestMessage?.sender?.name}</span>
+                  <span>
+                    {latestMessage?.sender?.id === me?.id
+                      ? "Du"
+                      : latestMessage?.sender?.name}
+                  </span>
                 </div>
 
                 <div>
@@ -123,7 +137,7 @@ export function ConversationTable() {
       </div>
       {selectedConversation && (
         <div className="primary-background rounded-2xl p-3 shadow-lg/15 backdrop-blur-lg">
-          <ChatBox conversationId={selectedConversation.id} />
+          <ChatBox conversationId={selectedConversation.id} context="EMAIL" />
         </div>
       )}
     </div>

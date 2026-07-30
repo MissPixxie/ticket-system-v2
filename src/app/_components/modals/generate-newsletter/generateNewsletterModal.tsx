@@ -1,32 +1,49 @@
 "use client";
 
+import type { NewsCategory, Priority } from "@prisma/client";
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { IoSparklesSharp } from "react-icons/io5";
+import type { Prisma } from "@prisma/client";
 
-interface Newsletter {
-  subject: string;
-  body: string;
-}
+const categories: NewsCategory[] = [
+  "NEWS",
+  "CAMPAIGN",
+  "PRODUCT_INFORMATION",
+  "STORE_MANUAL",
+];
+
+const priorities: Priority[] = ["LOW", "MEDIUM", "HIGH"];
+
+type Newsletter = Pick<
+  Prisma.NewsCreateInput,
+  "title" | "content" | "category" | "priority"
+>;
 
 interface GenerateNewsletterModalProps {
   open: boolean;
   newsletter: Newsletter | null;
   onClose: () => void;
+  onSend: (newsletter: Newsletter) => void;
 }
 
 export default function GenerateNewsletterModal({
   open,
   newsletter,
   onClose,
+  onSend,
 }: GenerateNewsletterModalProps) {
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [category, setCategory] = useState<NewsCategory>("NEWS");
+  const [priority, setPriority] = useState<Priority>("LOW");
 
   useEffect(() => {
     if (newsletter) {
-      setSubject(newsletter.subject);
-      setBody(newsletter.body);
+      setTitle(newsletter.title);
+      setContent(newsletter.content);
+      setCategory(newsletter.category ?? "NEWS");
+      setPriority(newsletter.priority ?? "LOW");
     }
   }, [newsletter]);
 
@@ -51,8 +68,8 @@ export default function GenerateNewsletterModal({
             <label className="mb-2 block text-sm text-white/60">Ämne</label>
 
             <input
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-purple-500"
             />
           </div>
@@ -63,11 +80,47 @@ export default function GenerateNewsletterModal({
             </label>
 
             <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               rows={12}
               className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-purple-500"
             />
+          </div>
+        </div>
+        <div>
+          <div className="mt-4 flex flex-row gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-white/60">
+                Kategori
+              </label>
+              <select
+                value={newsletter.category}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => setCategory(e.target.value as NewsCategory)}
+                className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white backdrop-blur-sm transition-all outline-none hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
+              >
+                <option>OPEN</option>
+                <option value="IN_PROGRESS">IN PROGRESS</option>
+                <option>CLOSED</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-white/60">
+                Prioritet
+              </label>
+              <select
+                value={newsletter.priority}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => setPriority(e.target.value as Priority)}
+                className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white backdrop-blur-sm transition-all outline-none hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
+              >
+                <option>LOW</option>
+                <option>MEDIUM</option>
+                <option>HIGH</option>
+                <option>URGENT</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -76,10 +129,20 @@ export default function GenerateNewsletterModal({
             onClick={onClose}
             className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white/80 hover:bg-white/10"
           >
-            Avbryt
+            Stäng
           </button>
 
-          <button className="rounded-xl bg-blue-600 px-5 py-2 text-white hover:bg-blue-500">
+          <button
+            onClick={() =>
+              onSend({
+                title,
+                content,
+                category,
+                priority,
+              })
+            }
+            className="submit-button"
+          >
             Skicka nyhetsbrev
           </button>
         </div>

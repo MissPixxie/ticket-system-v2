@@ -11,9 +11,8 @@ import {
   FaShoppingCart,
   FaHandHoldingHeart,
 } from "react-icons/fa";
-import { ROLE_MAP } from "~/app/constants/roles";
 
-type RoleKey = keyof typeof ROLE_MAP;
+type RoleKey = "USER" | "HANDLER";
 
 const departments = [
   { value: Department.IT, label: "IT", icon: <FaLaptop size={22} /> },

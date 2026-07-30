@@ -55,7 +55,7 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
         {me?.id && ticketProps.conversation?.id && (
           <ChatBox
             conversationId={ticketProps.conversation.id}
-            currentUserId={me.id}
+            context="TICKET"
           />
         )}
         <div className="mt-4 flex flex-row gap-4">

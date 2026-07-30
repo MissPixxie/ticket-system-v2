@@ -100,13 +100,13 @@ export const userRouter = createTRPCRouter({
         name: z.string().min(1),
         email: z.string().email(),
         password: z.string().min(6),
-        roleId: z.string().min(1),
+        role: z.enum(["USER", "HANDLER"]),
         departments: z.array(z.nativeEnum(Department)),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const role = await ctx.db.role.findUnique({
-        where: { id: input.roleId },
+        where: { name: input.role },
       });
 
       if (!role) {
@@ -141,14 +141,14 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      logAuditAsync({
-        type: "USER_CREATED",
-        severity: "INFO",
-        entityType: "USER",
-        entityId: newUser.id,
-        actor: { connect: { id: ctx.session.user.id } },
-        message: `${ctx.session.user.email} created user ${newUser.email}`,
-      });
+      // logAuditAsync({
+      //   type: "USER_CREATED",
+      //   severity: "INFO",
+      //   entityType: "USER",
+      //   entityId: newUser.id,
+      //   actor: { connect: { id: ctx.session.user.id } },
+      //   message: `${ctx.session.user.email} created user ${newUser.email}`,
+      // });
 
       return newUser;
     }),

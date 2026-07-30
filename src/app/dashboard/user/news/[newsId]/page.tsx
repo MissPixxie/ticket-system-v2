@@ -86,7 +86,7 @@ export default function NewsPage({
         </div>
         <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
           {news.conversationId && (
-            <ChatBox conversationId={news.conversationId} />
+            <ChatBox conversationId={news.conversationId} context="NEWS"/>
           )}
         </div>
       </div>

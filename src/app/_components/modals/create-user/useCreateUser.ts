@@ -8,7 +8,7 @@ interface CreateUserInput {
   name: string;
   email: string;
   password: string;
-  roleId: string;
+  role: "USER" | "HANDLER";
   departments: Department[];
 }
 
@@ -18,7 +18,7 @@ export function useCreateUser() {
 
   const mutation = api.user.create.useMutation({
     onSuccess: async (user) => {
-      await utils.user.listAll.invalidate();
+      await utils.user.listAll.refetch();
 
       socket?.emit("join:room", user.id);
     },

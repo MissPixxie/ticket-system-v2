@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api, type RouterOutputs } from "~/trpc/react";
 import { useSocket } from "../socketProvider";
 import FeedbackBubble from "./feedbackBubble";
@@ -8,6 +8,7 @@ import { GenerateNewsletterButton } from "./modals/generate-newsletter/generateN
 
 interface ChatBoxProps {
   conversationId: string;
+  context: "TICKET" | "RESOURCE" | "NEWS" | "QUESTION" | "EMAIL";
 }
 
 interface Newsletter {
@@ -15,11 +16,12 @@ interface Newsletter {
   body: string;
 }
 
-export default function ChatBox({ conversationId }: ChatBoxProps) {
+export default function ChatBox({ conversationId, context }: ChatBoxProps) {
   const { socket } = useSocket();
   const [newMessage, setNewMessage] = useState("");
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   const [newsletter, setNewsletter] = useState<Newsletter | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const utils = api.useUtils();
   const { data: me } = api.user.me.useQuery();
@@ -72,6 +74,14 @@ export default function ChatBox({ conversationId }: ChatBoxProps) {
     setNewMessage("");
   };
 
+  useEffect(() => {
+    if (!messages) return;
+
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
+
   return (
     <div className="flex flex-col gap-4">
       <h3 className="text-lg font-semibold">Meddelanden</h3>
@@ -107,6 +117,8 @@ export default function ChatBox({ conversationId }: ChatBoxProps) {
                 </div>
               );
             })}
+
+            <div ref={messagesEndRef} />
           </>
         )}
       </div>
@@ -123,7 +135,9 @@ export default function ChatBox({ conversationId }: ChatBoxProps) {
           Skicka
         </button>
       </div>
-      <GenerateNewsletterButton conversationId={conversationId} />
+      {context === "EMAIL" && (
+        <GenerateNewsletterButton conversationId={conversationId} />
+      )}
       {generateNewsletter.isPending && (
         <FeedbackBubble
           open={generateNewsletter.isPending}

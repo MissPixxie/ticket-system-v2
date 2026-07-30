@@ -46,7 +46,9 @@ export default function MessagePage() {
   const utils = api.useUtils();
 
   const [newMessage, setNewMessage] = useState("");
-
+  const { data: me } = api.user.me.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+  });
   const [selectedDepartments, setSelectedDepartments] = useState<Department[]>(
     [],
   );
@@ -67,10 +69,16 @@ export default function MessagePage() {
   const filteredUsers = useMemo(() => {
     if (!users) return [];
 
-    return users.filter((user) =>
-      user.name?.toLowerCase().includes(search.toLowerCase()),
-    );
-  }, [users, search]);
+    return users.filter((user) => {
+      const matchesSearch = user.name
+        ?.toLowerCase()
+        .includes(search.toLowerCase());
+
+      const isNotMe = user.id !== me?.id;
+
+      return matchesSearch && isNotMe;
+    });
+  }, [users, search, me]);
 
   /**
    * TOGGLE DEPARTMENT

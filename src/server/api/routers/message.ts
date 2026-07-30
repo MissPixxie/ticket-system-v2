@@ -34,6 +34,9 @@ export const messageRouter = createTRPCRouter({
           },
         },
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
       include: {
         participants: {
           include: {

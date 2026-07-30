@@ -3,8 +3,14 @@
 import { useState } from "react";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import GenerateNewsletterModal from "./generateNewsletterModal";
-import { api } from "~/trpc/react";
 import { useGenerateNewsletter } from "./useGenerateNewsletter";
+import { useCreateNewsletter } from "./useCreateNewsletter";
+import type { Prisma } from "@prisma/client";
+
+type Newsletter = Pick<
+  Prisma.NewsCreateInput,
+  "title" | "content" | "category" | "priority"
+>;
 
 interface GenerateNewsletterSectionProps {
   conversationId: string;
@@ -14,11 +20,9 @@ export function GenerateNewsletterButton({
   conversationId,
 }: GenerateNewsletterSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [newsletter, setNewsletter] = useState<{
-    subject: string;
-    body: string;
-  } | null>(null);
+  const [newsletter, setNewsletter] = useState<Newsletter | null>(null);
 
+  const { createNewsletter, isLoading: isCreating } = useCreateNewsletter();
   const { generateNewsletter, isLoading } = useGenerateNewsletter();
 
   const handleGenerate = async () => {
@@ -26,8 +30,27 @@ export function GenerateNewsletterButton({
       conversationId,
     });
 
-    setNewsletter(result.newsletter);
+    console.log("AI result:", result);
+
+    setNewsletter({
+      title: result.newsletter.subject,
+      content: result.newsletter.body,
+      category: "NEWS",
+      priority: "LOW",
+    });
+
     setIsOpen(true);
+  };
+
+  const handleSendNewsletter = async (newsletter: Newsletter) => {
+    await createNewsletter({
+      title: newsletter.title,
+      content: newsletter.content,
+      category: newsletter.category ?? "NEWS",
+      priority: newsletter.priority ?? "LOW",
+    });
+
+    setIsOpen(false);
   };
 
   return (
@@ -46,6 +69,7 @@ export function GenerateNewsletterButton({
         open={isOpen}
         newsletter={newsletter}
         onClose={() => setIsOpen(false)}
+        onSend={handleSendNewsletter}
       />
     </>
   );

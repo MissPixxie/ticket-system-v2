@@ -254,7 +254,7 @@ export default function TicketPage({
             </div>
             <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
               {ticket.conversation?.id && (
-                <ChatBox conversationId={ticket.conversation?.id ?? null} />
+                <ChatBox conversationId={ticket.conversation?.id ?? null} context="TICKET" />
               )}
             </div>
           </div>

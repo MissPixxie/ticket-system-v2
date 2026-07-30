@@ -25,7 +25,10 @@ export default function QuestionCard({
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
         {selectedQuestion?.conversationId && (
-          <ChatBox conversationId={selectedQuestion?.conversationId} />
+          <ChatBox
+            conversationId={selectedQuestion?.conversationId}
+            context="QUESTION"
+          />
         )}
       </div>
     </div>
