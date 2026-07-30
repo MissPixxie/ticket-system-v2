@@ -107,6 +107,9 @@ export default function ChatBox({ conversationId }: ChatBoxProps) {
           Skicka
         </button>
       </div>
+      <button className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white/80 transition hover:bg-white/10">
+        ✨ Generera nyhetsbrev
+      </button>
     </div>
   );
 }

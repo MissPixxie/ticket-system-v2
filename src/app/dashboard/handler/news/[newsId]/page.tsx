@@ -204,65 +204,67 @@ export default function NewsPage({
                   </div>
                 )}
               </div>
-              <div className="w-full">
-                <h2 className="mb-4 text-lg font-semibold">Bilaga</h2>
+              <div className="flex w-full justify-end">
+                <div className="mr-15 flex flex-col">
+                  <h2 className="mb-4 text-lg font-semibold">Bilaga</h2>
 
-                {!news.imagePublicId ? (
-                  <div className="w-100">
-                    <UploadImageButton
-                      onUpload={(publicId) => {
-                        updateNews.mutate({
-                          id: news.id,
-                          imagePublicId: publicId,
-                        });
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div
-                      className="group relative overflow-hidden rounded-2xl"
-                      onClick={() => setIsPreviewOpen(true)}
-                    >
-                      <CldImage
-                        src={news.imagePublicId}
-                        width={600}
-                        height={400}
-                        alt="Förhandsvisning"
-                        className="w-full object-cover transition duration-300 group-hover:scale-105"
+                  {!news.imagePublicId ? (
+                    <div className="w-100">
+                      <UploadImageButton
+                        onUpload={(publicId) => {
+                          updateNews.mutate({
+                            id: news.id,
+                            imagePublicId: publicId,
+                          });
+                        }}
                       />
-                      <div className="absolute top-3 right-3 z-20 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                        <EditImageButton
-                          onUpload={(publicId) => {
-                            updateNews.mutate({
-                              id: news.id,
-                              imagePublicId: publicId,
-                            });
-                          }}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div
+                        className="group relative overflow-hidden rounded-2xl"
+                        onClick={() => setIsPreviewOpen(true)}
+                      >
+                        <CldImage
+                          src={news.imagePublicId}
+                          width={300}
+                          height={100}
+                          alt="Förhandsvisning"
+                          className="w-full object-cover transition duration-300 group-hover:scale-105"
                         />
+                        <div className="absolute top-3 right-3 z-20 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                          <EditImageButton
+                            onUpload={(publicId) => {
+                              updateNews.mutate({
+                                id: news.id,
+                                imagePublicId: publicId,
+                              });
+                            }}
+                          />
 
-                        <button
-                          type="button"
-                          className="rounded-full bg-black/50 p-2 text-white transition hover:bg-red-500"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            updateNews.mutate({
-                              id: news.id,
-                              imagePublicId: null,
-                            });
-                          }}
-                        >
-                          <FaTrash size={16} />
-                        </button>
-                      </div>
-                      <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
-                        <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white opacity-0 backdrop-blur-sm transition duration-300 group-hover:opacity-100">
-                          <FaSearchPlus size={22} />
-                        </span>
+                          <button
+                            type="button"
+                            className="rounded-full bg-black/50 p-2 text-white transition hover:bg-red-500"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateNews.mutate({
+                                id: news.id,
+                                imagePublicId: null,
+                              });
+                            }}
+                          >
+                            <FaTrash size={16} />
+                          </button>
+                        </div>
+                        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
+                          <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white opacity-0 backdrop-blur-sm transition duration-300 group-hover:opacity-100">
+                            <FaSearchPlus size={22} />
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
             <div>
