@@ -3,20 +3,36 @@
 import { useState, useEffect } from "react";
 import { api, type RouterOutputs } from "~/trpc/react";
 import { useSocket } from "../socketProvider";
+import FeedbackBubble from "./feedbackBubble";
+import { GenerateNewsletterButton } from "./modals/generate-newsletter/generateNewsletterButton";
 
 interface ChatBoxProps {
   conversationId: string;
 }
 
+interface Newsletter {
+  subject: string;
+  body: string;
+}
+
 export default function ChatBox({ conversationId }: ChatBoxProps) {
   const { socket } = useSocket();
   const [newMessage, setNewMessage] = useState("");
+  const [newsletterOpen, setNewsletterOpen] = useState(false);
+  const [newsletter, setNewsletter] = useState<Newsletter | null>(null);
 
   const utils = api.useUtils();
   const { data: me } = api.user.me.useQuery();
 
   const { data: messages, isLoading } = api.message.listMessages.useQuery({
     conversationId: conversationId,
+  });
+
+  const generateNewsletter = api.ai.generateNewsletter.useMutation({
+    onSuccess(data) {
+      setNewsletter(data.newsletter);
+      setNewsletterOpen(true);
+    },
   });
 
   const sortedMessages = messages ?? [];
@@ -107,9 +123,14 @@ export default function ChatBox({ conversationId }: ChatBoxProps) {
           Skicka
         </button>
       </div>
-      <button className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white/80 transition hover:bg-white/10">
-        ✨ Generera nyhetsbrev
-      </button>
+      <GenerateNewsletterButton conversationId={conversationId} />
+      {generateNewsletter.isPending && (
+        <FeedbackBubble
+          open={generateNewsletter.isPending}
+          message="✨ AI skriver nyhetsbrev..."
+          onClose={() => {}}
+        />
+      )}
     </div>
   );
 }

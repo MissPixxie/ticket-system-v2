@@ -8,7 +8,7 @@ interface FeedbackBubbleProps {
   message: string;
   type?: "success" | "error" | "info";
   duration?: number;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function FeedbackBubble({
@@ -21,7 +21,9 @@ export default function FeedbackBubble({
   useEffect(() => {
     if (!open) return;
 
-    const timer = setTimeout(onClose, duration);
+    const timer = setTimeout(() => {
+      onClose?.();
+    }, duration);
     return () => clearTimeout(timer);
   }, [open, duration, onClose]);
 
