@@ -29,6 +29,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
     limit: 20,
   });
   const [filter, setFilter] = useState<string>("ALL");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
   const { socket } = useSocket();
   const utils = api.useUtils();
@@ -78,6 +79,10 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
       return false;
     }
 
+    if (departmentFilter !== "ALL" && ticket.department !== departmentFilter) {
+      return false;
+    }
+
     switch (filter) {
       case "MINA":
         return ticket.assignedTo?.id === userId;
@@ -120,6 +125,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
     <div className="primary-background mt-15 rounded-2xl shadow-lg/15 backdrop-blur-lg">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 p-5">
         <div className="flex items-center gap-4">
+          <span className="text-sm text-white/60">Status:</span>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -136,6 +142,31 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
             </option>
             <option value="CLOSED" className="text-black">
               Stängda
+            </option>
+          </select>
+          <span className="text-sm text-white/60">Avdelning:</span>
+          <select
+            value={departmentFilter}
+            onChange={(e) => setDepartmentFilter(e.target.value)}
+            className="rounded-lg bg-white/10 px-3 py-2 text-sm"
+          >
+            <option value="ALL" className="text-black">
+              Alla
+            </option>
+            <option value="IT" className="text-black">
+              IT
+            </option>
+            <option value="HR" className="text-black">
+              HR
+            </option>
+            <option value="CAMPAIGN" className="text-black">
+              Kampanj
+            </option>
+            <option value="PRODUCT" className="text-black">
+              Produkt
+            </option>
+            <option value="CUSTOMERCLUB" className="text-black">
+              Kundklubb
             </option>
           </select>
 

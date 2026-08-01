@@ -8,7 +8,7 @@ import { db } from "~/server/db";
 export const auth = betterAuth({
   plugins: [nextCookies()],
   database: prismaAdapter(db, {
-    provider: "sqlite", // or "sqlite" or "mysql"
+    provider: "postgresql", // or "sqlite" or "mysql"
   }),
   emailAndPassword: {
     enabled: true,
@@ -29,7 +29,7 @@ export const auth = betterAuth({
       user,
     }: {
       session: typeof auth.$Infer.Session;
-      user: typeof auth.$Infer.Session["user"];
+      user: (typeof auth.$Infer.Session)["user"];
     }) => {
       const dbUser = await db.user.findUnique({
         where: { id: user.id },
