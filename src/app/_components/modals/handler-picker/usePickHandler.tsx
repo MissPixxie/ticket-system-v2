@@ -10,17 +10,18 @@ interface PickHandlerInput {
 
 export function usePickHandler() {
   const utils = api.useUtils();
-  const { socket } = useSocket();
 
-  const mutation = api.ticket.inviteUserToTicket.useMutation({
-    async onSuccess(ticket) {
+  const mutation = api.ticket.updateTicket.useMutation({
+    async onSuccess() {
       await utils.ticket.invalidate();
-      socket?.emit("join:room", ticket.id);
     },
   });
 
   const pickHandler = (data: PickHandlerInput) => {
-    // mutation.mutate(data);
+    mutation.mutate({
+      id: data.ticketId,
+      assignedToId: data.userId,
+    });
   };
 
   return {

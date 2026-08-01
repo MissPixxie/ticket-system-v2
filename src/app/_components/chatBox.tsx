@@ -30,7 +30,7 @@ export default function ChatBox({ conversationId, context }: ChatBoxProps) {
     conversationId: conversationId,
   });
 
-  const generateNewsletter = api.ai.generateNewsletter.useMutation({
+  const generateNewsletter = api.ai.generateConversationSummary.useMutation({
     onSuccess(data) {
       setNewsletter(data.newsletter);
       setNewsletterOpen(true);

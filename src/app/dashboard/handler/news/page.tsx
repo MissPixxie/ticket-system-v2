@@ -56,17 +56,14 @@ export default function NewsPage() {
   });
 
   const createNews = api.news.createNews.useMutation({
-    onSuccess: (newNews) => {
-      utils.news.listNews.setData({ limit: visibleCount }, (oldData) => {
-        if (!oldData) return [newNews];
-        return [newNews, ...oldData];
-      });
+    onSuccess: async () => {
+      await utils.news.listNews.invalidate();
 
       setTitle("");
       setCategory("NEWS");
       setContent("");
-      setImagePublicId;
-      ("");
+      setTags([]);
+      setImagePublicId("");
     },
   });
 

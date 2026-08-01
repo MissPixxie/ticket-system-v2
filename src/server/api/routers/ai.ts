@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { generateTags } from "~/server/ai/generateTags";
-import { generateNewsletter } from "~/server/ai/generateNewsLetter";
+import { generateNewsletter } from "~/server/ai/generateNewsletter";
 
 export const aiRouter = createTRPCRouter({
   generateTags: protectedProcedure
@@ -16,7 +16,7 @@ export const aiRouter = createTRPCRouter({
       return { tags };
     }),
 
-  generateNewsletter: protectedProcedure
+  generateConversationSummary: protectedProcedure
     .input(
       z.object({
         conversationId: z.string(),

@@ -7,7 +7,7 @@ interface GenerateNewsletterInput {
 }
 
 export function useGenerateNewsletter() {
-  const mutation = api.ai.generateNewsletter.useMutation();
+  const mutation = api.ai.generateConversationSummary.useMutation();
 
   const generateNewsletter = (data: GenerateNewsletterInput) => {
     return mutation.mutateAsync(data);

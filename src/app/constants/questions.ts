@@ -1,15 +1,12 @@
-import type { $Enums } from "@prisma/client";
-
 // types.ts (Klientsidan)
 export type Question = {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  title: string;
-  content: string;
+  question: string;
   createdById: string | null;
-  category: $Enums.QuestionCategory;
-  status: $Enums.QuestionStatus;
+  conversationId: string | null;
+  embedding: string | null;
 };
 
 // Typ för QuestionWithMessages
