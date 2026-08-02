@@ -37,6 +37,11 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
     });
   };
 
+  const canManageTicket =
+    me?.role?.name === "HANDLER" || me?.role?.name === "ADMIN";
+
+  console.log(me?.role?.name);
+
   return (
     <div className="space-y-6">
       <div>
@@ -58,48 +63,52 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
             context="TICKET"
           />
         )}
-        <div className="mt-4 flex flex-row gap-4">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold">Status</label>
-            <select
-              value={ticketProps.status}
-              onClick={(e) => e.stopPropagation()}
-              onChange={(e) => handleSetStatus(ticketProps.id, e.target.value)}
-              className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
-            >
-              <option>OPEN</option>
-              <option value="IN_PROGRESS">IN PROGRESS</option>
-              <option>CLOSED</option>
-            </select>
-          </div>
+        {canManageTicket && (
+          <div className="mt-4 flex flex-row gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Status</label>
+              <select
+                value={ticketProps.status}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) =>
+                  handleSetStatus(ticketProps.id, e.target.value)
+                }
+                className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+              >
+                <option>OPEN</option>
+                <option value="IN_PROGRESS">IN PROGRESS</option>
+                <option>CLOSED</option>
+              </select>
+            </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold">Prioritet</label>
-            <select
-              value={ticketProps.priority}
-              onClick={(e) => e.stopPropagation()}
-              onChange={(e) =>
-                handleSetPriority(ticketProps.id, e.target.value)
-              }
-              className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
-            >
-              <option>LOW</option>
-              <option>MEDIUM</option>
-              <option>HIGH</option>
-              <option>URGENT</option>
-            </select>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Prioritet</label>
+              <select
+                value={ticketProps.priority}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) =>
+                  handleSetPriority(ticketProps.id, e.target.value)
+                }
+                className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
+              >
+                <option>LOW</option>
+                <option>MEDIUM</option>
+                <option>HIGH</option>
+                <option>URGENT</option>
+              </select>
+            </div>
+            <div className="ml-auto flex flex-row gap-5 self-end">
+              <InviteSection ticketId={ticketProps.id} />
+              <button
+                className="flex cursor-pointer flex-row rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
+                title="Ticket History"
+              >
+                Ticket History
+                <TiDocumentText className="self-center" size={22} />
+              </button>
+            </div>
           </div>
-          <div className="ml-auto flex flex-row gap-5 self-end">
-            <InviteSection ticketId={ticketProps.id} />
-            <button
-              className="flex cursor-pointer flex-row rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
-              title="Ticket History"
-            >
-              Ticket History
-              <TiDocumentText className="self-center" size={22} />
-            </button>
-          </div>
-        </div>
+        )}
         {/* {showHistory && (
           <TicketHistory
             actions={ticketProps.ticketHistories}

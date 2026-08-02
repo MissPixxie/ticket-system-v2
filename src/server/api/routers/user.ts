@@ -13,8 +13,15 @@ import { auth } from "~/server/better-auth";
 import { Department } from "@prisma/client";
 
 export const userRouter = createTRPCRouter({
-  me: protectedProcedure.query(({ ctx }) => {
-    return ctx.session.user;
+  me: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      include: {
+        role: true,
+      },
+    });
   }),
 
   listAll: protectedProcedure

@@ -134,48 +134,6 @@ export default function TicketPage({
                   <p>{ticket.status}</p>
                 </div>
               </div>
-              <div className="mt-4 flex flex-row gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-semibold">Status</label>
-                  <select
-                    value={ticket.status}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => handleSetStatus(ticket.id, e.target.value)}
-                    className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
-                  >
-                    <option>OPEN</option>
-                    <option value="IN_PROGRESS">IN PROGRESS</option>
-                    <option>CLOSED</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-semibold">Prioritet</label>
-                  <select
-                    value={ticket.priority}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) =>
-                      handleSetPriority(ticket.id, e.target.value)
-                    }
-                    className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
-                  >
-                    <option>LOW</option>
-                    <option>MEDIUM</option>
-                    <option>HIGH</option>
-                    <option>URGENT</option>
-                  </select>
-                </div>
-                <div className="ml-auto flex flex-row gap-5 self-end">
-                  <InviteSection ticketId={ticket.id} />
-                  <button
-                    className="flex cursor-pointer flex-row rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
-                    title="Ticket History"
-                  >
-                    Ticket History
-                    <TiDocumentText className="self-center" size={22} />
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -240,7 +198,10 @@ export default function TicketPage({
             </div>
             <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
               {ticket.conversation?.id && (
-                <ChatBox conversationId={ticket.conversation?.id ?? null} context="TICKET" />
+                <ChatBox
+                  conversationId={ticket.conversation?.id ?? null}
+                  context="TICKET"
+                />
               )}
             </div>
           </div>
