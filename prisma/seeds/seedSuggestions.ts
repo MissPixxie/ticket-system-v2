@@ -1,86 +1,116 @@
+import { createEmbedding } from "~/server/ai/createEmbedding";
+import { generateTags } from "~/server/ai/generateTags";
 import { db } from "~/server/db";
+import { SuggestionStatus } from "@prisma/client";
+
+type SeedSuggestion = {
+  content: string;
+  status: SuggestionStatus;
+  isAnonymous: boolean;
+  voteCount: number;
+};
 
 export async function seedSuggestions() {
   const box = await db.suggestionBox.findFirst();
   if (!box) {
     throw new Error("SuggestionBox must exist before seeding suggestions");
   }
-  await db.suggestion.createMany({
-    data: [
-      {
-        id: "s1",
-        content: "Kan vi få bättre skyltning för kampanjer i butikerna?",
-        status: "SENT",
-        isAnonymous: false,
-        userId: null, // kan sättas om du vill koppla users senare
-        suggestionBoxId: box.id,
-        voteCount: 12,
-      },
-      {
-        id: "s2",
-        content: "Önskar kortare laddningstid i kassasystemet",
-        status: "UNDER_REVIEW",
-        isAnonymous: false,
-        userId: null,
-        suggestionBoxId: box.id,
-        voteCount: 28,
-      },
-      {
-        id: "s3",
-        content: "Mer utbildning kring nya produkter i personalportalen",
-        status: "APPROVED",
-        isAnonymous: true,
-        userId: null,
-        suggestionBoxId: box.id,
-        voteCount: 19,
-      },
-      {
-        id: "s4",
-        content: "Kan vi få mörkt läge i systemet?",
-        status: "SENT",
-        isAnonymous: false,
-        userId: null,
-        suggestionBoxId: box.id,
-        voteCount: 45,
-      },
-      {
-        id: "s5",
-        content: "Bättre filter för nyheter och kampanjer behövs",
-        status: "UNDER_REVIEW",
-        isAnonymous: true,
-        userId: null,
-        suggestionBoxId: box.id,
-        voteCount: 33,
-      },
-      {
-        id: "s6",
-        content: "Appen kraschar ibland när man öppnar tickets",
-        status: "SENT",
-        isAnonymous: false,
-        userId: null,
-        suggestionBoxId: box.id,
-        voteCount: 7,
-      },
-      {
-        id: "s7",
-        content: "Kan vi få push-notiser vid nya kampanjer?",
-        status: "APPROVED",
-        isAnonymous: false,
-        userId: null,
-        suggestionBoxId: box.id,
-        voteCount: 51,
-      },
-      {
-        id: "s8",
-        content: "Förbättra sökfunktionen i dashboarden",
-        status: "IMPLEMENTED",
-        isAnonymous: true,
-        userId: null,
-        suggestionBoxId: box.id,
-        voteCount: 63,
-      },
-    ],
+
+  const suggestions: SeedSuggestion[] = [
+    {
+      content: "Kan vi få bättre skyltning för kampanjer i butikerna?",
+      status: "SENT",
+      isAnonymous: false,
+      voteCount: 12,
+    },
+    {
+      content: "Önskar kortare laddningstid i kassasystemet",
+      status: "UNDER_REVIEW",
+      isAnonymous: false,
+      voteCount: 28,
+    },
+    {
+      content: "Mer utbildning kring nya produkter i personalportalen",
+      status: "APPROVED",
+      isAnonymous: true,
+      voteCount: 19,
+    },
+    {
+      content: "Kan vi få mörkt läge i systemet?",
+      status: "SENT",
+      isAnonymous: false,
+      voteCount: 45,
+    },
+    {
+      content: "Bättre filter för nyheter och kampanjer behövs",
+      status: "UNDER_REVIEW",
+      isAnonymous: true,
+      voteCount: 33,
+    },
+    {
+      content: "Appen kraschar ibland när man öppnar tickets",
+      status: "SENT",
+      isAnonymous: false,
+      voteCount: 7,
+    },
+    {
+      content: "Kan vi få push-notiser vid nya kampanjer?",
+      status: "APPROVED",
+      isAnonymous: false,
+      voteCount: 51,
+    },
+    {
+      content: "Förbättra sökfunktionen i dashboarden",
+      status: "IMPLEMENTED",
+      isAnonymous: true,
+      voteCount: 63,
+    },
+  ];
+
+  const admin = await db.user.findFirst({
+    where: {
+      email: "admin@example.com",
+    },
   });
 
-  console.log("💡 Seeded suggestions");
+  if (!admin) {
+    throw new Error("Admin user not found");
+  }
+
+  for (const s of suggestions) {
+    const [embedding, tags] = await Promise.all([
+      createEmbedding(s.content),
+      generateTags(s.content),
+    ]);
+
+    const conversation = await db.conversation.create({
+      data: {},
+    });
+
+    await db.suggestion.create({
+      data: {
+        content: s.content,
+        status: s.status,
+        isAnonymous: s.isAnonymous,
+        voteCount: s.voteCount,
+        userId: admin.id,
+        suggestionBoxId: box.id,
+        conversationId: conversation.id,
+        embedding: JSON.stringify(embedding),
+
+        tags: {
+          connectOrCreate: tags.map((tag: string) => ({
+            where: {
+              name: tag,
+            },
+            create: {
+              name: tag,
+            },
+          })),
+        },
+      },
+    });
+  }
+
+  console.log("❓ Seeded suggestions");
 }

@@ -3,12 +3,14 @@ import { db } from "~/server/db";
 import { seedNews } from "./seeds/seedNews";
 import { seedSuggestions } from "./seeds/seedSuggestions";
 import { seedQuestions } from "./seeds/seedQuestions";
+import { seedResources } from "./seeds/seedResources";
 
 async function main() {
   await db.user.deleteMany();
   await db.role.deleteMany();
   await db.permission.deleteMany();
   await db.question.deleteMany();
+  await db.resource.deleteMany();
   await db.news.deleteMany();
   await db.suggestion.deleteMany();
   await db.conversation.deleteMany();
@@ -91,6 +93,7 @@ async function main() {
   await seedNews();
   await seedSuggestions();
   await seedQuestions();
+  await seedResources();
 
   console.log("✅ Seed klar!");
 }

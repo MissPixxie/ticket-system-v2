@@ -127,13 +127,24 @@ export default function QuestionPage() {
             className="w-full resize-none rounded-2xl border border-white/5 bg-black/20 p-4 text-sm text-white transition outline-none placeholder:text-white/30 focus:border-purple-500/40 focus:ring-2 focus:ring-purple-500/20"
           />
           {similarQuestions && similarQuestions.length > 0 && (
-            <div className="rounded-xl bg-purple-500/10 p-4">
+            <div className="mt-5 rounded-xl bg-purple-500/10 p-4">
               <h3>Liknande frågor hittades</h3>
 
               {similarQuestions.map((q) => (
-                <div key={q.id} className="mt-2">
+                <button
+                  key={q.id}
+                  onClick={() => {
+                    document
+                      .getElementById(`question-${q.id}`)
+                      ?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                      });
+                  }}
+                  className="mt-2 block w-full rounded-lg bg-white/5 p-3 text-left transition hover:bg-white/10"
+                >
                   {q.question}
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -152,6 +163,7 @@ export default function QuestionPage() {
 
             return (
               <div
+                id={`question-${question.id}`}
                 key={question.id}
                 className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 shadow-xl backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.07]"
               >
