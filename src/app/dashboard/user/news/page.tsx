@@ -84,6 +84,7 @@ export default function CampaignList() {
                       </span>
                       <button
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           vote.mutate({ id: news.id, type: "UP" });
                         }}
@@ -103,6 +104,7 @@ export default function CampaignList() {
                       </button>
                       <button
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           vote.mutate({ id: news.id, type: "DOWN" });
                         }}
