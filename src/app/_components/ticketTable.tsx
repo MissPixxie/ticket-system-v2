@@ -227,30 +227,43 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
 
               <div>
                 {(() => {
-                  // Förutsatt att du har currentUserRole som "USER" | "HANDLER" | "ADMIN"
                   if (!ticket.assignedTo) {
                     switch (currentUserRole) {
                       case "USER":
-                        return <span>ingen</span>;
+                        return <span>Ingen</span>;
+
                       case "HANDLER":
                         return (
                           <button
+                            disabled={ticket.createdById === me?.id}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleSetStatus(ticket.id);
                             }}
-                            className="submit-button"
+                            title={
+                              ticket.createdById === me?.id
+                                ? "Du kan inte acceptera din egen ticket."
+                                : "Acceptera ticket"
+                            }
+                            className={`submit-button ${
+                              ticket.createdById === me?.id
+                                ? "cursor-not-allowed opacity-50"
+                                : ""
+                            }`}
                           >
                             Acceptera
                           </button>
                         );
+
                       case "ADMIN":
                         return <PickSection ticketId={ticket.id} />;
+
+                      default:
+                        return null;
                     }
-                  } else {
-                    // Om ticket redan har någon assignedTo
-                    return <span>{ticket.assignedTo.name}</span>;
                   }
+
+                  return <span>{ticket.assignedTo.name}</span>;
                 })()}
               </div>
             </Link>

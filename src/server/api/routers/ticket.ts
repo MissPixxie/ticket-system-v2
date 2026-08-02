@@ -152,6 +152,16 @@ export const ticketRouter = createTRPCRouter({
           message: "Ticket hittades inte",
         });
       }
+      if (
+        input.assignedToId &&
+        input.assignedToId === ctx.session.user.id &&
+        ticket.createdById === ctx.session.user.id
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Du kan inte acceptera en ticket som du själv har skapat.",
+        });
+      }
 
       const updatedTicket = await ctx.db.ticket.update({
         where: { id: input.id },

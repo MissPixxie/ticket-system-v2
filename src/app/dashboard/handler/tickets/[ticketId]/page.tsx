@@ -121,17 +121,24 @@ export default function TicketPage({
                 </div>
 
                 <div>
-                  <p className="text-sm text-white/60">Tilldelad:</p>
+                  <p className="mb-1 text-sm text-white/60">Tilldelad:</p>
                   <div>
                     {ticket.assignedTo ? (
                       <span>{ticket.assignedTo.name}</span>
                     ) : (
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSetStatus(ticket.id);
-                        }}
-                        className="submit-button"
+                        disabled={ticket.createdById === me?.id}
+                        onClick={() => handleSetStatus(ticket.id)}
+                        title={
+                          ticket.createdById === me?.id
+                            ? "Du kan inte acceptera en ticket som du själv har skapat."
+                            : "Acceptera ticket"
+                        }
+                        className={`submit-button ${
+                          ticket.createdById === me?.id
+                            ? "cursor-not-allowed opacity-50"
+                            : ""
+                        }`}
                       >
                         Acceptera
                       </button>
@@ -183,8 +190,9 @@ export default function TicketPage({
                 <div className="ml-auto flex flex-row gap-5 self-end">
                   <InviteSection ticketId={ticket.id} />
                   <button
-                    className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white/80 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white"
-                    title="Ticket History"
+                    disabled
+                    title="Kommer snart"
+                    className="flex cursor-not-allowed items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-4 py-2.5 text-white/40 opacity-50"
                   >
                     Ticket History
                     <TiDocumentText className="self-center" size={22} />
@@ -254,7 +262,10 @@ export default function TicketPage({
             </div>
             <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
               {ticket.conversation?.id && (
-                <ChatBox conversationId={ticket.conversation?.id ?? null} context="TICKET" />
+                <ChatBox
+                  conversationId={ticket.conversation?.id ?? null}
+                  context="TICKET"
+                />
               )}
             </div>
           </div>
