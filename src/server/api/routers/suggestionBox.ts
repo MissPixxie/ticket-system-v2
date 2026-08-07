@@ -77,7 +77,10 @@ export const suggestionBoxRouter = createTRPCRouter({
         originId: suggestion.id,
         originType: "SUGGESTION",
         actorId: ctx.session.user.id,
-        metadata: { suggestionBoxId: suggestionBox.id },
+        metadata: {
+          title: suggestion.content.slice(0, 80),
+          suggestionBoxId: suggestionBox.id,
+        },
       });
 
       await createAuditLog({
@@ -118,16 +121,17 @@ export const suggestionBoxRouter = createTRPCRouter({
         },
       });
 
-      // await prismaEventService.createEvent({
-      //   type: "SUGGESTION_STATUS_CHANGED",
-      //   originId: input.id,
-      //   originType: "SUGGESTION",
-      //   actorId: ctx.session.user.id,
-      //   metadata: {
-      //     oldStatus: suggestion.status,
-      //     newStatus: input.status,
-      //   },
-      // });
+      await prismaEventService.createEvent({
+        type: "SUGGESTION_STATUS_CHANGED",
+        originId: input.id,
+        originType: "SUGGESTION",
+        actorId: ctx.session.user.id,
+        metadata: {
+          title: suggestion.content.slice(0, 80),
+          oldStatus: suggestion.status,
+          newStatus: input.status,
+        },
+      });
 
       // await createAuditLog({
       //   type: "SUGGESTION_STATUS_CHANGED",

@@ -112,6 +112,16 @@ export const questionRouter = createTRPCRouter({
         },
       });
 
+      await prismaEventService.createEvent({
+        type: "QUESTION_CREATED",
+        originId: question.id,
+        originType: "QUESTION",
+        actorId: ctx.session.user.id,
+        metadata: {
+          title: question.question.slice(0, 80),
+        },
+      });
+
       return question;
     }),
 

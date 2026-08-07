@@ -3,6 +3,7 @@ import { EventOrigin, EventType, Severity } from "@prisma/client";
 import { db } from "~/server/db";
 import { createAuditLog } from "./auditLogService";
 import { resolveRecipients } from "./recipientResolver";
+import { resolveNotificationPath } from "./notificationPathResolver";
 
 type EventMetadata = Record<string, any>;
 
@@ -17,25 +18,60 @@ export class PrismaEventService extends EventEmitter {
   }) {
     const { type, originId, originType, actorId, metadata } = params;
 
-    const originExists =
-      originType === "TICKET"
-        ? await db.ticket.findUnique({ where: { id: originId } })
-        : originType === "QUESTION"
-          ? await db.question.findUnique({ where: { id: originId } })
-          : originType === "SUGGESTION"
-            ? await db.suggestion.findUnique({ where: { id: originId } })
-            : await db.message.findUnique({ where: { id: originId } });
+    let originExists;
+
+    switch (originType) {
+      case "TICKET":
+        originExists = await db.ticket.findUnique({
+          where: { id: originId },
+        });
+        break;
+
+      case "QUESTION":
+        originExists = await db.question.findUnique({
+          where: { id: originId },
+        });
+        break;
+
+      case "SUGGESTION":
+        originExists = await db.suggestion.findUnique({
+          where: { id: originId },
+        });
+        break;
+
+      case "NEWS":
+        originExists = await db.news.findUnique({
+          where: { id: originId },
+        });
+        break;
+
+      case "RESOURCE":
+        originExists = await db.resource.findUnique({
+          where: { id: originId },
+        });
+        break;
+
+      case "MESSAGE":
+        originExists = await db.message.findUnique({
+          where: { id: originId },
+        });
+        break;
+
+      default:
+        throw new Error(`Okänd originType: ${originType}`);
+    }
 
     if (!originExists) {
       throw new Error(`${originType} med id ${originId} finns inte`);
     }
 
-    const meta: EventMetadata = {
+    const path = await resolveNotificationPath(originType, originId);
+
+    const meta = {
       ...metadata,
+      path,
       timestamp: new Date().toISOString(),
     };
-
-    console.log("🚨 EVENT METADATA", JSON.stringify(meta, null, 2));
 
     const event = await db.event.create({
       data: {

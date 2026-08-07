@@ -44,17 +44,4 @@ export const notificationRouter = createTRPCRouter({
       },
     });
   }),
-
-  createNotification: protectedProcedure
-    .input(
-      z.object({ userId: z.string(), text: z.string(), originId: z.string() }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.notification.create({
-        data: {
-          userId: input.userId,
-          eventId: input.originId,
-        },
-      });
-    }),
 });

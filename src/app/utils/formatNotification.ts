@@ -43,7 +43,16 @@ export function formatNotification(notification: NotificationWithEvent) {
       return `${actor} skapade ett nytt förslag "${metadata.title}".`;
 
     case "SUGGESTION_STATUS_CHANGED":
-      return `${actor} ändrade status på förslaget "${metadata.title}".`;
+      return `${actor} ändrade status på förslaget "${metadata.title}" från ${metadata.oldStatus} till ${metadata.newStatus}.`;
+
+    case "QUESTION_CREATED":
+      return `${actor} skapade frågan "${metadata.title}".`;
+
+    case "RESOURCE_CREATED":
+      return `${actor} skapade resursen "${metadata.title}".`;
+
+    case "NEWS_CREATED":
+      return `${actor} skapade nyheten "${metadata.title}".`;
 
     default:
       return "Ny aktivitet.";

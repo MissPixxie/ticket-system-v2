@@ -88,7 +88,7 @@ export const messageRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { message, ticket } = await ctx.db.$transaction(async (tx) => {
+      const message = await ctx.db.$transaction(async (tx) => {
         const participant = await tx.conversationParticipant.findUnique({
           where: {
             conversationId_userId: {
@@ -128,17 +128,6 @@ export const messageRouter = createTRPCRouter({
           },
         });
 
-        const ticket = await tx.ticket.findUnique({
-          where: {
-            conversationId: input.conversationId,
-          },
-          select: {
-            title: true,
-          },
-        });
-
-        console.log("🎫 Ticket:", ticket);
-
         await tx.conversation.update({
           where: {
             id: input.conversationId,
@@ -146,10 +135,7 @@ export const messageRouter = createTRPCRouter({
           data: {},
         });
 
-        return {
-          message,
-          ticket,
-        };
+        return message;
       });
 
       await prismaEventService.createEvent({
@@ -158,13 +144,13 @@ export const messageRouter = createTRPCRouter({
         originType: "MESSAGE",
         actorId: ctx.session.user.id,
         metadata: {
-          title: ticket?.title,
           messagePreview: message.content.slice(0, 80),
         },
       });
 
       return message;
     }),
+
   createConversation: protectedProcedure
     .input(
       z.object({

@@ -121,7 +121,7 @@ export const ticketRouter = createTRPCRouter({
           title: ticket.title,
           oldStatus: ticket.status,
           newStatus: ticket.status,
-        }
+        },
       });
 
       await createAuditLog({
@@ -231,6 +231,7 @@ export const ticketRouter = createTRPCRouter({
           originType: "TICKET",
           actorId: ctx.session.user.id,
           metadata: {
+            title: ticket.title,
             oldAssignee: ticket.assignedToId,
             newAssignee: input.assignedToId,
           },

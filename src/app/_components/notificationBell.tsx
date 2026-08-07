@@ -17,6 +17,10 @@ type NotificationWithEvent = Prisma.NotificationGetPayload<{
   };
 }>;
 
+type EventMetadata = {
+  path?: string;
+};
+
 function getDashboardPrefix(role?: string) {
   switch (role) {
     case "ADMIN":
@@ -34,41 +38,15 @@ function getNotificationLink(
   notification: NotificationWithEvent,
   role?: string,
 ) {
-  const { originType, originId } = notification.event;
-
-  console.log({
-    originType,
-    originId,
-    role,
-  });
-
   const dashboard = getDashboardPrefix(role);
 
-  switch (originType) {
-    case "TICKET":
-      switch (role) {
-        case "ADMIN":
-          return `/dashboard/admin/tickets/${originId}`;
+  const metadata = notification.event.metadata as EventMetadata;
 
-        case "HANDLER":
-          return `/dashboard/handler/tickets/${originId}`;
-
-        default:
-          return `/dashboard/user/my-tickets/${originId}`;
-      }
-
-    case "QUESTION":
-      return `${dashboard}/questions/${originId}`;
-
-    case "SUGGESTION":
-      return `${dashboard}/suggestions/${originId}`;
-
-    case "NEWS":
-      return `${dashboard}/news/${originId}`;
-
-    default:
-      return "#";
+  if (!metadata.path) {
+    return "#";
   }
+
+  return `${dashboard}${metadata.path}`;
 }
 
 export const NotificationBell = () => {

@@ -73,12 +73,15 @@ export const resourceRouter = createTRPCRouter({
         },
       });
 
-      //   await prismaEventService.createEvent({
-      //     type: "RESOURCE_CREATED",
-      //     originId: news.id,
-      //     originType: "RESOURCE",
-      //     actorId: ctx.session.user.id,
-      //   });
+      await prismaEventService.createEvent({
+        type: "RESOURCE_CREATED",
+        originId: news.id,
+        originType: "RESOURCE",
+        actorId: ctx.session.user.id,
+        metadata: {
+          title: news.title,
+        },
+      });
 
       //   await createAuditLog({
       //     type: "RESOURCE_CREATED",
