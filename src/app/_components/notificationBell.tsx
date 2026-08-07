@@ -7,7 +7,6 @@ import { formatNotification } from "../utils/formatNotification";
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 
-
 type NotificationWithEvent = Prisma.NotificationGetPayload<{
   include: {
     event: {
@@ -31,8 +30,17 @@ function getDashboardPrefix(role?: string) {
   }
 }
 
-function getNotificationLink(notification: NotificationWithEvent, role?: string) {
+function getNotificationLink(
+  notification: NotificationWithEvent,
+  role?: string,
+) {
   const { originType, originId } = notification.event;
+
+  console.log({
+    originType,
+    originId,
+    role,
+  });
 
   const dashboard = getDashboardPrefix(role);
 
