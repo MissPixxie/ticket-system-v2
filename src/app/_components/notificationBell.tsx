@@ -4,17 +4,73 @@ import { useEffect, useRef, useState } from "react";
 import { FaBell } from "react-icons/fa";
 import { api } from "~/trpc/react";
 import { formatNotification } from "../utils/formatNotification";
+import Link from "next/link";
+import type { Prisma } from "@prisma/client";
 
-interface NotificationBellProps {
-  userId: string;
+
+type NotificationWithEvent = Prisma.NotificationGetPayload<{
+  include: {
+    event: {
+      include: {
+        actor: true;
+      };
+    };
+  };
+}>;
+
+function getDashboardPrefix(role?: string) {
+  switch (role) {
+    case "ADMIN":
+      return "/dashboard/admin";
+
+    case "HANDLER":
+      return "/dashboard/handler";
+
+    default:
+      return "/dashboard/user";
+  }
 }
 
-export const NotificationBell = ({ userId }: NotificationBellProps) => {
+function getNotificationLink(notification: NotificationWithEvent, role?: string) {
+  const { originType, originId } = notification.event;
+
+  const dashboard = getDashboardPrefix(role);
+
+  switch (originType) {
+    case "TICKET":
+      switch (role) {
+        case "ADMIN":
+          return `/dashboard/admin/tickets/${originId}`;
+
+        case "HANDLER":
+          return `/dashboard/handler/tickets/${originId}`;
+
+        default:
+          return `/dashboard/user/my-tickets/${originId}`;
+      }
+
+    case "QUESTION":
+      return `${dashboard}/questions/${originId}`;
+
+    case "SUGGESTION":
+      return `${dashboard}/suggestions/${originId}`;
+
+    case "NEWS":
+      return `${dashboard}/news/${originId}`;
+
+    default:
+      return "#";
+  }
+}
+
+export const NotificationBell = () => {
   const utils = api.useUtils();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: unreadCount = 0 } = api.notification.getUnseenCount.useQuery();
+
+  const { data: me } = api.user.me.useQuery();
 
   const { data: notifications = [], isLoading } =
     api.notification.list.useQuery();
@@ -84,19 +140,21 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
               </div>
             ) : (
               notifications.map((notification) => (
-                <div
+                <Link
                   key={notification.id}
-                  className={`border-b p-4 transition hover:bg-gray-50 ${
+                  href={getNotificationLink(notification, me?.role?.name)}
+                  className={`block border-b p-4 transition hover:bg-gray-50 ${
                     !notification.seen ? "bg-blue-50/50" : ""
                   }`}
                 >
                   <p className="text-sm text-gray-800">
                     {formatNotification(notification)}
                   </p>
+
                   <span className="mt-1 block text-[10px] text-gray-400">
                     {new Date(notification.createdAt).toLocaleString()}
                   </span>
-                </div>
+                </Link>
               ))
             )}
           </div>

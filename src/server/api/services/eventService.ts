@@ -1,7 +1,8 @@
 import { EventEmitter } from "events";
+import { EventOrigin, EventType, Severity } from "@prisma/client";
 import { db } from "~/server/db";
 import { createAuditLog } from "./auditLogService";
-import { EventType, EventOrigin, Severity } from "@prisma/client";
+import { resolveRecipients } from "./recipientResolver";
 
 type EventMetadata = Record<string, any>;
 
@@ -21,7 +22,9 @@ export class PrismaEventService extends EventEmitter {
         ? await db.ticket.findUnique({ where: { id: originId } })
         : originType === "QUESTION"
           ? await db.question.findUnique({ where: { id: originId } })
-          : await db.suggestion.findUnique({ where: { id: originId } });
+          : originType === "SUGGESTION"
+            ? await db.suggestion.findUnique({ where: { id: originId } })
+            : await db.message.findUnique({ where: { id: originId } });
 
     if (!originExists) {
       throw new Error(`${originType} med id ${originId} finns inte`);
@@ -30,8 +33,9 @@ export class PrismaEventService extends EventEmitter {
     const meta: EventMetadata = {
       ...metadata,
       timestamp: new Date().toISOString(),
-      oldStatus: (originExists as any).status,
     };
+
+    console.log("🚨 EVENT METADATA", JSON.stringify(meta, null, 2));
 
     const event = await db.event.create({
       data: {
@@ -43,28 +47,27 @@ export class PrismaEventService extends EventEmitter {
       },
     });
 
+    const recipients = await resolveRecipients({
+      type,
+      originType,
+      originId,
+      actorId,
+    });
+
+    if (recipients.length > 0) {
+      await db.notification.createMany({
+        data: recipients.map((userId) => ({
+          userId,
+          eventId: event.id,
+        })),
+      });
+    }
+
     console.log("Skapar notification", {
       actorId,
       eventId: event.id,
+      recipients,
     });
-
-    if (originType === "TICKET") {
-      const ticket = await db.ticket.findUnique({
-        where: { id: originId },
-        select: {
-          createdById: true,
-        },
-      });
-
-      if (ticket?.createdById) {
-        await db.notification.create({
-          data: {
-            userId: ticket.createdById,
-            eventId: event.id,
-          },
-        });
-      }
-    }
 
     // const subscriptions = await db.subscription.findMany({
     //   where: {
@@ -86,13 +89,13 @@ export class PrismaEventService extends EventEmitter {
     // });
 
     // if (params.severity) {
-    //   createAuditLog({
+    //   await createAuditLog({
     //     type: params.type,
     //     severity: params.severity,
     //     entityType: params.originType,
     //     entityId: params.originId,
     //     actor: { connect: { id: params.actorId } },
-    //     message:
+    //     message: "",
     //   });
     // }
 

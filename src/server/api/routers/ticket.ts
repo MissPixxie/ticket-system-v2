@@ -76,25 +76,25 @@ export const ticketRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // const embeddingText = `
-      // Title: ${input.title}
+      const embeddingText = `
+      Title: ${input.title}
 
-      // Issue: ${input.issue}
+      Issue: ${input.issue}
 
-      // Department: ${input.department}
+      Department: ${input.department}
 
-      // Priority: ${input.priority}
+      Priority: ${input.priority}
 
-      // `;
+      `;
 
-      // const embedding = await createEmbedding(embeddingText);
+      const embedding = await createEmbedding(embeddingText);
 
       const ticket = await ctx.db.ticket.create({
         data: {
           title: input.title,
           issue: input.issue,
           department: input.department,
-          //embedding: JSON.stringify(embedding),
+          embedding: JSON.stringify(embedding),
           imagePublicId: input.imagePublicId,
           createdBy: {
             connect: {
@@ -112,21 +112,26 @@ export const ticketRouter = createTRPCRouter({
         },
       });
 
-      // await prismaEventService.createEvent({
-      //   type: "TICKET_CREATED",
-      //   originId: ticket.id,
-      //   originType: "TICKET",
-      //   actorId: ctx.session.user.id,
-      // });
+      await prismaEventService.createEvent({
+        type: "TICKET_CREATED",
+        originId: ticket.id,
+        originType: "TICKET",
+        actorId: ctx.session.user.id,
+        metadata: {
+          title: ticket.title,
+          oldStatus: ticket.status,
+          newStatus: ticket.status,
+        }
+      });
 
-      // await createAuditLog({
-      //   type: "TICKET_CREATED",
-      //   severity: "INFO",
-      //   entityType: "TICKET",
-      //   entityId: ticket.id,
-      //   actor: { connect: { id: ctx.session.user.id } },
-      //   message: `${ctx.session.user.email} created ticket "${ticket.title}"`,
-      // });
+      await createAuditLog({
+        type: "TICKET_CREATED",
+        severity: "INFO",
+        entityType: "TICKET",
+        entityId: ticket.id,
+        actor: { connect: { id: ctx.session.user.id } },
+        message: `${ctx.session.user.email} created ticket "${ticket.title}"`,
+      });
 
       return ticket;
     }),
@@ -180,6 +185,7 @@ export const ticketRouter = createTRPCRouter({
           originType: "TICKET",
           actorId: ctx.session.user.id,
           metadata: {
+            title: ticket.title,
             oldStatus: ticket.status,
             newStatus: input.status,
           },
@@ -202,6 +208,7 @@ export const ticketRouter = createTRPCRouter({
           originType: "TICKET",
           actorId: ctx.session.user.id,
           metadata: {
+            title: ticket.title,
             oldPriority: ticket.priority,
             newPriority: input.priority,
           },

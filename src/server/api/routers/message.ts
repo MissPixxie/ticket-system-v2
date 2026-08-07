@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { ConversationRole, Department, MessageType } from "@prisma/client";
 import { createAuditLog } from "../services/auditLogService";
+import { prismaEventService } from "../services/eventService";
 
 export const messageRouter = createTRPCRouter({
   listMessages: protectedProcedure
@@ -87,7 +88,7 @@ export const messageRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const message = await ctx.db.$transaction(async (tx) => {
+      const { message, ticket } = await ctx.db.$transaction(async (tx) => {
         const participant = await tx.conversationParticipant.findUnique({
           where: {
             conversationId_userId: {
@@ -127,6 +128,17 @@ export const messageRouter = createTRPCRouter({
           },
         });
 
+        const ticket = await tx.ticket.findUnique({
+          where: {
+            conversationId: input.conversationId,
+          },
+          select: {
+            title: true,
+          },
+        });
+
+        console.log("🎫 Ticket:", ticket);
+
         await tx.conversation.update({
           where: {
             id: input.conversationId,
@@ -134,7 +146,21 @@ export const messageRouter = createTRPCRouter({
           data: {},
         });
 
-        return message;
+        return {
+          message,
+          ticket,
+        };
+      });
+
+      await prismaEventService.createEvent({
+        type: "MESSAGE_SENT",
+        originId: message.id,
+        originType: "MESSAGE",
+        actorId: ctx.session.user.id,
+        metadata: {
+          title: ticket?.title,
+          messagePreview: message.content.slice(0, 80),
+        },
       });
 
       return message;
