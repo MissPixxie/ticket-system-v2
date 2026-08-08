@@ -1,7 +1,6 @@
 import { EventOrigin, EventType } from "@prisma/client";
 import { db } from "~/server/db";
 
-
 export async function resolveRecipients(params: {
   type: EventType;
   originType: EventOrigin;
@@ -106,6 +105,15 @@ async function resolveQuestionRecipients(params: {
     },
     include: {
       createdBy: true,
+      conversation: {
+        include: {
+          participants: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -116,13 +124,13 @@ async function resolveQuestionRecipients(params: {
       return [];
 
     case "QUESTION_MESSAGE_SENT": {
-      const recipients: string[] = [];
-
-      const createdById = question.createdById;
-
-      if (createdById !== null && createdById !== actorId) {
-        recipients.push(createdById);
-      }
+      const recipients = [
+        ...new Set(
+          question.conversation?.participants
+            .map((participant) => participant.userId)
+            .filter((userId) => userId !== actorId) ?? [],
+        ),
+      ];
 
       return recipients;
     }
