@@ -1,11 +1,9 @@
 import { EventOrigin } from "@prisma/client";
 import { db } from "~/server/db";
 
-
 /**
  * Bestämmer vilken sida en notifikation ska öppna.
  */
-
 
 export async function resolveNotificationPath(
   originType: EventOrigin,
@@ -16,7 +14,7 @@ export async function resolveNotificationPath(
       return `/tickets/${originId}`;
 
     case "QUESTION":
-      return `/questions/${originId}`;
+      return `/questions?question=${originId}`;
 
     case "SUGGESTION":
       return `/suggestions/${originId}`;

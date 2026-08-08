@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiQuestionMarkCircle } from "react-icons/hi";
 import QuestionCard from "~/app/_components/cards/questionCard";
 import { api } from "~/trpc/react";
 import { FaChevronDown } from "react-icons/fa6";
+import { useSearchParams } from "next/navigation";
 
 const PAGE_SIZE = 5;
 
 export default function QuestionPage() {
+  const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const utils = api.useUtils();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
@@ -21,6 +23,9 @@ export default function QuestionPage() {
     },
   );
   const [newMessage, setNewMessage] = useState("");
+  const searchParams = useSearchParams();
+
+  const questionId = searchParams.get("question");
 
   const { data: me } = api.user.me.useQuery();
 
@@ -76,6 +81,21 @@ export default function QuestionPage() {
 
     setNewMessage("");
   };
+
+  useEffect(() => {
+    if (!questionId) return;
+
+    setSelectedQuestionId(questionId);
+
+    const element = questionRefs.current[questionId];
+
+    if (!element) return;
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [questionId, questions]);
 
   if (isLoading) {
     return (
@@ -165,6 +185,9 @@ export default function QuestionPage() {
               <div
                 id={`question-${question.id}`}
                 key={question.id}
+                ref={(el) => {
+                  questionRefs.current[question.id] = el;
+                }}
                 className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 shadow-xl backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.07]"
               >
                 <button

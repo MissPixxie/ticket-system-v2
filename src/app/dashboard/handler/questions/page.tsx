@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiQuestionMarkCircle } from "react-icons/hi";
 import QuestionCard from "~/app/_components/cards/questionCard";
 import { api } from "~/trpc/react";
 import { FaChevronDown } from "react-icons/fa6";
 import { FiSearch } from "react-icons/fi";
+import { useSearchParams } from "next/navigation";
 
 const PAGE_SIZE = 5;
 
 export default function QuestionPage() {
+  const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
     null,
@@ -17,6 +19,9 @@ export default function QuestionPage() {
   const [newMessage, setNewMessage] = useState("");
   const [search, setSearch] = useState("");
   const utils = api.useUtils();
+  const searchParams = useSearchParams();
+
+  const questionId = searchParams.get("question");
 
   const { data: me } = api.user.me.useQuery();
 
@@ -73,6 +78,21 @@ export default function QuestionPage() {
     setNewMessage("");
   };
 
+  useEffect(() => {
+    if (!questionId) return;
+
+    setSelectedQuestionId(questionId);
+
+    const element = questionRefs.current[questionId];
+
+    if (!element) return;
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [questionId, questions]);
+
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center text-white/70">
@@ -126,6 +146,9 @@ export default function QuestionPage() {
             return (
               <div
                 key={question.id}
+                ref={(el) => {
+                  questionRefs.current[question.id] = el;
+                }}
                 className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 shadow-xl backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.07]"
               >
                 <button
