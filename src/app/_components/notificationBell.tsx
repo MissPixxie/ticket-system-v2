@@ -45,7 +45,7 @@ function getNotificationLink(
       }`;
 
     case "QUESTION":
-      return `${dashboard}/questions/${notification.event.originId}`;
+      return `${dashboard}/questions?question=${notification.event.originId}`;
 
     case "NEWS":
       return `${dashboard}/news/${notification.event.originId}`;
