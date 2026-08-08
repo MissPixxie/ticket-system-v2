@@ -11,6 +11,8 @@ type SeedSuggestion = {
 };
 
 export async function seedSuggestions() {
+  await db.vote.deleteMany();
+  await db.suggestion.deleteMany();
   const box = await db.suggestionBox.findFirst();
   if (!box) {
     throw new Error("SuggestionBox must exist before seeding suggestions");
@@ -109,3 +111,5 @@ export async function seedSuggestions() {
 
   console.log("❓ Seeded suggestions");
 }
+
+void seedSuggestions();
