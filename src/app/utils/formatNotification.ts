@@ -12,6 +12,8 @@ type NotificationWithEvent = Prisma.NotificationGetPayload<{
 
 type EventMetadata = {
   title?: string;
+  content?: string;
+  messagePreview?: string;
   newStatus?: string;
   oldStatus?: string;
   newPriority?: string;
@@ -37,26 +39,40 @@ export function formatNotification(notification: NotificationWithEvent) {
       return `${actor} tog över ärendet "${metadata.title}".`;
 
     case "MESSAGE_SENT":
-      return `${actor} skickade ett nytt meddelande i "${metadata.title}".`;
+      return `${actor} skickade ett nytt meddelande i "${getDisplayText(metadata)}".`;
 
     case "SUGGESTION_CREATED":
-      return `${actor} skapade ett nytt förslag "${metadata.title}".`;
+      return `${actor} skapade ett nytt förslag "${getDisplayText(metadata)}".`;
 
     case "SUGGESTION_STATUS_CHANGED":
-      return `${actor} ändrade status på förslaget "${metadata.title}" från ${metadata.oldStatus} till ${metadata.newStatus}.`;
+      return `${actor} ändrade status på förslaget "${getDisplayText(metadata)}" från ${metadata.oldStatus} till ${metadata.newStatus}.`;
 
     case "QUESTION_CREATED":
-      return `${actor} skapade frågan "${metadata.title}".`;
+      return `${actor} skapade frågan "${getDisplayText(metadata)}".`;
 
     case "RESOURCE_CREATED":
-      return `${actor} skapade resursen "${metadata.title}".`;
+      return `${actor} skapade resursen "${getDisplayText(metadata)}".`;
 
     case "NEWS_CREATED":
-      return `${actor} skapade nyheten "${metadata.title}".`;
+      return `${actor} skapade nyheten "${getDisplayText(metadata)}".`;
 
     default:
       return "Ny aktivitet.";
   }
+}
+
+function getDisplayText(metadata: EventMetadata) {
+  if (metadata.title) return metadata.title;
+
+  if (metadata.messagePreview) {
+    return metadata.messagePreview.slice(0, 10);
+  }
+
+  if (metadata.content) {
+    return metadata.content.slice(0, 10);
+  }
+
+  return "okänt";
 }
 
 function formatStatus(status?: string) {
