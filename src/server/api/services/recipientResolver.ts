@@ -1,6 +1,7 @@
 import { EventOrigin, EventType } from "@prisma/client";
 import { db } from "~/server/db";
 
+
 export async function resolveRecipients(params: {
   type: EventType;
   originType: EventOrigin;
