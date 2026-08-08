@@ -43,16 +43,35 @@ async function resolveTicketRecipients(params: {
 
   switch (type) {
     case "TICKET_CREATED":
-      // Kommer implementeras senare
       return [];
 
     case "TICKET_ASSIGNED":
     case "TICKET_STATUS_CHANGED":
     case "TICKET_CHANGED_PRIORITY":
-    case "TICKET_MESSAGE_SENT":
       return ticket.createdById && ticket.createdById !== actorId
         ? [ticket.createdById]
         : [];
+
+    case "TICKET_MESSAGE_SENT": {
+      const recipients: string[] = [];
+
+      const createdById = ticket.createdById;
+
+      if (createdById !== null && createdById !== actorId) {
+        recipients.push(createdById);
+      }
+      const assignedToId = ticket.assignedToId;
+
+      if (
+        assignedToId &&
+        assignedToId !== actorId &&
+        assignedToId !== ticket.createdById
+      ) {
+        recipients.push(assignedToId);
+      }
+
+      return recipients;
+    }
 
     default:
       return [];
