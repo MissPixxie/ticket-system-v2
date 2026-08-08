@@ -39,16 +39,11 @@ export function formatNotification(notification: NotificationWithEvent) {
       return `${actor} tog över ärendet "${metadata.title}".`;
 
     case "TICKET_MESSAGE_SENT":
-      return `${actor} skickade ett nytt meddelande i "${getDisplayText(metadata)}".`;
-
     case "QUESTION_MESSAGE_SENT":
-      return `${actor} skickade ett nytt meddelande i "${getDisplayText(metadata)}".`;
-
     case "RESOURCE_MESSAGE_SENT":
-      return `${actor} skickade ett nytt meddelande i "${getDisplayText(metadata)}".`;
-
     case "NEWS_MESSAGE_SENT":
       return `${actor} skickade ett nytt meddelande i "${getDisplayText(metadata)}".`;
+
     case "SUGGESTION_CREATED":
       return `${actor} skapade ett nytt förslag "${getDisplayText(metadata)}".`;
 

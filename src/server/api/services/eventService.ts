@@ -50,12 +50,6 @@ export class PrismaEventService extends EventEmitter {
         });
         break;
 
-      case "MESSAGE":
-        originExists = await db.message.findUnique({
-          where: { id: originId },
-        });
-        break;
-
       default:
         throw new Error(`Okänd originType: ${originType}`);
     }

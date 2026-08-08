@@ -16,8 +16,7 @@ export async function resolveRecipients(params: {
         ticketId: originId,
         actorId,
       });
-    case "MESSAGE":
-      return resolveMessageRecipients(originId, actorId);
+
     default:
       return [];
   }
@@ -43,45 +42,19 @@ async function resolveTicketRecipients(params: {
   if (!ticket) return [];
 
   switch (type) {
-    case "TICKET_CREATED": {
-      // kommer vi implementera snart
+    case "TICKET_CREATED":
+      // Kommer implementeras senare
       return [];
-    }
 
     case "TICKET_ASSIGNED":
     case "TICKET_STATUS_CHANGED":
-    case "TICKET_CHANGED_PRIORITY": {
+    case "TICKET_CHANGED_PRIORITY":
+    case "TICKET_MESSAGE_SENT":
       return ticket.createdById && ticket.createdById !== actorId
         ? [ticket.createdById]
         : [];
-    }
 
     default:
       return [];
   }
-}
-
-async function resolveMessageRecipients(messageId: string, actorId: string) {
-  const message = await db.message.findUnique({
-    where: {
-      id: messageId,
-    },
-    include: {
-      conversation: {
-        include: {
-          participants: {
-            select: {
-              userId: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!message) return [];
-
-  return message.conversation.participants
-    .map((participant) => participant.userId)
-    .filter((userId) => userId !== actorId);
 }

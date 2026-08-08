@@ -76,7 +76,6 @@ enum EventOrigin {
   NEWS
   QUESTION
   RESOURCE
-  MESSAGE
 }
 
 model Event {

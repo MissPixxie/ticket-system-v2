@@ -165,7 +165,34 @@ export const messageRouter = createTRPCRouter({
           break;
 
         case "QUESTION":
-          // question-event
+         const question = await ctx.db.question.findUnique({
+           where: {
+             conversationId: input.conversationId,
+           },
+           select: {
+             id: true,
+             question: true,
+           },
+         });
+
+         if (!question) {
+           throw new TRPCError({
+             code: "NOT_FOUND",
+             message: "Frågan hittades inte",
+           });
+         }
+
+         await prismaEventService.createEvent({
+           type: "QUESTION_MESSAGE_SENT",
+           originId: question.id,
+           originType: "QUESTION",
+           actorId: ctx.session.user.id,
+           metadata: {
+             title: question.question,
+             messagePreview: message.content.slice(0, 80),
+           },
+         });
+
           break;
 
         case "RESOURCE":

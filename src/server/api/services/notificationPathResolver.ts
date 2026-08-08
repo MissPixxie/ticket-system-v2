@@ -27,66 +27,6 @@ export async function resolveNotificationPath(
     case "RESOURCE":
       return `/resources/${originId}`;
 
-    case "MESSAGE": {
-      const message = await db.message.findUnique({
-        where: {
-          id: originId,
-        },
-        select: {
-          conversationId: true,
-        },
-      });
-
-      if (!message) {
-        return undefined;
-      }
-
-      // Tillhör meddelandet en ticket?
-      const ticket = await db.ticket.findUnique({
-        where: {
-          conversationId: message.conversationId,
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (ticket) {
-        return `/tickets/${ticket.id}`;
-      }
-
-      // Tillhör meddelandet en fråga?
-      const question = await db.question.findUnique({
-        where: {
-          conversationId: message.conversationId,
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (question) {
-        return `/questions/${question.id}`;
-      }
-
-      // Tillhör meddelandet ett förslag?
-      const suggestion = await db.suggestion.findUnique({
-        where: {
-          conversationId: message.conversationId,
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (suggestion) {
-        return `/suggestions/${suggestion.id}`;
-      }
-
-      // Vanlig konversation
-      return `/messages/${message.conversationId}`;
-    }
-
     default:
       return undefined;
   }
