@@ -9,17 +9,24 @@ export async function resolveRecipients(params: {
 }) {
   const { type, originType, originId, actorId } = params;
 
-  switch (originType) {
-    case "TICKET":
-      return resolveTicketRecipients({
-        type,
-        ticketId: originId,
-        actorId,
-      });
+switch (originType) {
+  case "TICKET":
+    return resolveTicketRecipients({
+      type,
+      ticketId: originId,
+      actorId,
+    });
 
-    default:
-      return [];
-  }
+  case "QUESTION":
+    return resolveQuestionRecipients({
+      type,
+      questionId: originId,
+      actorId,
+    });
+
+  default:
+    return [];
+}
 }
 
 async function resolveTicketRecipients(params: {
@@ -68,6 +75,45 @@ async function resolveTicketRecipients(params: {
         assignedToId !== ticket.createdById
       ) {
         recipients.push(assignedToId);
+      }
+
+      return recipients;
+    }
+
+    default:
+      return [];
+  }
+}
+
+async function resolveQuestionRecipients(params: {
+  type: EventType;
+  questionId: string;
+  actorId: string;
+}) {
+  const { type, questionId, actorId } = params;
+
+  const question = await db.question.findUnique({
+    where: {
+      id: questionId,
+    },
+    include: {
+      createdBy: true,
+    },
+  });
+
+  if (!question) return [];
+
+  switch (type) {
+    case "QUESTION_CREATED":
+      return [];
+
+    case "QUESTION_MESSAGE_SENT": {
+      const recipients: string[] = [];
+
+      const createdById = question.createdById;
+
+      if (createdById !== null && createdById !== actorId) {
+        recipients.push(createdById);
       }
 
       return recipients;
