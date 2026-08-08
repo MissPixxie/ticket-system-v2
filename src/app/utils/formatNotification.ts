@@ -38,6 +38,9 @@ export function formatNotification(notification: NotificationWithEvent) {
     case "TICKET_ASSIGNED":
       return `${actor} tog över ärendet "${metadata.title}".`;
 
+    case "TICKET_PARTICIPANT_ADDED":
+      return `${actor} lade till en deltagare i ärendet "${metadata.title}".`;
+
     case "TICKET_MESSAGE_SENT":
     case "QUESTION_MESSAGE_SENT":
     case "RESOURCE_MESSAGE_SENT":
