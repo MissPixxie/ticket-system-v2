@@ -132,6 +132,7 @@ async function resolveQuestionRecipients(params: {
         ),
       ];
 
+      console.log("hello");
       return recipients;
     }
 
