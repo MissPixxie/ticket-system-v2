@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
-import { Source } from "@prisma/client";
+import { EventOrigin } from "@prisma/client";
 
 export const tagRouter = createTRPCRouter({
   createTag: protectedProcedure
@@ -43,12 +43,12 @@ export const tagRouter = createTRPCRouter({
       z.object({
         tagId: z.string().min(1),
         sourceId: z.string().min(1),
-        sourceType: z.nativeEnum(Source),
+        sourceType: z.nativeEnum(EventOrigin),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       switch (input.sourceType) {
-        case Source.TICKET:
+        case EventOrigin.TICKET:
           return ctx.db.ticket.update({
             where: { id: input.sourceId },
             data: {
@@ -58,7 +58,7 @@ export const tagRouter = createTRPCRouter({
             },
           });
 
-        case Source.QUESTION:
+        case EventOrigin.QUESTION:
           return ctx.db.question.update({
             where: { id: input.sourceId },
             data: {
@@ -68,7 +68,7 @@ export const tagRouter = createTRPCRouter({
             },
           });
 
-        case Source.SUGGESTION:
+        case EventOrigin.SUGGESTION:
           return ctx.db.suggestion.update({
             where: { id: input.sourceId },
             data: {
@@ -78,7 +78,7 @@ export const tagRouter = createTRPCRouter({
             },
           });
 
-        case Source.NEWS:
+        case EventOrigin.NEWS:
           return ctx.db.news.update({
             where: { id: input.sourceId },
             data: {
@@ -88,7 +88,7 @@ export const tagRouter = createTRPCRouter({
             },
           });
 
-        case Source.RESOURCE:
+        case EventOrigin.RESOURCE:
           return ctx.db.resource.update({
             where: { id: input.sourceId },
             data: {
@@ -105,12 +105,12 @@ export const tagRouter = createTRPCRouter({
       z.object({
         tagId: z.string().min(1),
         sourceId: z.string().min(1),
-        sourceType: z.nativeEnum(Source),
+        sourceType: z.nativeEnum(EventOrigin),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       switch (input.sourceType) {
-        case Source.TICKET:
+        case EventOrigin.TICKET:
           return ctx.db.ticket.update({
             where: { id: input.sourceId },
             data: {
@@ -120,7 +120,7 @@ export const tagRouter = createTRPCRouter({
             },
           });
 
-        case Source.QUESTION:
+        case EventOrigin.QUESTION:
           return ctx.db.question.update({
             where: { id: input.sourceId },
             data: {
@@ -130,7 +130,7 @@ export const tagRouter = createTRPCRouter({
             },
           });
 
-        case Source.SUGGESTION:
+        case EventOrigin.SUGGESTION:
           return ctx.db.suggestion.update({
             where: { id: input.sourceId },
             data: {
@@ -140,7 +140,7 @@ export const tagRouter = createTRPCRouter({
             },
           });
 
-        case Source.NEWS:
+        case EventOrigin.NEWS:
           return ctx.db.news.update({
             where: { id: input.sourceId },
             data: {
@@ -150,7 +150,7 @@ export const tagRouter = createTRPCRouter({
             },
           });
 
-        case Source.RESOURCE:
+        case EventOrigin.RESOURCE:
           return ctx.db.resource.update({
             where: { id: input.sourceId },
             data: {

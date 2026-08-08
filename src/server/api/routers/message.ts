@@ -124,7 +124,6 @@ export const messageRouter = createTRPCRouter({
             senderId: ctx.session.user.id,
             content: input.content,
             type: input.type ?? MessageType.USER_MESSAGE,
-            context: input.context,
           },
           include: {
             sender: true,

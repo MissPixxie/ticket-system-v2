@@ -3,7 +3,6 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prismaEventService } from "../services/eventService";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { TRPCError } from "@trpc/server";
-import { ParentType } from "@prisma/client";
 import { createEmbedding } from "~/server/ai/createEmbedding";
 import { cosineSimilarity } from "../../ai/embeddingSimilarity";
 import { Prisma } from "@prisma/client";

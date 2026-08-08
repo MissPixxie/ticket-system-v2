@@ -43,23 +43,6 @@ model AuditLog {
   @@index([createdAt])
 }
 
-enum EventParentType {
-  TICKET
-  SUGGESTION
-  NEWS
-  QUESTION
-  RESOURCE
-}
-
-// Ska source ersätta eventtype?
-enum Source {
-  TICKET
-  SUGGESTION
-  NEWS
-  QUESTION
-  RESOURCE
-}
-
 enum EventType {
   TICKET_CREATED
   TICKET_STATUS_CHANGED
@@ -267,12 +250,6 @@ model Message {
 enum MessageType {
   USER_MESSAGE
   SYSTEM_MESSAGE
-}
-
-enum ParentType {
-  TICKET
-  QUESTION
-  GENERAL
 }
 
 enum SubscriptionType {

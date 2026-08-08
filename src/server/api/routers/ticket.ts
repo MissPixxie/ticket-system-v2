@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { createAuditLog } from "~/server/api/services/auditLogService";
 import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
-import { ParentType, Department, Priority, Status } from "@prisma/client";
+import { Department, Priority, Status } from "@prisma/client";
 import { createEmbedding } from "~/server/ai/createEmbedding";
 import { messageService } from "../services/messageService";
 
