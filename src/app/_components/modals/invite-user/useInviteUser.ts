@@ -5,7 +5,7 @@ import { useSocket } from "~/app/socketProvider";
 
 interface InviteUserInput {
   userId: string;
-  ticketId: string;
+  conversationId: string;
 }
 
 export function useInviteUser() {
@@ -14,15 +14,18 @@ export function useInviteUser() {
 
   const mutation = api.message.inviteUser.useMutation({
     async onSuccess(conversation) {
+      if (!conversation) return;
+
       await utils.message.listMessages.invalidate({
         conversationId: conversation.id,
       });
+
       socket?.emit("join:room", conversation.id);
     },
   });
 
   const inviteUser = (data: InviteUserInput) => {
-    // mutation.mutate(data);
+    mutation.mutate(data);
   };
 
   return {

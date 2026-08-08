@@ -6,7 +6,7 @@ import { env } from "~/env";
 import { db } from "~/server/db";
 
 export const auth = betterAuth({
-  baseURL: "https://ticket-system-v2-production.up.railway.app",
+  baseURL: env.BETTER_AUTH_URL,
   plugins: [nextCookies()],
   database: prismaAdapter(db, {
     provider: "postgresql", // or "sqlite" or "mysql"

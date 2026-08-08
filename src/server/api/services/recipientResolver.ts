@@ -86,6 +86,23 @@ async function resolveTicketRecipients(params: {
       return recipients;
     }
 
+    case "TICKET_PARTICIPANT_ADDED": {
+      const event = await db.event.findFirst({
+        where: {
+          type: "TICKET_PARTICIPANT_ADDED",
+          originId: ticketId,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      const invitedUserId = (event?.metadata as { invitedUserId?: string })
+        ?.invitedUserId;
+
+      return invitedUserId ? [invitedUserId] : [];
+    }
+
     default:
       return [];
   }

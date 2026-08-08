@@ -6,10 +6,10 @@ import { useInviteUser } from "./useInviteUser";
 import { FaUserPlus } from "react-icons/fa6";
 
 interface InviteSectionProps {
-  ticketId: string;
+  conversationId: string;
 }
 
-export function InviteSection({ ticketId }: InviteSectionProps) {
+export function InviteSection({ conversationId }: InviteSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { inviteUser, isLoading } = useInviteUser();
 
@@ -25,7 +25,7 @@ export function InviteSection({ ticketId }: InviteSectionProps) {
       </button>
 
       <InviteUserModal
-        ticketId={ticketId}
+        conversationId={conversationId}
         isOpen={isOpen}
         onClose={() => {
           setIsOpen(false);

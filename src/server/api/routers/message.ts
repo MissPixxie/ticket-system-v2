@@ -347,13 +347,63 @@ export const messageRouter = createTRPCRouter({
   }),
 
   inviteUser: protectedProcedure
-    .input(z.object({ conversationId: z.string(), userId: z.string() }))
+    .input(
+      z.object({
+        conversationId: z.string(),
+        userId: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      const updatedConversation = await ctx.db.conversation.update({
-        where: { id: input.conversationId },
-        data: { participants: { connect: { id: input.userId } } },
+      const existingParticipant =
+        await ctx.db.conversationParticipant.findUnique({
+          where: {
+            conversationId_userId: {
+              conversationId: input.conversationId,
+              userId: input.userId,
+            },
+          },
+        });
+
+      if (existingParticipant) {
+        throw new Error("Användaren är redan med i konversationen.");
+      }
+
+      await ctx.db.conversationParticipant.create({
+        data: {
+          conversationId: input.conversationId,
+          userId: input.userId,
+        },
       });
 
-      return updatedConversation;
+      const ticket = await ctx.db.ticket.findFirst({
+        where: {
+          conversationId: input.conversationId,
+        },
+      });
+
+      if (ticket) {
+        await prismaEventService.createEvent({
+          type: "TICKET_PARTICIPANT_ADDED",
+          originId: ticket.id,
+          originType: "TICKET",
+          actorId: ctx.session.user.id,
+          metadata: {
+            invitedUserId: input.userId,
+          },
+        });
+      }
+
+      return ctx.db.conversation.findUnique({
+        where: {
+          id: input.conversationId,
+        },
+        include: {
+          participants: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      });
     }),
 });

@@ -7,18 +7,18 @@ import FeedbackBubble from "../../feedbackBubble";
 
 export interface InviteUserData {
   userId: string;
-  ticketId: string;
+  conversationId: string;
 }
 
 interface InviteUserModalProps {
-  ticketId: string;
+  conversationId: string;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: InviteUserData) => void;
 }
 
 const InviteUserModal: React.FC<InviteUserModalProps> = ({
-  ticketId,
+  conversationId,
   isOpen,
   onClose,
   onSubmit,
@@ -39,7 +39,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
     e.preventDefault();
     onSubmit({
       userId: selected!,
-      ticketId,
+      conversationId,
     });
     setSearch("");
     setSelected(null);

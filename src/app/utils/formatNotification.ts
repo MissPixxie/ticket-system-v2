@@ -78,7 +78,7 @@ function getDisplayText(metadata: EventMetadata) {
   return "okänt";
 }
 
-function formatStatus(status?: string) {
+export function formatStatus(status?: string) {
   switch (status) {
     case "OPEN":
       return "Öppen";
@@ -91,7 +91,7 @@ function formatStatus(status?: string) {
   }
 }
 
-function formatPriority(priority?: string) {
+export function formatPriority(priority?: string) {
   switch (priority) {
     case "LOW":
       return "Låg";

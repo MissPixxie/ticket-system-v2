@@ -10,6 +10,7 @@ import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImag
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 import { FaSearchPlus, FaTrash } from "react-icons/fa";
 import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
+import { formatPriority, formatStatus } from "~/app/utils/formatNotification";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -90,7 +91,7 @@ export default function TicketPage({
                 statusClasses[ticket.status]
               }`}
             >
-              {ticket.status}
+              {formatStatus(ticket.status)}
             </span>
 
             <span
@@ -98,7 +99,7 @@ export default function TicketPage({
                 priorityClasses[ticket.priority]
               }`}
             >
-              {ticket.priority}
+              {formatPriority(ticket.priority)}
             </span>
           </div>
         </div>
@@ -135,12 +136,20 @@ export default function TicketPage({
 
                 <div>
                   <p className="text-sm text-white/60">Skapad</p>
-                  <p>{new Date(ticket.createdAt).toLocaleString()}</p>
+                  <p>
+                    {new Date(ticket.createdAt).toLocaleDateString()} ·{" "}
+                    {new Date(ticket.createdAt).toLocaleTimeString()}
+                  </p>
                 </div>
 
                 <div>
                   <p className="text-sm text-white/60">Status</p>
-                  <p>{ticket.status}</p>
+                  <p>{formatStatus(ticket.status)}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-white/60">Prioritet</p>
+                  <p>{formatPriority(ticket.priority)}</p>
                 </div>
               </div>
             </div>

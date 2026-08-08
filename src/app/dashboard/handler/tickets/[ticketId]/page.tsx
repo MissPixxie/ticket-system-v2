@@ -11,6 +11,7 @@ import { FaSearchPlus, FaTrash } from "react-icons/fa";
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 import { CldImage } from "next-cloudinary";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
+import { formatPriority, formatStatus } from "~/app/utils/formatNotification";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -91,7 +92,7 @@ export default function TicketPage({
                 statusClasses[ticket.status]
               }`}
             >
-              {ticket.status}
+              {formatStatus(ticket.status)}
             </span>
 
             <span
@@ -99,7 +100,7 @@ export default function TicketPage({
                 priorityClasses[ticket.priority]
               }`}
             >
-              {ticket.priority}
+              {formatPriority(ticket.priority)}
             </span>
           </div>
         </div>
@@ -157,12 +158,13 @@ export default function TicketPage({
 
                 <div>
                   <p className="text-sm text-white/60">Skapad</p>
-                  <p>{new Date(ticket.createdAt).toLocaleString()}</p>
+                  {new Date(ticket.createdAt).toLocaleDateString()} ·{" "}
+                  {new Date(ticket.createdAt).toLocaleTimeString()}
                 </div>
 
                 <div>
                   <p className="text-sm text-white/60">Status</p>
-                  <p>{ticket.status}</p>
+                  <p>{formatStatus(ticket.status)}</p>
                 </div>
               </div>
               <div className="mt-4 flex flex-row gap-4">
@@ -174,9 +176,9 @@ export default function TicketPage({
                     onChange={(e) => handleSetStatus(ticket.id)}
                     className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white backdrop-blur-sm transition-all outline-none hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
                   >
-                    <option>OPEN</option>
-                    <option value="IN_PROGRESS">IN PROGRESS</option>
-                    <option>CLOSED</option>
+                    <option value="OPEN">Öppen</option>
+                    <option value="IN_PROGRESS">Pågående</option>
+                    <option value="CLOSED">Stängd</option>
                   </select>
                 </div>
 
@@ -190,14 +192,16 @@ export default function TicketPage({
                     }
                     className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white backdrop-blur-sm transition-all outline-none hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
                   >
-                    <option>LOW</option>
-                    <option>MEDIUM</option>
-                    <option>HIGH</option>
-                    <option>URGENT</option>
+                    <option value="LOW">Låg</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">Hög</option>
+                    <option value="URGENT">Akut</option>
                   </select>
                 </div>
                 <div className="ml-auto flex flex-row gap-5 self-end">
-                  <InviteSection ticketId={ticket.id} />
+                  {ticket.conversation?.id && (
+                    <InviteSection conversationId={ticket.conversation.id} />
+                  )}
                   <button
                     disabled
                     title="Kommer snart"
