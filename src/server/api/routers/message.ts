@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { ConversationRole, Department, MessageType } from "@prisma/client";
 import { createAuditLog } from "../services/auditLogService";
 import { prismaEventService } from "../services/eventService";
+import { TRPCError } from "@trpc/server";
 
 export const messageRouter = createTRPCRouter({
   listMessages: protectedProcedure
@@ -85,6 +86,7 @@ export const messageRouter = createTRPCRouter({
         conversationId: z.string().min(1),
         content: z.string().min(1),
         type: z.nativeEnum(MessageType).optional(),
+        context: z.enum(["TICKET", "QUESTION", "RESOURCE", "NEWS", "EMAIL"]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -122,6 +124,7 @@ export const messageRouter = createTRPCRouter({
             senderId: ctx.session.user.id,
             content: input.content,
             type: input.type ?? MessageType.USER_MESSAGE,
+            context: input.context,
           },
           include: {
             sender: true,
@@ -138,15 +141,43 @@ export const messageRouter = createTRPCRouter({
         return message;
       });
 
-      await prismaEventService.createEvent({
-        type: "MESSAGE_SENT",
-        originId: message.id,
-        originType: "MESSAGE",
-        actorId: ctx.session.user.id,
-        metadata: {
-          messagePreview: message.content.slice(0, 80),
-        },
-      });
+      switch (input.context) {
+        case "TICKET":
+          const ticket = await ctx.db.ticket.findUniqueOrThrow({
+            where: {
+              conversationId: input.conversationId,
+            },
+            select: {
+              id: true,
+              title: true,
+            },
+          });
+
+          await prismaEventService.createEvent({
+            type: "TICKET_MESSAGE_SENT",
+            originId: ticket.id,
+            originType: "TICKET",
+            actorId: ctx.session.user.id,
+            metadata: {
+              title: ticket.title,
+              messagePreview: message.content.slice(0, 80),
+            },
+          });
+          break;
+
+        case "QUESTION":
+          // question-event
+          break;
+
+        case "RESOURCE":
+          break;
+
+        case "NEWS":
+          break;
+
+        case "EMAIL":
+          break;
+      }
 
       return message;
     }),

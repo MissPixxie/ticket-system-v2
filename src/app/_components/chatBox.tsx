@@ -64,7 +64,7 @@ export default function ChatBox({ conversationId, context }: ChatBoxProps) {
   const handleSend = () => {
     if (!newMessage.trim()) return;
 
-    createMessage.mutate({ conversationId, content: newMessage });
+    createMessage.mutate({ conversationId, content: newMessage, context });
     socket?.emit("chat:message", { conversationId });
     setNewMessage("");
   };

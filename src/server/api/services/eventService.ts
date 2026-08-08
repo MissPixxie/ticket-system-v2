@@ -3,7 +3,6 @@ import { EventOrigin, EventType, Severity } from "@prisma/client";
 import { db } from "~/server/db";
 import { createAuditLog } from "./auditLogService";
 import { resolveRecipients } from "./recipientResolver";
-import { resolveNotificationPath } from "./notificationPathResolver";
 
 type EventMetadata = Record<string, any>;
 
@@ -65,11 +64,8 @@ export class PrismaEventService extends EventEmitter {
       throw new Error(`${originType} med id ${originId} finns inte`);
     }
 
-    const path = await resolveNotificationPath(originType, originId);
-
     const meta = {
       ...metadata,
-      path,
       timestamp: new Date().toISOString(),
     };
 
