@@ -200,7 +200,10 @@ export default function TicketPage({
                 </div>
                 <div className="ml-auto flex flex-row gap-5 self-end">
                   {ticket.conversation?.id && (
-                    <InviteSection conversationId={ticket.conversation.id} />
+                    <InviteSection
+                      ticketId={ticket.id}
+                      conversationId={ticket.conversation.id}
+                    />
                   )}
                   <button
                     disabled

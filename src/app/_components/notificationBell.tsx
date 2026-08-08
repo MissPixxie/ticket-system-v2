@@ -119,50 +119,65 @@ export const NotificationBell = () => {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-3 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white text-black shadow-xl">
-          <div className="flex items-center justify-between border-b p-4">
-            <h3 className="font-semibold">Notifikationer</h3>
+        <div className="absolute right-0 z-50 mt-3 w-[420px] overflow-hidden rounded-2xl bg-linear-to-b from-[#3b0e7a]/80 to-[#282a53]/80 shadow-2xl backdrop-blur-lg">
+          <div className="flex items-center justify-between border-b border-white/10 p-5">
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                Notifikationer
+              </h3>
+
+              <p className="text-sm text-white/40">Senaste aktivitet</p>
+            </div>
+
             {unreadCount > 0 && (
-              <span className="text-xs text-gray-500">{unreadCount} nya</span>
+              <span className="rounded-full bg-purple-500/20 px-3 py-1 text-xs font-medium text-purple-300">
+                {unreadCount} nya
+              </span>
             )}
           </div>
 
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-96 space-y-2 overflow-y-auto p-3">
             {isLoading ? (
-              <div className="p-4 text-center text-sm text-gray-500">
-                Laddar...
-              </div>
-            ) : notifications?.length === 0 ? (
-              <div className="p-8 text-center text-sm text-gray-400">
-                Inga notiser just nu.
+              <div className="py-8 text-center text-white/50">Laddar...</div>
+            ) : notifications.length === 0 ? (
+              <div className="py-8 text-center text-white/40">
+                Inga notiser ännu.
               </div>
             ) : (
               notifications.map((notification) => (
                 <Link
                   key={notification.id}
                   href={getNotificationLink(notification, me?.role?.name)}
-                  className={`block border-b p-4 transition hover:bg-gray-50 ${
-                    !notification.seen ? "bg-blue-50/50" : ""
+                  className={`block rounded-xl border border-white/5 p-4 transition-all duration-200 ${
+                    notification.seen
+                      ? "bg-white/5 hover:bg-white/10"
+                      : "bg-purple-500/15 ring-1 ring-purple-400/20 hover:bg-purple-500/20"
                   }`}
                 >
-                  <p className="text-sm text-gray-800">
+                  <p className="text-sm font-medium text-white">
                     {formatNotification(notification)}
                   </p>
 
-                  <span className="mt-1 block text-[10px] text-gray-400">
-                    {new Date(notification.createdAt).toLocaleString()}
-                  </span>
+                  <p className="mt-2 text-xs text-white/40">
+                    {new Date(notification.createdAt).toLocaleDateString()} ·{" "}
+                    {new Date(notification.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
                 </Link>
               ))
             )}
           </div>
 
-          <button
-            onClick={() => markAllAsSeen.mutate()}
-            className="w-full bg-gray-50 p-3 text-center text-sm font-medium text-blue-600 transition hover:bg-gray-100"
-          >
-            Markera alla som lästa
-          </button>
+          <div className="border-t border-white/10 p-3">
+            <button
+              onClick={() => markAllAsSeen.mutate()}
+              className="w-full rounded-xl bg-white/5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+            >
+              Markera alla som lästa
+            </button>
+          </div>
         </div>
       )}
     </div>

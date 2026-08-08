@@ -6,12 +6,16 @@ import { useInviteUser } from "./useInviteUser";
 import { FaUserPlus } from "react-icons/fa6";
 
 interface InviteSectionProps {
+  ticketId: string;
   conversationId: string;
 }
 
-export function InviteSection({ conversationId }: InviteSectionProps) {
+export function InviteSection({
+  ticketId,
+  conversationId,
+}: InviteSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { inviteUser, isLoading } = useInviteUser();
+  const { inviteUser, isLoading } = useInviteUser(ticketId);
 
   return (
     <>
