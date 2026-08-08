@@ -165,41 +165,67 @@ export const messageRouter = createTRPCRouter({
           break;
 
         case "QUESTION":
-         const question = await ctx.db.question.findUnique({
-           where: {
-             conversationId: input.conversationId,
-           },
-           select: {
-             id: true,
-             question: true,
-           },
-         });
+          const question = await ctx.db.question.findUnique({
+            where: {
+              conversationId: input.conversationId,
+            },
+            select: {
+              id: true,
+              question: true,
+            },
+          });
 
-         if (!question) {
-           throw new TRPCError({
-             code: "NOT_FOUND",
-             message: "Frågan hittades inte",
-           });
-         }
+          if (!question) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "Frågan hittades inte",
+            });
+          }
 
-         await prismaEventService.createEvent({
-           type: "QUESTION_MESSAGE_SENT",
-           originId: question.id,
-           originType: "QUESTION",
-           actorId: ctx.session.user.id,
-           metadata: {
-             title: question.question,
-             messagePreview: message.content.slice(0, 80),
-           },
-         });
+          await prismaEventService.createEvent({
+            type: "QUESTION_MESSAGE_SENT",
+            originId: question.id,
+            originType: "QUESTION",
+            actorId: ctx.session.user.id,
+            metadata: {
+              title: question.question,
+              messagePreview: message.content.slice(0, 80),
+            },
+          });
 
           break;
 
-        case "RESOURCE":
-          break;
+        case "NEWS": {
+          const news = await ctx.db.news.findUnique({
+            where: {
+              conversationId: input.conversationId,
+            },
+            select: {
+              id: true,
+              title: true,
+            },
+          });
 
-        case "NEWS":
+          if (!news) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "Nyheten hittades inte",
+            });
+          }
+
+          await prismaEventService.createEvent({
+            type: "NEWS_MESSAGE_SENT",
+            originId: news.id,
+            originType: "NEWS",
+            actorId: ctx.session.user.id,
+            metadata: {
+              title: news.title,
+              messagePreview: message.content.slice(0, 80),
+            },
+          });
+
           break;
+        }
 
         case "EMAIL":
           break;

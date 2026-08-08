@@ -9,24 +9,31 @@ export async function resolveRecipients(params: {
 }) {
   const { type, originType, originId, actorId } = params;
 
-switch (originType) {
-  case "TICKET":
-    return resolveTicketRecipients({
-      type,
-      ticketId: originId,
-      actorId,
-    });
+  switch (originType) {
+    case "TICKET":
+      return resolveTicketRecipients({
+        type,
+        ticketId: originId,
+        actorId,
+      });
 
-  case "QUESTION":
-    return resolveQuestionRecipients({
-      type,
-      questionId: originId,
-      actorId,
-    });
+    case "QUESTION":
+      return resolveQuestionRecipients({
+        type,
+        questionId: originId,
+        actorId,
+      });
 
-  default:
-    return [];
-}
+    case "NEWS":
+      return resolveNewsRecipients({
+        type,
+        newsId: originId,
+        actorId,
+      });
+
+    default:
+      return [];
+  }
 }
 
 async function resolveTicketRecipients(params: {
@@ -111,6 +118,45 @@ async function resolveQuestionRecipients(params: {
       const recipients: string[] = [];
 
       const createdById = question.createdById;
+
+      if (createdById !== null && createdById !== actorId) {
+        recipients.push(createdById);
+      }
+
+      return recipients;
+    }
+
+    default:
+      return [];
+  }
+}
+
+async function resolveNewsRecipients(params: {
+  type: EventType;
+  newsId: string;
+  actorId: string;
+}) {
+  const { type, newsId, actorId } = params;
+
+  const news = await db.news.findUnique({
+    where: {
+      id: newsId,
+    },
+    include: {
+      createdBy: true,
+    },
+  });
+
+  if (!news) return [];
+
+  switch (type) {
+    case "NEWS_CREATED":
+      return [];
+
+    case "NEWS_MESSAGE_SENT": {
+      const recipients: string[] = [];
+
+      const createdById = news.createdById;
 
       if (createdById !== null && createdById !== actorId) {
         recipients.push(createdById);
