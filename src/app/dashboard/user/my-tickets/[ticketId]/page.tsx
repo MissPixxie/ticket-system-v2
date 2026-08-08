@@ -123,6 +123,15 @@ export default function TicketPage({
                   <p className="text-sm text-white/60">Tilldelad</p>
                   <p>{ticket.assignedTo?.name ?? "Ingen"}</p>
                 </div>
+                <div>
+                  <p className="text-sm text-white/60">Deltagare</p>
+
+                  <p>
+                    {ticket.conversation?.participants
+                      .map((participant) => participant.user.name)
+                      .join(", ")}
+                  </p>
+                </div>
 
                 <div>
                   <p className="text-sm text-white/60">Skapad</p>

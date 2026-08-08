@@ -145,6 +145,15 @@ export default function TicketPage({
                     )}
                   </div>
                 </div>
+                <div>
+                  <p className="text-sm text-white/60">Deltagare</p>
+
+                  <p>
+                    {ticket.conversation?.participants
+                      .map((participant) => participant.user.name)
+                      .join(", ")}
+                  </p>
+                </div>
 
                 <div>
                   <p className="text-sm text-white/60">Skapad</p>

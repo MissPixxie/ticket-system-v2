@@ -49,7 +49,15 @@ async function resolveTicketRecipients(params: {
     },
     include: {
       createdBy: true,
-      assignedTo: true,
+      conversation: {
+        include: {
+          participants: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -67,22 +75,13 @@ async function resolveTicketRecipients(params: {
         : [];
 
     case "TICKET_MESSAGE_SENT": {
-      const recipients: string[] = [];
-
-      const createdById = ticket.createdById;
-
-      if (createdById !== null && createdById !== actorId) {
-        recipients.push(createdById);
-      }
-      const assignedToId = ticket.assignedToId;
-
-      if (
-        assignedToId &&
-        assignedToId !== actorId &&
-        assignedToId !== ticket.createdById
-      ) {
-        recipients.push(assignedToId);
-      }
+      const recipients = [
+        ...new Set(
+          ticket.conversation?.participants
+            .map((participant) => participant.userId)
+            .filter((userId) => userId !== actorId) ?? [],
+        ),
+      ];
 
       return recipients;
     }
@@ -132,7 +131,6 @@ async function resolveQuestionRecipients(params: {
         ),
       ];
 
-      console.log("hello");
       return recipients;
     }
 
@@ -154,6 +152,15 @@ async function resolveNewsRecipients(params: {
     },
     include: {
       createdBy: true,
+      conversation: {
+        include: {
+          participants: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -164,13 +171,13 @@ async function resolveNewsRecipients(params: {
       return [];
 
     case "NEWS_MESSAGE_SENT": {
-      const recipients: string[] = [];
-
-      const createdById = news.createdById;
-
-      if (createdById !== null && createdById !== actorId) {
-        recipients.push(createdById);
-      }
+      const recipients = [
+        ...new Set(
+          news.conversation?.participants
+            .map((participant) => participant.userId)
+            .filter((userId) => userId !== actorId) ?? [],
+        ),
+      ];
 
       return recipients;
     }

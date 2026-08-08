@@ -58,7 +58,20 @@ export const ticketRouter = createTRPCRouter({
         include: {
           createdBy: true,
           assignedTo: true,
-          conversation: { select: { id: true } },
+          conversation: {
+            include: {
+              participants: {
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       });
 
