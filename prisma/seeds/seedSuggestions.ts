@@ -83,10 +83,6 @@ export async function seedSuggestions() {
       generateTags(s.content),
     ]);
 
-    const conversation = await db.conversation.create({
-      data: {},
-    });
-
     await db.suggestion.create({
       data: {
         content: s.content,
@@ -95,7 +91,6 @@ export async function seedSuggestions() {
         voteCount: s.voteCount,
         userId: admin.id,
         suggestionBoxId: box.id,
-        conversationId: conversation.id,
         embedding: JSON.stringify(embedding),
 
         tags: {
