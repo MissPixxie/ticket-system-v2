@@ -96,7 +96,12 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
               </select>
             </div>
             <div className="ml-auto flex flex-row gap-5 self-end">
-              <InviteSection ticketId={ticketProps.id} />
+              {ticketProps.conversation?.id && (
+                <InviteSection
+                  ticketId={ticketProps.id}
+                  conversationId={ticketProps.conversation.id}
+                />
+              )}
               <button
                 className="flex cursor-pointer flex-row rounded bg-gray-700 p-2 shadow-md/20 hover:bg-gray-600"
                 title="Ticket History"
