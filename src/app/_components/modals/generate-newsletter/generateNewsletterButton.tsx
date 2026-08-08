@@ -30,8 +30,6 @@ export function GenerateNewsletterButton({
       conversationId,
     });
 
-    console.log("AI result:", result);
-
     setNewsletter({
       title: result.newsletter.subject,
       content: result.newsletter.body,

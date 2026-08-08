@@ -42,11 +42,19 @@ function getNotificationLink(
 
   const metadata = notification.event.metadata as EventMetadata;
 
-  if (!metadata.path) {
-    return "#";
+  if (!metadata.path) return "#";
+
+  let path = metadata.path;
+
+  if (role === "USER") {
+    switch (true) {
+      case path.startsWith("/tickets/"):
+        path = path.replace("/tickets/", "/my-tickets/");
+        break;
+    }
   }
 
-  return `${dashboard}${metadata.path}`;
+  return `${dashboard}${path}`;
 }
 
 export const NotificationBell = () => {

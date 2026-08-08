@@ -49,7 +49,7 @@ export const tagRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       switch (input.sourceType) {
         case Source.TICKET:
-          await ctx.db.ticket.update({
+          return ctx.db.ticket.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -57,8 +57,9 @@ export const tagRouter = createTRPCRouter({
               },
             },
           });
+
         case Source.QUESTION:
-          await ctx.db.question.update({
+          return ctx.db.question.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -66,8 +67,9 @@ export const tagRouter = createTRPCRouter({
               },
             },
           });
+
         case Source.SUGGESTION:
-          await ctx.db.suggestion.update({
+          return ctx.db.suggestion.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -75,8 +77,9 @@ export const tagRouter = createTRPCRouter({
               },
             },
           });
+
         case Source.NEWS:
-          await ctx.db.news.update({
+          return ctx.db.news.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -84,8 +87,9 @@ export const tagRouter = createTRPCRouter({
               },
             },
           });
+
         case Source.RESOURCE:
-          await ctx.db.resource.update({
+          return ctx.db.resource.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -107,7 +111,7 @@ export const tagRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       switch (input.sourceType) {
         case Source.TICKET:
-          await ctx.db.ticket.update({
+          return ctx.db.ticket.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -115,8 +119,9 @@ export const tagRouter = createTRPCRouter({
               },
             },
           });
+
         case Source.QUESTION:
-          await ctx.db.question.update({
+          return ctx.db.question.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -124,8 +129,9 @@ export const tagRouter = createTRPCRouter({
               },
             },
           });
+
         case Source.SUGGESTION:
-          await ctx.db.suggestion.update({
+          return ctx.db.suggestion.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -133,8 +139,9 @@ export const tagRouter = createTRPCRouter({
               },
             },
           });
+
         case Source.NEWS:
-          await ctx.db.news.update({
+          return ctx.db.news.update({
             where: { id: input.sourceId },
             data: {
               tags: {
@@ -142,8 +149,9 @@ export const tagRouter = createTRPCRouter({
               },
             },
           });
+
         case Source.RESOURCE:
-          await ctx.db.resource.update({
+          return ctx.db.resource.update({
             where: { id: input.sourceId },
             data: {
               tags: {

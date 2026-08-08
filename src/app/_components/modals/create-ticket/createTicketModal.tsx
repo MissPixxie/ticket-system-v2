@@ -183,7 +183,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                     className="rounded-full bg-black/50 p-2 text-white transition hover:bg-red-500"
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log("Trash clicked");
+
                       setImagePublicId("");
                     }}
                   >

@@ -40,8 +40,6 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
   const canManageTicket =
     me?.role?.name === "HANDLER" || me?.role?.name === "ADMIN";
 
-  console.log(me?.role?.name);
-
   return (
     <div className="space-y-6">
       <div>

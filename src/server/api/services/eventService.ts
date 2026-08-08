@@ -99,12 +99,6 @@ export class PrismaEventService extends EventEmitter {
       });
     }
 
-    console.log("Skapar notification", {
-      actorId,
-      eventId: event.id,
-      recipients,
-    });
-
     // const subscriptions = await db.subscription.findMany({
     //   where: {
     //     originId,

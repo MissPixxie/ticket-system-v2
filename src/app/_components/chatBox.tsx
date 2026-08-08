@@ -41,11 +41,6 @@ export default function ChatBox({ conversationId, context }: ChatBoxProps) {
 
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {
-      console.log(
-        "Message created, invalidating messages for id:",
-        conversationId,
-      );
-
       utils.message.listMessages.invalidate();
       utils.message.listUserConversations.invalidate();
     },

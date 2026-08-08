@@ -153,7 +153,6 @@ export default function UserHome() {
       <CreateTicketModal
         isOpen={isOpen}
         onClose={() => {
-          console.log("Closing modal!");
           setIsOpen(false);
         }}
         onSubmit={(data) => {

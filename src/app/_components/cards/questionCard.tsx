@@ -11,7 +11,6 @@ type QuestionCardProps = {
 export default function QuestionCard({
   selectedQuestionId,
 }: QuestionCardProps) {
-  console.log("QuestionCard render", selectedQuestionId);
   const utils = api.useUtils();
   const { data: selectedQuestion } = api.question.getQuestionById.useQuery(
     { id: selectedQuestionId! },
@@ -19,7 +18,6 @@ export default function QuestionCard({
       enabled: !!selectedQuestionId,
     },
   );
-  console.log(selectedQuestion);
 
   return (
     <div className="space-y-6">

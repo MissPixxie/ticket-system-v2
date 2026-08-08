@@ -1,8 +1,6 @@
 import { openai } from "./aiClient";
 
 export async function generateNewsletter(text: string) {
-  console.log("Calling OpenAI");
-
   const response = await openai.responses.create({
     model: "gpt-5.4-mini",
     input: `

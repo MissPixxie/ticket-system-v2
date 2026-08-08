@@ -52,8 +52,6 @@ export const auth = betterAuth({
     account: {
       update: {
         after: async (account) => {
-          console.log(account);
-
           await db.account.update({
             where: { id: account.id },
             data: {

@@ -28,8 +28,6 @@ export function ConversationTable() {
   const { data: conversations, isLoading } =
     api.message.listUserConversations.useQuery();
 
-  console.log("Fetched conversations:", conversations);
-
   const deleteMessage = api.message.deleteConversation.useMutation({
     onSuccess: () => {
       utils.message.listUserConversations.invalidate();
@@ -82,14 +80,6 @@ export function ConversationTable() {
 
         {conversations?.map((conversation) => {
           const latestMessage = conversation.messages[0];
-
-          console.log({
-            loggedInUser: me?.id,
-            loggedInName: me?.name,
-            messageSender: latestMessage?.sender?.id,
-            messageSenderName: latestMessage?.sender?.name,
-            message: latestMessage?.content,
-          });
 
           return (
             <div

@@ -20,7 +20,6 @@ export function TicketSection() {
       <CreateTicketModal
         isOpen={isOpen}
         onClose={() => {
-          console.log("Closing modal!");
           setIsOpen(false);
         }}
         onSubmit={(data) => {
