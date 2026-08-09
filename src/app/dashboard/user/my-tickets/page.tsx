@@ -1,21 +1,9 @@
 "use client";
 
-import { api } from "~/trpc/react";
-import { TicketSection } from "~/app/_components/modals/create-ticket/ticketSection";
 import { TicketTable } from "~/app/_components/ticketTable";
 import { TiTicket } from "react-icons/ti";
 
 export default function MyTicketsPage() {
-  const { data: tickets, isLoading } = api.ticket.listUserTickets.useQuery();
-
-  if (isLoading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center text-white/70">
-        Laddar tickets...
-      </main>
-    );
-  }
-
   return (
     <main className="main-page-layout">
       <div className="container">

@@ -1,31 +1,28 @@
-// export default function SkeletonResourcesCard() {
-//   return (
-//     <div className="card relative overflow-hidden bg-white/5 shadow-lg/15 backdrop-blur-lg">
-//       {/* shimmer */}
-//       <div className="pointer-events-none absolute inset-0 animate-[shimmer_3.5s_ease-in-out_infinite] bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.08),transparent)] bg-size-[200%_100%]" />
-
-//       <div className="space-y-4">
-//         {/* TITLE */}
-//         <div className="h-5 w-1/3 rounded bg-white/10" />
-
-//         {/* CONTENT */}
-//         <div className="space-y-2">
-//           <div className="h-5 w-full rounded bg-white/10" />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 export default function SkeletonResourcesCard() {
   return (
-    <div className="skeleton relative overflow-hidden rounded-xl bg-white/5 p-4 shadow-lg/15 backdrop-blur-lg">
-      <div className="space-y-4">
-        {/* TITLE */}
-        <div className="h-4 w-1/3 rounded bg-white/10" />
+    <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15">
+      {/* TITLE + CATEGORY */}
+      <div className="mb-2 flex items-start justify-between gap-4">
+        <div className="space-y-2">
+          <div className="h-5 w-40 animate-pulse rounded bg-white/10" />
+          <div className="h-5 w-28 animate-pulse rounded bg-white/10" />
+        </div>
 
-        {/* META */}
-        <div className="h-3 w-1/4 rounded bg-white/10" />
+        <div className="h-6 w-24 shrink-0 animate-pulse rounded-full bg-white/10" />
       </div>
+
+      {/* DATE + AUTHOR */}
+      <div className="mt-3 h-4 w-32 animate-pulse rounded bg-white/10" />
+
+      {/* DESCRIPTION */}
+      <div className="mt-4 space-y-2">
+        <div className="h-4 w-full animate-pulse rounded bg-white/10" />
+        <div className="h-4 w-11/12 animate-pulse rounded bg-white/10" />
+        <div className="h-4 w-2/3 animate-pulse rounded bg-white/10" />
+      </div>
+
+      {/* LINK */}
+      <div className="mt-4 h-4 w-16 animate-pulse rounded bg-white/10" />
     </div>
   );
 }

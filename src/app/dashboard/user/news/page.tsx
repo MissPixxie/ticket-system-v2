@@ -6,6 +6,7 @@ import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import Link from "next/link";
 import { MdCampaign } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
+import SkeletonNewsPage from "~/app/_components/skeletonComponents/pages/skeletonNewsPage";
 //import SkeletonCard from "./skeletonComponents/cards/skeletonCampaignCard";
 
 export default function CampaignList() {
@@ -32,22 +33,9 @@ export default function CampaignList() {
     },
   });
 
-  // if (isLoading) {
-  //   return (
-  //     <main className="min-h-screen text-white">
-  //       <div>
-  //         <h1 className="text-xl font-semibold tracking-wide text-white">
-  //           Kommande kampanjer
-  //         </h1>
-  //         <div className="mt-4 space-y-3">
-  //           {[...Array(2)].map((_, i) => (
-  //             <SkeletonCard key={i} />
-  //           ))}
-  //         </div>
-  //       </div>
-  //     </main>
-  //   );
-  // }
+  if (isLoading) {
+    return <SkeletonNewsPage />;
+  }
 
   const filteredNews = news?.filter((n) => {
     const searchText = search.toLowerCase();

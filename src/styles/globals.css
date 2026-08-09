@@ -152,6 +152,8 @@
     letter-spacing: 0.025em;
   }
 
+  /* Button styles */
+
   .submit-button {
     font-size: 1rem;
     cursor: pointer;

@@ -6,6 +6,7 @@ import QuestionCard from "~/app/_components/cards/questionCard";
 import { api } from "~/trpc/react";
 import { FaChevronDown } from "react-icons/fa6";
 import { useSearchParams } from "next/navigation";
+import SkeletonQuestionPage from "~/app/_components/skeletonComponents/pages/skeletonQuestionPage";
 
 const PAGE_SIZE = 5;
 
@@ -100,7 +101,7 @@ export default function QuestionPage() {
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center text-white/70">
-        Laddar frågor...
+        <SkeletonQuestionPage />;
       </main>
     );
   }

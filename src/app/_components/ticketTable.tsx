@@ -7,6 +7,8 @@ import { useSocket } from "../socketProvider";
 import { TicketSection } from "./modals/create-ticket/ticketSection";
 import { PickSection } from "./modals/handler-picker/pickSection";
 import Link from "next/link";
+import CustomSelect from "./customSelect";
+import SkeletonTickets from "./skeletonComponents/pages/skeletonTickets";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -112,7 +114,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
     );
   });
 
-  if (isLoading) return <p>Laddar tickets...</p>;
+  if (isLoading) return <SkeletonTickets />;
   if (!tickets || tickets.tickets.length === 0)
     return (
       <div className="flex justify-between">
@@ -126,49 +128,65 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 p-5">
         <div className="flex items-center gap-4">
           <span className="text-sm text-white/60">Status:</span>
-          <select
+          <CustomSelect
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="input rounded-lg px-3 py-2 text-sm"
-          >
-            <option value="ALL" className="text-black">
-              Alla
-            </option>
-            <option value="OPEN" className="text-black">
-              Öppna
-            </option>
-            <option value="IN_PROGRESS" className="text-black">
-              Pågående
-            </option>
-            <option value="CLOSED" className="text-black">
-              Stängda
-            </option>
-          </select>
+            onChange={setFilter}
+            options={[
+              {
+                value: "ALL",
+                label: "Alla",
+              },
+              {
+                value: "OPEN",
+                label: "Öppna",
+              },
+              {
+                value: "IN_PROGRESS",
+                label: "Pågående",
+              },
+              {
+                value: "CLOSED",
+                label: "Stängda",
+              },
+            ]}
+            size="sm"
+            className="w-32"
+          />
+
           <span className="text-sm text-white/60">Avdelning:</span>
-          <select
+
+          <CustomSelect
             value={departmentFilter}
-            onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="input rounded-lg px-3 py-2 text-sm"
-          >
-            <option value="ALL" className="text-black">
-              Alla
-            </option>
-            <option value="IT" className="text-black">
-              IT
-            </option>
-            <option value="HR" className="text-black">
-              HR
-            </option>
-            <option value="CAMPAIGN" className="text-black">
-              Kampanj
-            </option>
-            <option value="PRODUCT" className="text-black">
-              Produkt
-            </option>
-            <option value="CUSTOMERCLUB" className="text-black">
-              Kundklubb
-            </option>
-          </select>
+            onChange={setDepartmentFilter}
+            options={[
+              {
+                value: "ALL",
+                label: "Alla",
+              },
+              {
+                value: "IT",
+                label: "IT",
+              },
+              {
+                value: "HR",
+                label: "HR",
+              },
+              {
+                value: "CAMPAIGN",
+                label: "Kampanj",
+              },
+              {
+                value: "PRODUCT",
+                label: "Produkt",
+              },
+              {
+                value: "CUSTOMERCLUB",
+                label: "Kundklubb",
+              },
+            ]}
+            size="sm"
+            className="w-36"
+          />
 
           <input
             type="text"
