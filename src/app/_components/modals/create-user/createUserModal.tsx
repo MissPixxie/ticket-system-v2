@@ -11,6 +11,7 @@ import {
   FaShoppingCart,
   FaHandHoldingHeart,
 } from "react-icons/fa";
+import CustomSelect from "../../customSelect";
 
 type RoleKey = "USER" | "HANDLER";
 
@@ -114,7 +115,7 @@ export default function CreateUserModal({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full input rounded-xl px-4 py-3"
+                className="input w-full rounded-xl px-4 py-3"
                 required
               />
             </div>
@@ -125,7 +126,7 @@ export default function CreateUserModal({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full input rounded-xl px-4 py-3"
+                className="input w-full rounded-xl px-4 py-3"
                 required
               />
             </div>
@@ -136,25 +137,28 @@ export default function CreateUserModal({
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full input rounded-xl px-4 py-3"
+                className="input w-full rounded-xl px-4 py-3"
                 required
               />
             </div>
 
             <div>
               <label className="mb-1 block font-medium">Typ av användare</label>
-              <select
+              <CustomSelect
                 value={role}
-                onChange={(e) => setRole(e.target.value as RoleKey)}
-                className="w-full cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-blue-500 focus:outline-none"
-              >
-                <option value="USER" className="cursor-pointer text-black">
-                  Vanlig användare
-                </option>
-                <option value="HANDLER" className="cursor-pointer text-black">
-                  Handläggare
-                </option>
-              </select>
+                onChange={(value) => setRole(value as RoleKey)}
+                options={[
+                  {
+                    value: "USER",
+                    label: "Vanlig användare",
+                  },
+                  {
+                    value: "HANDLER",
+                    label: "Handläggare",
+                  },
+                ]}
+                className="w-full"
+              />
             </div>
           </div>
 

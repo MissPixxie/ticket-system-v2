@@ -42,12 +42,26 @@ export const userRouter = createTRPCRouter({
           id: true,
           name: true,
           email: true,
+
           role: {
-            select: { name: true },
+            select: {
+              name: true,
+            },
           },
+
+          departments: {
+            select: {
+              department: true,
+            },
+          },
+
           createdAt: true,
+
           _count: {
-            select: { ticketsHandled: true, ticketsCreated: true },
+            select: {
+              ticketsHandled: true,
+              ticketsCreated: true,
+            },
           },
         },
       });
@@ -64,7 +78,6 @@ export const userRouter = createTRPCRouter({
         nextCursor,
       };
     }),
-
   searchUser: protectedProcedure
     .input(
       z.object({

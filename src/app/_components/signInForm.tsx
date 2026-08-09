@@ -84,7 +84,7 @@ export default function SignInForm() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 w-full rounded-full bg-blue-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="submit-button mt-4 w-full px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Loggar in..." : "Logga in"}
           </button>
