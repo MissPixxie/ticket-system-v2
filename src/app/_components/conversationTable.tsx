@@ -8,6 +8,7 @@ import { TicketSection } from "./modals/create-ticket/ticketSection";
 import { PickSection } from "./modals/handler-picker/pickSection";
 import { FaTrashAlt } from "react-icons/fa";
 import ChatBox from "./chatBox";
+import CustomSelect from "./customSelect";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -47,25 +48,28 @@ export function ConversationTable() {
       <div className="primary-background rounded-2xl shadow-lg/15 backdrop-blur-lg">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 p-5">
           <div className="flex items-center gap-4">
-            <select
+            <CustomSelect
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="rounded-lg bg-white/10 px-3 py-2 text-sm"
-            >
-              <option value="ALL" className="text-black">
-                Öppnade
-              </option>
-              <option value="OPEN" className="text-black">
-                Oöppnade
-              </option>
-            </select>
-
+              onChange={setFilter}
+              size="sm"
+              options={[
+                {
+                  value: "ALL",
+                  label: "Öppnade",
+                },
+                {
+                  value: "OPEN",
+                  label: "Oöppnade",
+                },
+              ]}
+              className="w-36"
+            />
             <input
               type="text"
               placeholder="Sök meddelanden..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="rounded-lg bg-white/10 px-3 py-2 text-sm"
+              className="input rounded-lg px-3 py-2 text-sm"
             />
           </div>
         </div>

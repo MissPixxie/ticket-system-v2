@@ -123,14 +123,14 @@ const EditNewsModal: React.FC<EditNewsModalProps> = ({
             placeholder="Titel"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rounded-lg border border-black/50 bg-white/5 px-4 py-3 text-gray-200/65 required:border-red-500 required:text-red-500"
+            className="input rounded-lg px-4 py-3 required:border-red-500 required:text-red-500"
           />
           <label htmlFor="content">Beskriv nyheten</label>
           <textarea
             placeholder="Beskriv nyheten"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
+            className="input h-full min-h-44 rounded-lg p-7 px-4 py-2 required:border-red-500 required:text-red-500"
           />
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold">Prioritet</label>

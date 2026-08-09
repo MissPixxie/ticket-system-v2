@@ -61,13 +61,13 @@ export default function LogsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Sök i loggar..."
-            className="w-full rounded-xl bg-white/10 px-4 py-2 text-white placeholder:text-white/40 focus:outline-none md:max-w-sm"
+            className="w-full input rounded-xl px-4 py-2 md:max-w-sm"
           />
 
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="rounded-xl bg-white/10 px-4 py-2 text-white focus:outline-none"
+            className="input rounded-xl px-4 py-2 focus:outline-none"
           >
             <option value="ALL">Alla</option>
             <option value="USER">Användare</option>

@@ -70,7 +70,7 @@ export default function GenerateNewsletterModal({
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-purple-500"
+              className="w-full input rounded-xl px-4 py-300"
             />
           </div>
 

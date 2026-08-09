@@ -10,6 +10,7 @@ import Link from "next/link";
 import CampaignList from "~/app/_components/campaignList";
 import { CldImage } from "next-cloudinary";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
+import { formatStatus } from "~/app/utils/formatNotification";
 
 export default function UserHome() {
   const { data: tickets } = api.ticket.listUserTickets.useQuery();
@@ -114,7 +115,9 @@ export default function UserHome() {
                       ? `${ticket.issue.slice(0, 10)}...`
                       : ticket.issue}
                   </span>
-                  <span className="text-white/60">{ticket.status}</span>
+                  <span className="text-white/60">
+                    {formatStatus(ticket.status)}
+                  </span>
                 </Link>
               ))}
 

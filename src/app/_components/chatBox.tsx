@@ -124,7 +124,7 @@ export default function ChatBox({ conversationId, context }: ChatBoxProps) {
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Skriv ett meddelande..."
           rows={3}
-          className="flex-1 resize-none rounded-lg bg-black/30 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          className="input flex-1 resize-none rounded-lg p-3 text-sm"
         />
         <button onClick={handleSend} className="submit-button">
           Skicka

@@ -71,7 +71,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
             placeholder="Sök användare..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pr-4 pl-4 text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-500 focus:bg-white/10"
+            className="input w-full rounded-xl py-3 pr-4 pl-4"
           />
           <div className="mt-3 flex flex-col gap-2">
             {visibleUsers?.map((user) => (

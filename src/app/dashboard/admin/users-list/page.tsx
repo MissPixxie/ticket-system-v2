@@ -108,7 +108,7 @@ export default function ListUsersPage() {
               placeholder="Sök bland användare..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pr-4 pl-11 text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-500 focus:bg-white/10"
+              className="input w-full rounded-xl py-3 pr-4 pl-11"
             />
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function ListUsersPage() {
                                 <input
                                   value={editName}
                                   onChange={(e) => setEditName(e.target.value)}
-                                  className="rounded-lg bg-white/10 px-4 py-2"
+                                  className="input rounded-lg px-4 py-2"
                                   placeholder="Namn"
                                 />
 

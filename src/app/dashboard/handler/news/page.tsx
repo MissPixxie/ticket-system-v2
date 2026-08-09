@@ -11,6 +11,7 @@ import { FaSearchPlus, FaTrash } from "react-icons/fa";
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 import { CldImage } from "next-cloudinary";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
+import CustomSelect from "~/app/_components/customSelect";
 
 const PAGE_SIZE = 5;
 
@@ -98,40 +99,45 @@ export default function NewsPage() {
               placeholder="Titel"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
+              className="input rounded-lg px-4 py-2"
             />
-            <select
+            <CustomSelect
               value={category}
-              onChange={(e) =>
+              onChange={(value) =>
                 setCategory(
-                  e.target.value as
+                  value as
                     | "NEWS"
                     | "STORE_MANUAL"
                     | "PRODUCT_INFORMATION"
                     | "CAMPAIGN",
                 )
               }
-              className="rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="NEWS" className="text-black">
-                Nyheter
-              </option>
-              <option value="STORE_MANUAL" className="text-black">
-                Butiksmanual
-              </option>
-              <option value="PRODUCT_INFORMATION" className="text-black">
-                Produktinformation
-              </option>
-              <option value="CAMPAIGN" className="text-black">
-                Kampanjer
-              </option>
-            </select>
+              options={[
+                {
+                  value: "NEWS",
+                  label: "Nyheter",
+                },
+                {
+                  value: "STORE_MANUAL",
+                  label: "Butiksmanual",
+                },
+                {
+                  value: "PRODUCT_INFORMATION",
+                  label: "Produktinformation",
+                },
+                {
+                  value: "CAMPAIGN",
+                  label: "Kampanjer",
+                },
+              ]}
+              className="w-full"
+            />
             <textarea
               placeholder="Innehåll"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={4}
-              className="resize-none rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
+              className="input resize-none rounded-lg px-4 py-2"
             />
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-col gap-2">

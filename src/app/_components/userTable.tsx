@@ -53,7 +53,7 @@ export function UserTable({ onSelectUsers }: UserTableProps) {
             placeholder="Sök användare..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="rounded-lg bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/40"
+            className="input rounded-lg px-3 py-2 text-sm"
           />
 
           <button

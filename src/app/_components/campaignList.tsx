@@ -145,9 +145,16 @@ export default function CampaignList() {
                 </div>
 
                 <div
-                  className={`grid overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "mt-4 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"} `}
+                  className={`grid overflow-hidden transition-all duration-300 ease-in-out ${
+                    isOpen
+                      ? "mt-4 grid-rows-[1fr] opacity-100"
+                      : "mt-0 grid-rows-[0fr] opacity-0"
+                  }`}
                 >
-                  <div className="overflow-hidden">
+                  <div
+                    className="overflow-hidden"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="rounded-xl bg-black/20 p-4 text-sm text-white/70">
                       <p className="mb-2 font-medium text-white">Meddelanden</p>
 
@@ -167,6 +174,7 @@ export default function CampaignList() {
                         <p className="text-white/40">Inga meddelanden än</p>
                       )}
                     </div>
+
                     <div className="mt-4 flex gap-2">
                       <input
                         type="text"
@@ -178,7 +186,7 @@ export default function CampaignList() {
                           }))
                         }
                         placeholder="Skriv ett meddelande..."
-                        className="flex-1 rounded-lg bg-white/5 px-3 py-2 text-sm text-white outline-none"
+                        className="input flex-1 rounded-lg px-3 py-2 text-sm"
                       />
 
                       <button

@@ -2,14 +2,7 @@
 
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import {
-  FaHandHoldingHeart,
-  FaLaptop,
-  FaRegFileAlt,
-  FaShopify,
-  FaShoppingCart,
-  FaUsers,
-} from "react-icons/fa";
+import { FaRegFileAlt, FaShopify } from "react-icons/fa";
 import { ImInfo } from "react-icons/im";
 import { MdCampaign } from "react-icons/md";
 import type { RouterOutputs } from "~/trpc/react";
@@ -51,7 +44,6 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
   const [tags, setTags] = useState<string[]>(
     resource.tags.map((tag) => tag.name),
   );
-  const [isSelected, setIsSelected] = useState<null | number>(null);
 
   if (!isOpen) return null;
 
@@ -97,7 +89,6 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
     setDescription("");
     setCategory("OTHER");
     setUrl("");
-    setIsSelected(null);
   };
 
   return ReactDOM.createPortal(
@@ -109,30 +100,33 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
         className="w-full max-w-xl rounded-lg bg-linear-to-b p-6 shadow-lg dark:from-[#3b0e7a]/70 dark:to-[#282a53]/70"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-center md:gap-8">
-          {categorys.map((cat) => (
-            <div
-              key={cat.id}
-              className="flex flex-col items-center justify-center gap-2"
-            >
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {categorys.map((cat) => {
+            const selected = category === cat.value;
+
+            return (
               <button
-                onClick={() => {
-                  setCategory(cat.value as Category);
-                  setIsSelected(cat.id);
-                }}
-                className={`flex max-w-xs cursor-pointer flex-col items-center gap-4 rounded-xl p-4 shadow-lg/40 transition-all duration-300 ${
-                  isSelected === cat.id
-                    ? "scale-110 bg-blue-500 text-white"
-                    : isSelected !== null
-                      ? "bg-white/5 text-white/40 hover:bg-white/10"
-                      : "bg-white/10 hover:bg-white/20"
+                key={cat.id}
+                type="button"
+                onClick={() => setCategory(cat.value as Category)}
+                className={`flex h-24 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border shadow-lg/40 transition-all duration-300 ${
+                  selected
+                    ? "border-blue-500 bg-blue-500/20 text-blue-300"
+                    : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
                 }`}
               >
-                {cat.icon}
+                <div
+                  className={`transition-transform duration-200 ${
+                    selected ? "scale-110" : ""
+                  }`}
+                >
+                  {cat.icon}
+                </div>
+
+                <span className="text-sm font-medium">{cat.label}</span>
               </button>
-              <span className="text-xs font-bold">{cat.label}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-2">
@@ -142,14 +136,14 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
             placeholder="Titel"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rounded-lg border border-black/50 bg-white/5 px-4 py-3 text-gray-200/65 required:border-red-500 required:text-red-500"
+            className="input rounded-lg px-4 py-3 required:border-red-500 required:text-red-500"
           />
           <label htmlFor="content">Beskriv Resursen</label>
           <textarea
             placeholder="Beskriv resursen"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
+            className="input h-full min-h-44 rounded-lg p-7 px-4 py-2 required:border-red-500 required:text-red-500"
           />
           <label htmlFor="url">URL</label>
           <input

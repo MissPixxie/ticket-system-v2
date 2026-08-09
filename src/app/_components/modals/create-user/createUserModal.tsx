@@ -114,7 +114,7 @@ export default function CreateUserModal({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-gray-200/65 placeholder:text-white/40 focus:border-blue-500 focus:outline-none"
+                className="w-full input rounded-xl px-4 py-3"
                 required
               />
             </div>
@@ -125,7 +125,7 @@ export default function CreateUserModal({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-gray-200/65 placeholder:text-white/40 focus:border-blue-500 focus:outline-none"
+                className="w-full input rounded-xl px-4 py-3"
                 required
               />
             </div>
@@ -136,7 +136,7 @@ export default function CreateUserModal({
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-gray-200/65 placeholder:text-white/40 focus:border-blue-500 focus:outline-none"
+                className="w-full input rounded-xl px-4 py-3"
                 required
               />
             </div>

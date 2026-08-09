@@ -13,6 +13,7 @@ import { CldImage } from "next-cloudinary";
 import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
+import CustomSelect from "~/app/_components/customSelect";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -134,7 +135,7 @@ export default function NewsPage({
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition outline-none focus:border-blue-500"
+                className="input w-full rounded-lg px-4 py-3"
               />
             </div>
 
@@ -144,20 +145,21 @@ export default function NewsPage({
                   Kategori
                 </label>
 
-                <select
+                <CustomSelect
                   value={category}
-                  onChange={(e) =>
-                    setCategory(e.target.value as typeof category)
-                  }
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3"
-                >
-                  <option value="NEWS">Nyhet</option>
-                  <option value="CAMPAIGN">Kampanj</option>
-                  <option value="STORE_MANUAL">Butikshandbok</option>
-                  <option value="PRODUCT_INFORMATION">
-                    Produktinformation
-                  </option>
-                </select>
+                  onChange={(value) => setCategory(value as typeof category)}
+                  options={[
+                    { value: "NEWS", label: "Nyhet" },
+                    { value: "CAMPAIGN", label: "Kampanj" },
+                    { value: "STORE_MANUAL", label: "Butikshandbok" },
+                    {
+                      value: "PRODUCT_INFORMATION",
+                      label: "Produktinformation",
+                    },
+                  ]}
+                  size="md"
+                  className="w-full"
+                />
               </div>
 
               <div>
@@ -165,18 +167,18 @@ export default function NewsPage({
                   Prioritet
                 </label>
 
-                <select
+                <CustomSelect
                   value={priority}
-                  onChange={(e) =>
-                    setPriority(e.target.value as typeof priority)
-                  }
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3"
-                >
-                  <option>LOW</option>
-                  <option>MEDIUM</option>
-                  <option>HIGH</option>
-                  <option>URGENT</option>
-                </select>
+                  onChange={(value) => setPriority(value as typeof priority)}
+                  options={[
+                    { value: "LOW", label: "LOW" },
+                    { value: "MEDIUM", label: "MEDIUM" },
+                    { value: "HIGH", label: "HIGH" },
+                    { value: "URGENT", label: "URGENT" },
+                  ]}
+                  size="md"
+                  className="w-full"
+                />
               </div>
             </div>
             <div className="flex justify-between">

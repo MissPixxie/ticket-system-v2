@@ -47,7 +47,7 @@ export default function ResourcesPage() {
               placeholder="Sök bland resurser..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pr-4 pl-11 text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-500 focus:bg-white/10"
+              className="input w-full rounded-xl py-3 pr-4 pl-11"
             />
           </div>
           {isLoading && (

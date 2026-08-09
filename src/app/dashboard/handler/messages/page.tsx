@@ -169,7 +169,7 @@ export default function MessagePage() {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   rows={6}
-                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white transition-all outline-none placeholder:text-white/40 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10"
                 />
               </div>
 
@@ -196,9 +196,9 @@ export default function MessagePage() {
                         onClick={() => handleDepartmentChange(dep.value)}
                         className={`flex items-center gap-3 rounded-2xl border px-5 py-3 transition-all duration-200 ${
                           isSelected
-                            ? "border-blue-500 bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/10"
+                            ? "selected-blue"
                             : "border-white/10 bg-white/5 text-white hover:bg-white/10"
-                        } `}
+                        }`}
                       >
                         <div
                           className={`transition-transform ${
@@ -228,7 +228,7 @@ export default function MessagePage() {
                 </div>
 
                 {/* SEARCH */}
-                <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10">
+                <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition-all focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-500/10">
                   <LuSearch className="shrink-0 text-white/40" size={18} />
 
                   <input
@@ -302,12 +302,12 @@ export default function MessagePage() {
                           }
                           className={`flex w-full items-center justify-between rounded-2xl border px-4 py-2 text-left transition-all duration-200 ${
                             isSelected
-                              ? "border-blue-500 bg-blue-500/10"
+                              ? "selected-blue"
                               : "border-white/10 bg-white/5 hover:bg-white/10"
-                          } `}
+                          }`}
                         >
                           <div className="flex items-center gap-4">
-                            {/* Avatar */}
+                            {/* AVATAR */}
                             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-500 font-semibold text-white">
                               {user.name?.charAt(0) ?? "U"}
                             </div>
@@ -341,7 +341,7 @@ export default function MessagePage() {
                               isSelected
                                 ? "bg-blue-500 text-white"
                                 : "bg-white/10 text-white/60"
-                            } `}
+                            }`}
                           >
                             {isSelected ? "Vald" : "Välj"}
                           </div>

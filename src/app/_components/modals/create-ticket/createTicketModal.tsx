@@ -143,14 +143,14 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             placeholder="Titel"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
+            className="input rounded-lg p-7 px-4 py-2 required:border-red-500 required:text-red-500"
           />
           <label htmlFor="issue">Beskriv problemet</label>
           <textarea
             placeholder="Beskriv problemet"
             value={issue}
             onChange={(e) => setIssue(e.target.value)}
-            className="h-full min-h-44 rounded-lg border border-black/50 bg-white/10 p-7 px-4 py-2 text-gray-200/65 required:border-red-500 required:text-red-500"
+            className="input h-full min-h-44 rounded-lg p-7 px-4 py-2 required:border-red-500 required:text-red-500"
           />
           <label className="mt-3 text-sm font-semibold">Bilaga</label>
 
@@ -203,7 +203,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               type="checkbox"
               checked={isAnonymous}
               onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="h-4 w-4 cursor-pointer"
+              className="input h-4 w-4 cursor-pointer"
             />
             <label>Skicka anonymt</label>
           </div>

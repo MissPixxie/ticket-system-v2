@@ -129,7 +129,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="rounded-lg bg-white/10 px-3 py-2 text-sm"
+            className="input rounded-lg px-3 py-2 text-sm"
           >
             <option value="ALL" className="text-black">
               Alla
@@ -148,7 +148,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
           <select
             value={departmentFilter}
             onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="rounded-lg bg-white/10 px-3 py-2 text-sm"
+            className="input rounded-lg px-3 py-2 text-sm"
           >
             <option value="ALL" className="text-black">
               Alla
@@ -175,7 +175,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
             placeholder="Sök tickets..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="rounded-lg bg-white/10 px-3 py-2 text-sm"
+            className="input rounded-lg px-3 py-2 text-sm"
           />
         </div>
 

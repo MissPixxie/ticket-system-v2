@@ -5,6 +5,7 @@ import { api } from "~/trpc/react";
 import { ImBooks } from "react-icons/im";
 import ResourcesCard from "~/app/_components/cards/resourceCard";
 import { GenerateTagsButton } from "~/app/_components/ai/generateTags";
+import CustomSelect from "~/app/_components/customSelect";
 
 export default function ResourcesPage() {
   const utils = api.useUtils();
@@ -85,7 +86,7 @@ export default function ResourcesPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Titel"
-              className="rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
+              className="input rounded-lg px-4 py-2"
             />
 
             <textarea
@@ -93,42 +94,48 @@ export default function ResourcesPage() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Beskrivning"
               rows={3}
-              className="resize-none rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
+              className="input resize-none rounded-lg px-4 py-2"
             />
-            <select
+            <CustomSelect
               value={category}
-              onChange={(e) =>
+              onChange={(value) =>
                 setCategory(
-                  e.target.value as
+                  value as
                     | "DOCUMENTATION"
                     | "TUTORIAL"
                     | "INFORMATION"
                     | "OTHER",
                 )
               }
-              className="rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="DOCUMENTATION" className="text-black">
-                Dokumentation
-              </option>
-              <option value="TUTORIAL" className="text-black">
-                Tutorial
-              </option>
-              <option value="INFORMATION" className="text-black">
-                Information
-              </option>
-              <option value="OTHER" className="text-black">
-                Övrigt
-              </option>
-            </select>
+              options={[
+                {
+                  value: "DOCUMENTATION",
+                  label: "Dokumentation",
+                },
+                {
+                  value: "TUTORIAL",
+                  label: "Tutorial",
+                },
+                {
+                  value: "INFORMATION",
+                  label: "Information",
+                },
+                {
+                  value: "OTHER",
+                  label: "Övrigt",
+                },
+              ]}
+              size="md"
+              className="w-full"
+            />
             <input
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Länk till dokument (URL)"
-              className={`rounded-lg bg-white/10 px-4 py-2 text-white outline-none focus:ring-2 ${
+              className={`input rounded-lg px-4 py-2 ${
                 urlError
                   ? "ring-2 ring-red-500 focus:ring-red-500"
-                  : "focus:ring-blue-500"
+                  : "focus:ring-4 focus:ring-purple-500/10"
               }`}
             />
             {urlError && (
