@@ -6,6 +6,7 @@ import { ImBooks } from "react-icons/im";
 import ResourcesCard from "~/app/_components/cards/resourceCard";
 import { GenerateTagsButton } from "~/app/_components/ai/generateTags";
 import CustomSelect from "~/app/_components/customSelect";
+import SkeletonResourcesPage from "~/app/_components/skeletonComponents/pages/skeletonResourcePage";
 
 export default function ResourcesPage() {
   const utils = api.useUtils();
@@ -64,7 +65,7 @@ export default function ResourcesPage() {
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center text-white/70">
-        Laddar resurser...
+        <SkeletonResourcesPage />
       </main>
     );
   }
@@ -166,10 +167,7 @@ export default function ResourcesPage() {
                 />
               </div>
             </div>
-            <button
-              onClick={handleCreate}
-              className="cursor-pointer self-start rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
-            >
+            <button onClick={handleCreate} className="submit-button">
               Skapa resurs
             </button>
           </div>

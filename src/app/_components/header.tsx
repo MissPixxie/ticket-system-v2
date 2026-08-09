@@ -18,7 +18,7 @@ export default async function Header() {
       <header className="flex h-fit w-full grow flex-row place-content-end items-center gap-4 bg-linear-to-b from-[#2e026d] to-[#15162c] px-5 py-3 shadow-md/80">
         <NotificationBell />
         <p className="text-center text-2xl text-white">
-          <span>Logged in as {session.user.name}</span>
+          <span>Inloggad som {session.user.name}</span>
         </p>
         <SignOutButton />
       </header>

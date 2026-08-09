@@ -23,7 +23,7 @@ export function SignOutButton() {
       onClick={logout}
       className="cursor-pointer rounded-lg bg-blue-500/20 px-4 py-2 text-lg text-blue-300 hover:bg-blue-500/30"
     >
-      Sign out
+      Logga ut
     </button>
   );
 }

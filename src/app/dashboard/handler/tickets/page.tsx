@@ -5,6 +5,7 @@ import { Status } from "@prisma/client";
 import { useSocket } from "~/app/socketProvider";
 import { TicketTable } from "~/app/_components/ticketTable";
 import { TiTicket } from "react-icons/ti";
+import SkeletonTicketOverview from "~/app/_components/skeletonComponents/pages/skeletonTicketOverview";
 
 export default function TicketsPage() {
   const { data: tickets, isLoading } = api.ticket.listAllTickets.useQuery({
@@ -34,7 +35,7 @@ export default function TicketsPage() {
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center text-white/70">
-        Laddar tickets...
+        <SkeletonTicketOverview />
       </main>
     );
   }

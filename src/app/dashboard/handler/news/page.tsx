@@ -223,10 +223,7 @@ export default function NewsPage() {
                 </div>
               </div>
             )}
-            <button
-              onClick={handleCreateNews}
-              className="cursor-pointer self-start rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
-            >
+            <button onClick={handleCreateNews} className="submit-button">
               Skapa nyhet
             </button>
           </div>

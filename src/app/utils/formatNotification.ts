@@ -108,3 +108,50 @@ export function formatPriority(priority?: string) {
       return priority;
   }
 }
+
+export function formatSuggestionStatus(status?: string) {
+  switch (status) {
+    case "SENT":
+      return "Skickad";
+    case "UNDER_REVIEW":
+      return "Under granskning";
+    case "APPROVED":
+      return "Godkänd";
+    case "IMPLEMENTED":
+      return "Implementerad";
+    case "REJECTED":
+      return "Avslagen";
+    default:
+      return status;
+  }
+}
+
+export function formatNewsCategory(category?: string) {
+  switch (category) {
+    case "NEWS":
+      return "Allmänt";
+    case "STORE_MANUAL":
+      return "Butiks manual";
+    case "PRODUCT_INFORMATION":
+      return "Produkt information";
+    case "CAMPAIGN":
+      return "Kampanj";
+    default:
+      return category;
+  }
+}
+
+export function formatResourceCategory(category?: string) {
+  switch (category) {
+    case "DOCUMENTATION":
+      return "Dokumentation";
+    case "TUTORIAL":
+      return "Tutorial";
+    case "INFORMATION":
+      return "Information";
+    case "OTHER":
+      return "Övrigt";
+    default:
+      return category;
+  }
+}

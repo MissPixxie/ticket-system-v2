@@ -151,7 +151,7 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
             placeholder="URL"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="rounded-lg border border-black/50 bg-white/5 px-4 py-3 text-gray-200/65 required:border-red-500 required:text-red-500"
+            className="input rounded-lg px-4 py-3 required:border-red-500 required:text-red-500"
           />
           <div className="flex w-100 flex-col gap-3">
             <label className="mb-2 block text-sm font-medium text-white/70">

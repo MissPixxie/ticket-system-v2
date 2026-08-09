@@ -7,6 +7,7 @@ import type { RouterOutputs } from "~/trpc/react";
 import { EditResourceSection } from "../modals/edit-resource/editResourceSection";
 import Link from "next/link";
 import { FiExternalLink } from "react-icons/fi";
+import { formatResourceCategory } from "~/app/utils/formatNotification";
 
 type Resources = RouterOutputs["resource"]["listResources"][number];
 
@@ -36,14 +37,14 @@ export default function ResourcesCard({ resourceItem }: ResourceCardProps) {
   return (
     <div
       key={resourceItem.id}
-      className="cursor-pointer rounded-2xl bg-white/5 p-6 shadow-lg/15 transition hover:bg-white/10"
+      className="rounded-2xl bg-white/5 p-6 shadow-lg/15"
       onClick={() => setExpandedId(isExpanded ? null : resourceItem.id)}
     >
       {/* Header */}
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-xl font-bold">{resourceItem.title}</h3>
         <span className="rounded-full bg-blue-500/20 px-2 py-1 text-xs text-blue-300">
-          {resourceItem.category}
+          {formatResourceCategory(resourceItem.category)}
         </span>
       </div>
 

@@ -12,6 +12,8 @@ import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 import { CldImage } from "next-cloudinary";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
 import { formatPriority, formatStatus } from "~/app/utils/formatNotification";
+import SkeletonTicketDetails from "~/app/_components/skeletonComponents/pages/skeletonTicketDetails";
+import CustomSelect from "~/app/_components/customSelect";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -66,7 +68,7 @@ export default function TicketPage({
   if (isLoading || !ticket) {
     return (
       <main className="flex min-h-screen items-center justify-center text-white/70">
-        Laddar ticket...
+        <SkeletonTicketDetails />
       </main>
     );
   }
@@ -170,33 +172,60 @@ export default function TicketPage({
               <div className="mt-4 flex flex-row gap-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-semibold">Status</label>
-                  <select
-                    value={ticket.status}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => handleSetStatus(ticket.id)}
-                    className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white backdrop-blur-sm transition-all outline-none hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
-                  >
-                    <option value="OPEN">Öppen</option>
-                    <option value="IN_PROGRESS">Pågående</option>
-                    <option value="CLOSED">Stängd</option>
-                  </select>
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <CustomSelect
+                      value={ticket.status}
+                      onChange={() => handleSetStatus(ticket.id)}
+                      options={[
+                        {
+                          value: "OPEN",
+                          label: "Öppen",
+                        },
+                        {
+                          value: "IN_PROGRESS",
+                          label: "Pågående",
+                        },
+                        {
+                          value: "CLOSED",
+                          label: "Stängd",
+                        },
+                      ]}
+                      size="md"
+                      className="w-32"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-semibold">Prioritet</label>
-                  <select
-                    value={ticket.priority}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) =>
-                      handleSetPriority(ticket.id, e.target.value)
-                    }
-                    className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white backdrop-blur-sm transition-all outline-none hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
-                  >
-                    <option value="LOW">Låg</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HIGH">Hög</option>
-                    <option value="URGENT">Akut</option>
-                  </select>
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <CustomSelect
+                      value={ticket.priority}
+                      onChange={(value) => handleSetPriority(ticket.id, value)}
+                      options={[
+                        {
+                          value: "LOW",
+                          label: "Låg",
+                        },
+                        {
+                          value: "MEDIUM",
+                          label: "Medium",
+                        },
+                        {
+                          value: "HIGH",
+                          label: "Hög",
+                        },
+                        {
+                          value: "URGENT",
+                          label: "Akut",
+                        },
+                      ]}
+                      size="md"
+                      className="w-32"
+                    />
+                  </div>
                 </div>
                 <div className="ml-auto flex flex-row gap-5 self-end">
                   {ticket.conversation?.id && (

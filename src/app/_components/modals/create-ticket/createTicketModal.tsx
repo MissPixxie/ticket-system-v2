@@ -16,6 +16,7 @@ import { UploadImageButton } from "../../cloudinaryUpload/uploadImageButton";
 import { CldImage } from "next-cloudinary";
 import { ImagePreviewModal } from "../imagePreviewModal";
 import { EditImageButton } from "../../cloudinaryUpload/feEdit";
+import CustomSelect from "../../customSelect";
 
 export type Department = "IT" | "HR" | "CAMPAIGN" | "PRODUCT" | "CUSTOMERCLUB";
 export type Priority = "LOW" | "MEDIUM" | "URGENT";
@@ -111,30 +112,38 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
         className="w-full max-w-xl rounded-lg bg-linear-to-b from-[#3b0e7a]/70 to-[#282a53]/70 p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="grid grid-cols-5 gap-4 sm:grid-cols-5 md:gap-8">
-          {orderedDepartments.map((dep) => (
-            <div
-              key={dep.id}
-              className="flex flex-col items-center justify-center gap-2"
-            >
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {orderedDepartments.map((dep) => {
+            const selected = isSelected === dep.id;
+
+            return (
               <button
+                key={dep.id}
+                type="button"
                 onClick={() => {
                   setDepartment(dep.value as Department);
                   setIsSelected(dep.id);
                 }}
-                className={`flex max-w-xs cursor-pointer flex-col items-center gap-4 rounded-xl p-4 shadow-lg/40 transition-all duration-300 ${
-                  isSelected === dep.id
-                    ? "scale-110 bg-blue-500 text-white"
+                className={`flex h-24 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border shadow-lg/40 transition-all duration-300 ${
+                  selected
+                    ? "border-blue-500 bg-blue-500/20 text-blue-300"
                     : isSelected !== null
                       ? "notSelected"
-                      : "bg-white/10 hover:bg-white/20"
+                      : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
                 }`}
               >
-                {dep.icon}
+                <div
+                  className={`transition-transform duration-200 ${
+                    selected ? "scale-110" : ""
+                  }`}
+                >
+                  {dep.icon}
+                </div>
+
+                <span className="text-sm font-medium">{dep.label}</span>
               </button>
-              <span className="text-xs font-bold">{dep.label}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-2">
           <label htmlFor="title">Titel</label>
@@ -145,7 +154,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             onChange={(e) => setTitle(e.target.value)}
             className="input rounded-lg p-7 px-4 py-2 required:border-red-500 required:text-red-500"
           />
-          <label htmlFor="issue">Beskriv problemet</label>
+          <label htmlFor="issue">Beskriv problemet...</label>
           <textarea
             placeholder="Beskriv problemet"
             value={issue}
@@ -199,26 +208,65 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             </div>
           )}
           <div className="flex items-center gap-2 text-sm text-white">
-            <input
-              type="checkbox"
-              checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="input h-4 w-4 cursor-pointer"
-            />
-            <label>Skicka anonymt</label>
+            <label
+              className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-all duration-200 ${
+                isAnonymous
+                  ? "border-blue-500 bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/10"
+                  : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                className="sr-only"
+              />
+
+              <span
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200 ${
+                  isAnonymous
+                    ? "border-blue-400 bg-blue-500 text-white"
+                    : "border-white/20 bg-white/5"
+                }`}
+              >
+                {isAnonymous && (
+                  <svg viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5">
+                    <path
+                      d="M4 10.5L8 14L16 6"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+              </span>
+
+              <span className="text-sm font-medium">Skicka anonymt</span>
+            </label>
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold">Prioritet</label>
-            <select
+            <CustomSelect
               value={priority}
-              onClick={(e) => e.stopPropagation()}
-              onChange={(e) => setPriority(e.target.value as Priority)}
-              className="cursor-pointer rounded bg-gray-700 px-3 py-2 text-white shadow-md/20"
-            >
-              <option value="LOW">Låg</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="URGENT">Hög</option>
-            </select>
+              onChange={(value) => setPriority(value as Priority)}
+              options={[
+                {
+                  value: "LOW",
+                  label: "Låg",
+                },
+                {
+                  value: "MEDIUM",
+                  label: "Medium",
+                },
+                {
+                  value: "URGENT",
+                  label: "Hög",
+                },
+              ]}
+              size="sm"
+              className="w-32"
+            />
           </div>
           <div className="flex justify-end space-x-2 pt-4">
             <button type="button" onClick={onClose} className="abort-button">

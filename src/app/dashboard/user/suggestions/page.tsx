@@ -10,6 +10,7 @@ import { GoDotFill } from "react-icons/go";
 import { toast } from "sonner";
 import { useSocket } from "~/app/socketProvider";
 import SkeletonSuggestionCard from "~/app/_components/skeletonComponents/cards/skeletonSuggestionCard";
+import { formatSuggestionStatus } from "~/app/utils/formatNotification";
 
 type FilterType = "latest" | "popular" | "status";
 
@@ -107,7 +108,7 @@ export default function SuggestionsPage() {
               placeholder="Beskriv din idé..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="min-h-24 rounded-lg bg-white/10 p-3 text-sm outline-none"
+              className="input min-h-24 rounded-lg p-3"
             />
 
             <div className="flex items-center justify-between">
@@ -152,10 +153,7 @@ export default function SuggestionsPage() {
                 <span className="text-sm font-medium">Skicka anonymt</span>
               </label>
 
-              <button
-                type="submit"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm hover:bg-blue-500"
-              >
+              <button type="submit" className="submit-button">
                 Skicka
               </button>
             </div>
@@ -217,7 +215,7 @@ export default function SuggestionsPage() {
           {sortedSuggestions?.map((suggestion) => (
             <div
               key={suggestion.id}
-              className="flex items-start gap-4 rounded-xl bg-white/5 p-4 hover:bg-white/10"
+              className="flex items-start gap-4 rounded-xl bg-white/5 p-4"
             >
               {/* VOTE */}
               <button
@@ -257,7 +255,7 @@ export default function SuggestionsPage() {
                   statusStyles[suggestion.status]
                 }`}
               >
-                {suggestion.status}
+                {formatSuggestionStatus(suggestion.status)}
               </span>
             </div>
           ))}

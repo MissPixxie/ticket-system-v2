@@ -278,12 +278,12 @@ export default function NewsPage({
                 rows={18}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="w-full resize-none rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition outline-none focus:border-blue-500"
+                className="input w-full resize-none rounded-xl px-4 py-3"
               />
             </div>
             <div className="flex justify-end">
               <button
-                className="rounded-xl bg-blue-600 px-5 py-2 font-semibold hover:bg-blue-500"
+                className="submit-button"
                 onClick={() =>
                   updateNews.mutate({
                     id: news.id,

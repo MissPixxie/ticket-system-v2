@@ -63,7 +63,7 @@ export default function ResourcesPage() {
               {filteredResources?.map((item) => (
                 <div
                   key={item.id}
-                  className="cursor-pointer rounded-2xl bg-white/5 p-6 shadow-lg/15 transition-colors hover:bg-white/10"
+                  className="rounded-2xl bg-white/5 p-6 shadow-lg/15 transition-colors"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <h3 className="text-xl font-bold">{item.title}</h3>

@@ -98,10 +98,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
             >
               Avbryt
             </button>
-            <button
-              type="submit"
-              className="rounded-full bg-blue-500 px-10 py-3 text-white"
-            >
+            <button type="submit" className="submit-button">
               Bjud in
             </button>
           </div>
