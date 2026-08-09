@@ -274,7 +274,15 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
                         );
 
                       case "ADMIN":
-                        return <PickSection ticketId={ticket.id} />;
+                        return (
+                          <PickSection
+                            ticketId={ticket.id}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                          />
+                        );
 
                       default:
                         return null;

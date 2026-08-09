@@ -63,14 +63,11 @@ const PickHandlerModal: React.FC<PickHandlerModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="cursor-pointer rounded-lg hover:bg-white/20 border px-4 py-2"
+            className="cursor-pointer rounded-lg border px-4 py-2 hover:bg-white/20"
           >
             Avbryt
           </button>
-          <button
-            type="submit"
-            className="cursor-pointer rounded-lg bg-blue-500 hover:bg-blue-400/90 px-10 py-3 text-white"
-          >
+          <button type="submit" className="submit-button">
             Bjud in
           </button>
         </div>

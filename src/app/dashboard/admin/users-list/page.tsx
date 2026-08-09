@@ -226,7 +226,7 @@ export default function ListUsersPage() {
           </div>
 
           {/* TABLE */}
-          <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02]">
+          <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/2">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>

@@ -114,6 +114,7 @@ export default function CreateUserModal({
               <input
                 type="email"
                 value={email}
+                placeholder="Email"
                 onChange={(e) => setEmail(e.target.value)}
                 className="input w-full rounded-xl px-4 py-3"
                 required
@@ -125,6 +126,7 @@ export default function CreateUserModal({
               <input
                 type="text"
                 value={name}
+                placeholder="Namn"
                 onChange={(e) => setName(e.target.value)}
                 className="input w-full rounded-xl px-4 py-3"
                 required
@@ -136,6 +138,7 @@ export default function CreateUserModal({
               <input
                 type="password"
                 value={password}
+                placeholder="Lösenord"
                 onChange={(e) => setPassword(e.target.value)}
                 className="input w-full rounded-xl px-4 py-3"
                 required

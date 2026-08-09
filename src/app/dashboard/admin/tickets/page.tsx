@@ -6,6 +6,7 @@ import { useState } from "react";
 import { TicketSection } from "~/app/_components/modals/create-ticket/ticketSection";
 import TicketCard from "~/app/_components/cards/ticketCard";
 import { TicketTable } from "~/app/_components/ticketTable";
+import SkeletonTicketOverview from "~/app/_components/skeletonComponents/pages/skeletonTicketOverview";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -30,7 +31,7 @@ export default function TicketsPage() {
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center text-white/70">
-        Laddar tickets...
+        <SkeletonTicketOverview />
       </main>
     );
   }

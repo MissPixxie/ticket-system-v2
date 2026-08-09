@@ -183,6 +183,26 @@
   }
 }
 
+/* Blue interactive button */
+.blue-interactive {
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  background-color: rgba(59, 130, 246, 0.1);
+  color: rgb(147, 197, 253);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1);
+  transition: all 0.2s ease;
+}
+
+.blue-interactive:hover {
+  border-color: rgb(96, 165, 250);
+  background-color: rgba(59, 130, 246, 0.2);
+  color: rgb(191, 219, 254);
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.15);
+}
+
+.blue-interactive:active {
+  transform: scale(0.98);
+}
+
 @keyframes hide {
   from {
     opacity: 1;
