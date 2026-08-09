@@ -9,6 +9,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { GoDotFill, GoTrophy } from "react-icons/go";
 import { RiArrowUpDoubleFill } from "react-icons/ri";
 import { FiSearch } from "react-icons/fi";
+import { formatSuggestionStatus } from "~/app/utils/formatNotification";
+import SkeletonSuggestionPageHandler from "~/app/_components/skeletonComponents/pages/skeletonSuggestionPageHandler";
 
 type FilterType = "latest" | "popular" | "status";
 
@@ -86,7 +88,7 @@ export default function SuggestionsHandlerPage() {
   if (isLoading) {
     return (
       <main className="main-page-layout">
-        <div className="container text-white">Laddar förslag...</div>
+        <SkeletonSuggestionPageHandler />
       </main>
     );
   }
@@ -155,13 +157,6 @@ export default function SuggestionsHandlerPage() {
           </div>
         </div>
         {/* LIST */}
-        {isLoading && (
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <SkeletonSuggestionCard key={i} />
-            ))}
-          </div>
-        )}
         <div className="space-y-4">
           {!isLoading && visibleSuggestions?.length === 0 && (
             <p className="text-sm text-white/60">Inga idéer än</p>
@@ -170,7 +165,7 @@ export default function SuggestionsHandlerPage() {
           {visibleSuggestions?.map((suggestion) => (
             <div
               key={suggestion.id}
-              className="flex gap-6 rounded-xl bg-white/5 p-4 shadow-lg/15 hover:bg-white/10"
+              className="flex gap-6 rounded-xl bg-white/5 p-4 shadow-lg/15"
             >
               <div className="flex flex-row place-content-center items-center justify-center">
                 <RiArrowUpDoubleFill size={26} className={"text-gray-500"} />
@@ -191,11 +186,11 @@ export default function SuggestionsHandlerPage() {
 
               {/* STATUS */}
               <span
-                className={`self-start rounded-full px-3 py-1 text-xs ${
+                className={`flex h-7 items-center rounded-full px-3 text-xs ${
                   statusStyles[suggestion.status]
                 }`}
               >
-                {suggestion.status}
+                {formatSuggestionStatus(suggestion.status)}
               </span>
             </div>
           ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { api } from "~/trpc/react";
 import { RiArrowUpDoubleFill } from "react-icons/ri";
 import { FaLightbulb } from "react-icons/fa";
@@ -51,25 +51,31 @@ export default function SuggestionsPage() {
     },
   });
 
-  const sortedSuggestions = suggestions?.sort((a, b) => {
-    if (filter === "latest") {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
+  const sortedSuggestions = useMemo(() => {
+    if (!suggestions) return [];
 
-    if (filter === "popular") {
-      return b.voteCount - a.voteCount;
-    }
+    return [...suggestions].sort((a, b) => {
+      if (filter === "latest") {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      }
 
-    const order = {
-      SENT: 0,
-      UNDER_REVIEW: 1,
-      APPROVED: 2,
-      IMPLEMENTED: 3,
-      REJECTED: 4,
-    };
+      if (filter === "popular") {
+        return b.voteCount - a.voteCount;
+      }
 
-    return order[a.status] - order[b.status];
-  });
+      const order = {
+        SENT: 0,
+        UNDER_REVIEW: 1,
+        APPROVED: 2,
+        IMPLEMENTED: 3,
+        REJECTED: 4,
+      };
+
+      return order[a.status] - order[b.status];
+    });
+  }, [suggestions, filter]);
 
   return (
     <main className="flex min-h-screen justify-center px-6 py-12 text-white">
