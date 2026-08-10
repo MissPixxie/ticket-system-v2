@@ -80,13 +80,15 @@ export const NotificationBell = () => {
     },
   });
 
-  const toggleDropdown = () => {
-    const willOpen = !open;
-    setOpen(willOpen);
+  const markAsSeen = api.notification.markAsSeen.useMutation({
+    onSuccess: () => {
+      void utils.notification.list.invalidate();
+      void utils.notification.getUnseenCount.invalidate();
+    },
+  });
 
-    if (willOpen && unreadCount > 0) {
-      markAllAsSeen.mutate();
-    }
+  const toggleDropdown = () => {
+    setOpen((prev) => !prev);
   };
 
   useEffect(() => {
@@ -119,7 +121,7 @@ export const NotificationBell = () => {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-3 w-[420px] overflow-hidden rounded-2xl bg-linear-to-b from-[#3b0e7a]/80 to-[#282a53]/80 shadow-2xl backdrop-blur-lg">
+        <div className="absolute right-0 z-50 mt-3 w-105 overflow-hidden rounded-2xl bg-linear-to-b from-[#3b0e7a]/80 to-[#282a53]/80 shadow-2xl backdrop-blur-lg">
           <div className="flex items-center justify-between border-b border-white/10 p-5">
             <div>
               <h3 className="text-lg font-semibold text-white">
@@ -148,13 +150,28 @@ export const NotificationBell = () => {
                 <Link
                   key={notification.id}
                   href={getNotificationLink(notification, me?.role?.name)}
-                  className={`block rounded-xl border border-white/5 p-4 transition-all duration-200 ${
+                  onClick={() => {
+                    if (!notification.seen) {
+                      markAsSeen.mutate({ id: notification.id });
+                    }
+                  }}
+                  className={`relative block rounded-xl border p-4 transition-all duration-200 ${
                     notification.seen
-                      ? "bg-white/5 hover:bg-white/10"
-                      : "bg-purple-500/15 ring-1 ring-purple-400/20 hover:bg-purple-500/20"
+                      ? "border-white/5 bg-white/5 hover:bg-white/10"
+                      : "border-blue-400/20 bg-blue-500/10 shadow-lg shadow-blue-500/5 hover:border-blue-400/40 hover:bg-blue-500/15"
                   }`}
                 >
-                  <p className="text-sm font-medium text-white">
+                  {!notification.seen && (
+                    <span className="absolute top-4 right-4 h-2.5 w-2.5 rounded-full bg-blue-400 shadow-lg shadow-blue-500/50" />
+                  )}
+
+                  <p
+                    className={`pr-5 text-sm ${
+                      notification.seen
+                        ? "font-medium text-white/70"
+                        : "font-semibold text-white"
+                    }`}
+                  >
                     {formatNotification(notification)}
                   </p>
 
@@ -170,14 +187,16 @@ export const NotificationBell = () => {
             )}
           </div>
 
-          <div className="border-t border-white/10 p-3">
-            <button
-              onClick={() => markAllAsSeen.mutate()}
-              className="w-full rounded-xl bg-white/5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-            >
-              Markera alla som lästa
-            </button>
-          </div>
+          {unreadCount > 0 && (
+            <div className="border-t border-white/10 p-3">
+              <button
+                onClick={() => markAllAsSeen.mutate()}
+                className="w-full rounded-xl bg-white/5 py-3 text-sm font-medium text-white transition-all hover:bg-blue-500/10 hover:text-blue-300"
+              >
+                Markera alla som lästa
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import { db } from "~/server/db";
 import "dotenv/config";
 
+const PORT = Number(process.env.PORT) || 3001;
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
@@ -34,6 +35,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(3001, () => {
-  console.log("Socket.IO server running on http://localhost:3001");
+httpServer.listen(PORT, () => {
+  console.log(`Socket.IO server running on http://localhost:${PORT}`);
 });
