@@ -31,14 +31,19 @@ httpServer.on("request", (req, res) => {
     req.on("end", () => {
       try {
         const { userId } = JSON.parse(body);
-
         if (!userId || typeof userId !== "string") {
           res.writeHead(400);
           res.end("Invalid userId");
           return;
         }
 
-        io.to(`user:${userId}`).emit("notification:new");
+        const roomName = `user:${userId}`;
+        const room = io.sockets.adapter.rooms.get(roomName);
+
+        console.log("🔔 /notify mottagen för user:", userId);
+        console.log("👥 Socketar i user-room:", roomName, room?.size ?? 0);
+
+        io.to(roomName).emit("notification:new");
 
         res.writeHead(200, {
           "Content-Type": "application/json",
@@ -62,8 +67,13 @@ io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId as string;
 
   // Varje användare får ett eget room för personliga notiser
-  socket.join(`user:${userId}`);
+  const userRoom = `user:${userId}`;
+
+  socket.join(userRoom);
+
   console.log(`👤 ${userId} gick med i sitt user-room`);
+  console.log(`👤 Socket ID: ${socket.id}`);
+  console.log(`👤 User room: ${userRoom}`);
 
   socket.on("join:room", (roomId) => {
     console.log(`📥 ${userId} försöker gå med i room: ${roomId}`);
