@@ -26,24 +26,31 @@ export const SocketProvider = ({
   useEffect(() => {
     if (!userId) return;
 
-    const socketInstance = io( "https://victorious-freedom-production-8887.up.railway.app", {
-      query: { userId },
-      transports: ["websocket"],
+    const socketInstance = io(
+      "https://victorious-freedom-production-8887.up.railway.app",
+      {
+        query: { userId },
+        transports: ["websocket"],
+      },
+    );
+
+    socketInstance.on("connect", () => {
+      console.log("🟢 Connected to socket:", socketInstance.id);
+      setIsConnected(true);
     });
 
-socketInstance.on("connect", () => {
-  console.log("🟢 Connected to socket:", socketInstance.id);
-  setIsConnected(true);
-});
+    socketInstance.on("notification:new", () => {
+      console.log("🚨🚨 SOCKET PROVIDER FICK NOTIFICATION 🚨🚨");
+    });
 
-socketInstance.on("connect_error", (error) => {
-  console.error("🔴 Socket connection error:", error);
-});
+    socketInstance.on("connect_error", (error) => {
+      console.error("🔴 Socket connection error:", error);
+    });
 
-socketInstance.on("disconnect", (reason) => {
-  console.log("🟡 Socket disconnected:", reason);
-  setIsConnected(false);
-});
+    socketInstance.on("disconnect", (reason) => {
+      console.log("🟡 Socket disconnected:", reason);
+      setIsConnected(false);
+    });
 
     setSocket(socketInstance);
 

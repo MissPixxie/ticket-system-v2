@@ -97,17 +97,18 @@ export class PrismaEventService extends EventEmitter {
           try {
             console.log("🔔 Försöker skicka socket-notis till:", userId);
 
-            const response = await fetch(
-              `${process.env.SOCKET_SERVER_URL}/notify`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "x-internal-secret": process.env.INTERNAL_SOCKET_SECRET ?? "",
-                },
-                body: JSON.stringify({ userId }),
+            const socketUrl = `${process.env.SOCKET_SERVER_URL}/notify`;
+
+            console.log("🌐 Socket notify URL:", socketUrl);
+
+            const response = await fetch(socketUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-internal-secret": process.env.INTERNAL_SOCKET_SECRET ?? "",
               },
-            );
+              body: JSON.stringify({ userId }),
+            });
 
             console.log(
               "📡 Socket notify response:",

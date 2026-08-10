@@ -89,10 +89,17 @@ export const NotificationBell = () => {
   });
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      console.log("❌ NotificationBell: ingen socket");
+      return;
+    }
+
+    console.log("🔔 NotificationBell kopplar socket-listener");
+    console.log("🔌 Socket ID:", socket.id);
+    console.log("🔌 Socket connected:", socket.connected);
 
     const handleNewNotification = () => {
-      console.log("🔔 Ny notification mottagen via socket");
+      console.log("🚨🚨🚨 NY NOTIFICATION VIA SOCKET 🚨🚨🚨");
 
       void utils.notification.list.invalidate();
       void utils.notification.getUnseenCount.invalidate();
@@ -101,6 +108,7 @@ export const NotificationBell = () => {
     socket.on("notification:new", handleNewNotification);
 
     return () => {
+      console.log("🔕 NotificationBell tar bort socket-listener");
       socket.off("notification:new", handleNewNotification);
     };
   }, [socket, utils.notification.list, utils.notification.getUnseenCount]);
