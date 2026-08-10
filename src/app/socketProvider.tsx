@@ -31,8 +31,19 @@ export const SocketProvider = ({
       transports: ["websocket"],
     });
 
-    socketInstance.on("connect", () => setIsConnected(true));
-    socketInstance.on("disconnect", () => setIsConnected(false));
+socketInstance.on("connect", () => {
+  console.log("🟢 Connected to socket:", socketInstance.id);
+  setIsConnected(true);
+});
+
+socketInstance.on("connect_error", (error) => {
+  console.error("🔴 Socket connection error:", error);
+});
+
+socketInstance.on("disconnect", (reason) => {
+  console.log("🟡 Socket disconnected:", reason);
+  setIsConnected(false);
+});
 
     setSocket(socketInstance);
 
