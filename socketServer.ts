@@ -30,8 +30,8 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("notification", `User ${userId} has joined`);
   });
 
-  socket.on("disconnect", () => {
-    console.log(`User disconnected: ${userId}`);
+  socket.on("disconnect", (reason) => {
+    console.log(`User disconnected: ${userId}, reason: ${reason}`);
   });
 });
 
