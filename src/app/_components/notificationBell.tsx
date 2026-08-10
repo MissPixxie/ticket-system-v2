@@ -6,6 +6,7 @@ import { api } from "~/trpc/react";
 import { formatNotification } from "../utils/formatNotification";
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
+import { useSocket } from "../socketProvider";
 
 type NotificationWithEvent = Prisma.NotificationGetPayload<{
   include: {
@@ -65,7 +66,7 @@ export const NotificationBell = () => {
   const utils = api.useUtils();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const { socket } = useSocket();
   const { data: unreadCount = 0 } = api.notification.getUnseenCount.useQuery();
 
   const { data: me } = api.user.me.useQuery();
@@ -86,6 +87,23 @@ export const NotificationBell = () => {
       void utils.notification.getUnseenCount.invalidate();
     },
   });
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewNotification = () => {
+      console.log("🔔 Ny notification mottagen via socket");
+
+      void utils.notification.list.invalidate();
+      void utils.notification.getUnseenCount.invalidate();
+    };
+
+    socket.on("notification:new", handleNewNotification);
+
+    return () => {
+      socket.off("notification:new", handleNewNotification);
+    };
+  }, [socket, utils.notification.list, utils.notification.getUnseenCount]);
 
   const toggleDropdown = () => {
     setOpen((prev) => !prev);
