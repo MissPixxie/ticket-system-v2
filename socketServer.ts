@@ -8,7 +8,11 @@ const httpServer = createServer();
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://ticket-system-v2-production.up.railway.app",
+    origin: [
+      "https://ticket-system-v2-production.up.railway.app",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+    ],
   },
 });
 
