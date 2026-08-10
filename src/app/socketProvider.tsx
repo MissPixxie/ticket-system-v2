@@ -26,7 +26,7 @@ export const SocketProvider = ({
   useEffect(() => {
     if (!userId) return;
 
-    const socketInstance = io("http://localhost:3001", {
+    const socketInstance = io( "https://victorious-freedom-production-8887.up.railway.app", {
       query: { userId },
       transports: ["websocket"],
     });
