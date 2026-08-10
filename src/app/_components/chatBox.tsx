@@ -41,8 +41,10 @@ export default function ChatBox({ conversationId, context }: ChatBoxProps) {
 
   const createMessage = api.message.createMessage.useMutation({
     onSuccess: () => {
-      utils.message.listMessages.invalidate();
-      utils.message.listUserConversations.invalidate();
+      void utils.message.listMessages.invalidate();
+      void utils.message.listUserConversations.invalidate();
+
+      socket?.emit("chat:message", { conversationId });
     },
   });
 
@@ -64,10 +66,22 @@ export default function ChatBox({ conversationId, context }: ChatBoxProps) {
   const handleSend = () => {
     if (!newMessage.trim()) return;
 
-    createMessage.mutate({ conversationId, content: newMessage, context });
-    socket?.emit("chat:message", { conversationId });
+    createMessage.mutate({
+      conversationId,
+      content: newMessage,
+      context,
+    });
+
     setNewMessage("");
   };
+
+  useEffect(() => {
+    if (!socket || !conversationId) return;
+
+    console.log(`📥 Går med i conversation room: ${conversationId}`);
+
+    socket.emit("join:room", conversationId);
+  }, [socket, conversationId]);
 
   useEffect(() => {
     if (!messages) return;

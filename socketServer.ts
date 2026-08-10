@@ -15,15 +15,31 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId as string;
 
-  console.log(`🟢 User connected: ${userId}`);
+  socket.on("join:room", (roomId) => {
+    console.log(`📥 ${userId} försöker gå med i room: ${roomId}`);
 
-  // Personligt room för notifikationer
-  socket.join(`user:${userId}`);
+    const room = io.sockets.adapter.rooms.get(roomId);
+    const isCreator = !room || room.size === 0;
 
-  console.log(`🔔 ${userId} gick med i user:${userId}`);
+    socket.join(roomId);
+
+    if (isCreator) {
+      console.log(`🟢 ${userId} skapade och gick med i ${roomId}`);
+    } else {
+      console.log(`🟡 ${userId} gick med i befintligt rum ${roomId}`);
+    }
+  });
+
+  socket.on("chat:message", ({ conversationId }) => {
+    console.log(`💬 Nytt meddelande i conversation: ${conversationId}`);
+
+    socket.to(conversationId).emit("chat:message", {
+      conversationId,
+    });
+  });
 
   socket.on("disconnect", (reason) => {
-    console.log(`🔴 User disconnected: ${userId} - ${reason}`);
+    console.log(`🟡 User disconnected: ${userId}`, reason);
   });
 });
 

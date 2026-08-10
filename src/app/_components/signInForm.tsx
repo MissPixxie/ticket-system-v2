@@ -37,7 +37,7 @@ export default function SignInForm() {
         Logga in
       </h1>
 
-      <div className="w-full max-w-md rounded-3xl bg-white/5 p-10 shadow-xl backdrop-blur-lg transition hover:bg-white/10">
+      <div className="w-full max-w-md rounded-3xl bg-white/5 p-10 shadow-xl backdrop-blur-lg transition">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/20 p-3 text-center text-red-200">
             {error}
@@ -91,12 +91,9 @@ export default function SignInForm() {
         </form>
 
         <div className="mt-6 text-center text-sm text-white/60">
-          <Link
-            href="/forgotPassword"
-            className="transition hover:text-blue-400"
-          >
-            Glömt lösenord?
-          </Link>
+          <span className="cursor-not-allowed text-white/40">
+            Glömt lösenord? <span className="text-xs">(Ej implementerat)</span>
+          </span>
         </div>
       </div>
 

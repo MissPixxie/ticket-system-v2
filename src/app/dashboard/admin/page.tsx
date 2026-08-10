@@ -22,7 +22,7 @@ export default function AdminHome() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl bg-white/5 p-6 shadow-lg">
             <div className="flex items-center justify-between">
-              <FaUsers className="text-blue-400" />
+              <FaUsers size={28} className="text-blue-400" />
               <span className="text-3xl font-bold">
                 {users?.users.length ?? 0}
               </span>
@@ -32,7 +32,7 @@ export default function AdminHome() {
 
           <div className="rounded-2xl bg-white/5 p-6 shadow-lg">
             <div className="flex items-center justify-between">
-              <FaTicketAlt className="text-amber-400" />
+              <FaTicketAlt size={28} className="text-amber-400" />
               <span className="text-3xl font-bold">
                 {tickets?.tickets.length ?? 0}
               </span>

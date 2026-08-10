@@ -196,7 +196,11 @@ export default function CreateUserModal({
           </div>
 
           {/* KNAPP */}
-          <div className="md:col-span-2">
+          <div className="flex justify-end gap-3 md:col-span-2">
+            <button type="button" onClick={onClose} className="abort-button">
+              Avbryt
+            </button>
+
             <button
               type="submit"
               disabled={isLoading}
