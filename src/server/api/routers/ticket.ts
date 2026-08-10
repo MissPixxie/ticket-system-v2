@@ -182,6 +182,13 @@ export const ticketRouter = createTRPCRouter({
         });
       }
 
+      if (!ticket.conversationId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Ticketen saknar en conversation.",
+        });
+      }
+
       const updatedTicket = await ctx.db.ticket.update({
         where: { id: input.id },
         data: {
@@ -191,6 +198,24 @@ export const ticketRouter = createTRPCRouter({
           imagePublicId: input.imagePublicId,
         },
       });
+
+      if (input.assignedToId && input.assignedToId !== ticket.assignedToId) {
+        await ctx.db.conversationParticipant.upsert({
+          where: {
+            conversationId_userId: {
+              conversationId: ticket.conversationId,
+              userId: input.assignedToId,
+            },
+          },
+          update: {
+            hiddenAt: null,
+          },
+          create: {
+            conversationId: ticket.conversationId,
+            userId: input.assignedToId,
+          },
+        });
+      }
 
       if (input.status && input.status !== ticket.status) {
         await prismaEventService.createEvent({
