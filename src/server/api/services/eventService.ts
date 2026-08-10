@@ -95,6 +95,8 @@ export class PrismaEventService extends EventEmitter {
       await Promise.allSettled(
         recipients.map(async (userId) => {
           try {
+            console.log("🔔 Försöker skicka socket-notis till:", userId);
+
             const response = await fetch(
               `${process.env.SOCKET_SERVER_URL}/notify`,
               {
@@ -105,6 +107,12 @@ export class PrismaEventService extends EventEmitter {
                 },
                 body: JSON.stringify({ userId }),
               },
+            );
+
+            console.log(
+              "📡 Socket notify response:",
+              response.status,
+              await response.text(),
             );
 
             if (!response.ok) {
@@ -122,36 +130,6 @@ export class PrismaEventService extends EventEmitter {
         }),
       );
     }
-
-    // const subscriptions = await db.subscription.findMany({
-    //   where: {
-    //     originId,
-    //     type: originType,
-    //   },
-    // });
-
-    // await db.notification.createMany({
-    //   data: subscriptions.map((sub) => ({
-    //     userId: sub.userId,
-    //     eventId: event.id,
-    //   })),
-    // });
-
-    // this.emit(`${originType.toLowerCase()}:${type.toLowerCase()}`, {
-    //   event,
-    //   subscriptions,
-    // });
-
-    // if (params.severity) {
-    //   await createAuditLog({
-    //     type: params.type,
-    //     severity: params.severity,
-    //     entityType: params.originType,
-    //     entityId: params.originId,
-    //     actor: { connect: { id: params.actorId } },
-    //     message: "",
-    //   });
-    // }
 
     return event;
   }
