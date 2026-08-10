@@ -73,14 +73,6 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
   const filteredTickets = tickets?.tickets.filter((ticket) => {
     const userId = me?.id;
 
-    if (
-      currentUserRole === "HANDLER" &&
-      ticket.assignedTo &&
-      ticket.assignedTo.id !== userId
-    ) {
-      return false;
-    }
-
     if (departmentFilter !== "ALL" && ticket.department !== departmentFilter) {
       return false;
     }

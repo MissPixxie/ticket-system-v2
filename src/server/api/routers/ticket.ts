@@ -16,24 +16,59 @@ export const ticketRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          role: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Användaren hittades inte.",
+        });
+      }
+      const where =
+        user.role?.name === "USER"
+          ? {
+              createdById: ctx.session.user.id,
+            }
+          : undefined;
+
       const tickets = await ctx.db.ticket.findMany({
+        where,
         take: input.limit + 1,
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: { createdAt: "desc" },
         include: {
           createdBy: true,
           assignedTo: true,
-          conversation: { select: { id: true } },
+          conversation: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
 
       let nextCursor: string | null = null;
+
       if (tickets.length > input.limit) {
         const nextItem = tickets.pop()!;
         nextCursor = nextItem.id;
       }
 
-      return { tickets, nextCursor };
+      return {
+        tickets,
+        nextCursor,
+      };
     }),
 
   listUserTickets: protectedProcedure.query(({ ctx }) => {
