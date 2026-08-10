@@ -388,6 +388,7 @@ export const messageRouter = createTRPCRouter({
           originType: "TICKET",
           actorId: ctx.session.user.id,
           metadata: {
+            title: ticket.title,
             invitedUserId: input.userId,
           },
         });
