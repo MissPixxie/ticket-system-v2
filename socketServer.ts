@@ -12,8 +12,58 @@ const io = new Server(httpServer, {
   },
 });
 
+httpServer.on("request", (req, res) => {
+  if (req.method === "POST" && req.url === "/notify") {
+    const secret = req.headers["x-internal-secret"];
+
+    if (secret !== process.env.INTERNAL_SOCKET_SECRET) {
+      res.writeHead(401);
+      res.end("Unauthorized");
+      return;
+    }
+
+    let body = "";
+
+    req.on("data", (chunk) => {
+      body += chunk;
+    });
+
+    req.on("end", () => {
+      try {
+        const { userId } = JSON.parse(body);
+
+        if (!userId || typeof userId !== "string") {
+          res.writeHead(400);
+          res.end("Invalid userId");
+          return;
+        }
+
+        io.to(`user:${userId}`).emit("notification:new");
+
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+        });
+
+        res.end(JSON.stringify({ success: true }));
+      } catch {
+        res.writeHead(400);
+        res.end("Invalid JSON");
+      }
+    });
+
+    return;
+  }
+
+  res.writeHead(404);
+  res.end("Not found");
+});
+
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId as string;
+
+  // Varje användare får ett eget room för personliga notiser
+  socket.join(`user:${userId}`);
+  console.log(`👤 ${userId} gick med i sitt user-room`);
 
   socket.on("join:room", (roomId) => {
     console.log(`📥 ${userId} försöker gå med i room: ${roomId}`);
