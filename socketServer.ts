@@ -16,15 +16,17 @@ io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId as string;
 
   socket.on("join:room", (roomId) => {
+    console.log(`📥 ${userId} försöker gå med i room: ${roomId}`);
+
     const room = io.sockets.adapter.rooms.get(roomId);
     const isCreator = !room || room.size === 0;
 
     socket.join(roomId);
 
     if (isCreator) {
-      console.log(`${userId} skapade och gick med i ${roomId}`);
+      console.log(`🟢 ${userId} skapade och gick med i ${roomId}`);
     } else {
-      console.log(`${userId} gick med i befintligt rum ${roomId}`);
+      console.log(`🟡 ${userId} gick med i befintligt rum ${roomId}`);
     }
 
     socket.to(roomId).emit("notification", `User ${userId} has joined`);
