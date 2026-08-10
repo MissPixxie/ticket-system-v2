@@ -13,6 +13,7 @@ export default function HandlerHome() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const { data: tickets, isLoading: ticketsLoading } =
     api.ticket.listAllTickets.useQuery({ limit: 20 });
+  const { data: me } = api.user.me.useQuery();
 
   const { data: suggestions } = api.suggestionBox.listSuggestions.useQuery();
 

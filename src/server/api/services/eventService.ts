@@ -91,6 +91,36 @@ export class PrismaEventService extends EventEmitter {
           eventId: event.id,
         })),
       });
+
+      await Promise.allSettled(
+        recipients.map(async (userId) => {
+          try {
+            const response = await fetch(
+              `${process.env.SOCKET_SERVER_URL}/notify`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-internal-secret": process.env.INTERNAL_SOCKET_SECRET ?? "",
+                },
+                body: JSON.stringify({ userId }),
+              },
+            );
+
+            if (!response.ok) {
+              console.error(
+                `⚠️ Kunde inte skicka socket-notis till ${userId}:`,
+                response.status,
+              );
+            }
+          } catch (error) {
+            console.error(
+              `⚠️ Socket-notifiering misslyckades för ${userId}:`,
+              error,
+            );
+          }
+        }),
+      );
     }
 
     // const subscriptions = await db.subscription.findMany({
