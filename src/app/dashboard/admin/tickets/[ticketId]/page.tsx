@@ -2,7 +2,7 @@
 
 import { api } from "~/trpc/react";
 import ChatBox from "~/app/_components/chatBox";
-import { InviteButton } from "~/app/_components/modals/invite-user/inviteUserButton";
+import { InviteUserButton } from "~/app/_components/modals/invite-user/inviteUserButton";
 import { TiDocumentText } from "react-icons/ti";
 import { use, useState } from "react";
 import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
@@ -252,7 +252,7 @@ export default function TicketPage({
               {/* Verktyg */}
               <div className="mt-5 flex flex-wrap gap-3 border-t border-white/10 pt-5">
                 {ticket.conversation?.id && (
-                  <InviteButton
+                  <InviteUserButton
                     ticketId={ticket.id}
                     conversationId={ticket.conversation.id}
                   />

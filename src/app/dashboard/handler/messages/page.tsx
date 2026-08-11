@@ -128,6 +128,7 @@ export default function MessagePage() {
       message: newMessage,
       receiverDepartments: selectedDepartments,
       receivers: selectedUsers.map((u) => u.id),
+      context: "EMAIL",
     });
   };
 

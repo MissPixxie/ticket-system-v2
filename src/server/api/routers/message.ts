@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { ConversationRole, Department, MessageType } from "@prisma/client";
+import {
+  ConversationRole,
+  Department,
+  MessageType,
+  ConversationContext,
+} from "@prisma/client";
 import { createAuditLog } from "../services/auditLogService";
 import { prismaEventService } from "../services/eventService";
 import { TRPCError } from "@trpc/server";
@@ -29,6 +34,7 @@ export const messageRouter = createTRPCRouter({
   listUserConversations: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.conversation.findMany({
       where: {
+        context: "EMAIL",
         participants: {
           some: {
             userId: ctx.session.user.id,
@@ -240,6 +246,7 @@ export const messageRouter = createTRPCRouter({
         message: z.string().min(1),
         receivers: z.array(z.string()).optional(),
         receiverDepartments: z.array(z.nativeEnum(Department)).optional(),
+        context: z.nativeEnum(ConversationContext).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -271,6 +278,7 @@ export const messageRouter = createTRPCRouter({
       return await ctx.db.$transaction(async (tx) => {
         const conversation = await tx.conversation.create({
           data: {
+            context: input.context,
             participants: {
               create: Array.from(participantIds).map((userId) => ({
                 userId,

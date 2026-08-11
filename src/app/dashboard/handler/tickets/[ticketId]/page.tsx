@@ -20,6 +20,7 @@ import TicketReplyAssistant from "~/app/_components/ticketReplyAssistant";
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
   MEDIUM: "bg-yellow-500 text-black",
+  HIGH: "bg-orange-500 text-white",
   URGENT: "bg-red-600 text-white",
 };
 

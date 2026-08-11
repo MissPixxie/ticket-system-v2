@@ -5,12 +5,15 @@ import InviteUserModal from "./inviteUserModal";
 import { useInviteUser } from "./useInviteUser";
 import { FaUserPlus } from "react-icons/fa6";
 
-interface InviteButtonProps {
+interface InviteUserButtonProps {
   ticketId: string;
   conversationId: string;
 }
 
-export function InviteButton({ ticketId, conversationId }: InviteButtonProps) {
+export function InviteUserButton({
+  ticketId,
+  conversationId,
+}: InviteUserButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { inviteUser, isLoading } = useInviteUser(ticketId);
 
