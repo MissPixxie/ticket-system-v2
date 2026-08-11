@@ -5,7 +5,7 @@ import { api } from "~/trpc/react";
 import { TiDocumentText } from "react-icons/ti";
 import type { RouterOutputs } from "~/trpc/react";
 import ChatBox from "../chatBox";
-import { InviteSection } from "../modals/invite-user/inviteSection";
+import { InviteSection } from "../modals/invite-user/inviteUserButton";
 
 type TicketList = RouterOutputs["ticket"]["listAllTickets"];
 type Ticket = TicketList["tickets"][number];

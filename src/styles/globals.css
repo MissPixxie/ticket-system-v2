@@ -169,17 +169,20 @@
   }
 
   .abort-button {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
     border-radius: 0.5rem;
-    background-color: rgba(255, 255, 255, 0.2);
-    padding: 0.5rem 0.75rem;
-    transition: background-color 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+    transition: all 0.2s ease;
+    cursor: pointer;
   }
 
   .abort-button:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
   }
 }
 

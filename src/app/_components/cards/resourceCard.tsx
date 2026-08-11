@@ -4,7 +4,7 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 import { FaTrashAlt } from "react-icons/fa";
 import type { RouterOutputs } from "~/trpc/react";
-import { EditResourceSection } from "../modals/edit-resource/editResourceSection";
+import { EditResourceButton } from "../modals/edit-resource/editResourceButton";
 import Link from "next/link";
 import { FiExternalLink } from "react-icons/fi";
 import { formatResourceCategory } from "~/app/utils/formatNotification";
@@ -75,7 +75,7 @@ export default function ResourcesCard({ resourceItem }: ResourceCardProps) {
       >
         <div className="flex gap-2">
           {/* EDIT */}
-          <EditResourceSection resource={resourceItem} />
+          <EditResourceButton resource={resourceItem} />
 
           {/* DELETE */}
           <button

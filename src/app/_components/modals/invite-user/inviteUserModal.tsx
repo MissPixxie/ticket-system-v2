@@ -342,11 +342,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
           </div>
 
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-all hover:border-white/20 hover:bg-white/10"
-            >
+            <button type="button" onClick={onClose} className="abort-button">
               Avbryt
             </button>
 

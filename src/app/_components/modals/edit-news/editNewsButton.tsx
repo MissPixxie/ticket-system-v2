@@ -1,20 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useEditResource } from "./useEditResource";
+import EditNewsModal from "./editNewsModal";
+import { useEditNews } from "./useEditNews";
 import { RiEdit2Fill } from "react-icons/ri";
-import EditResourceModal from "./editResourceModal";
-import type { RouterOutputs } from "~/trpc/react";
+import type { News } from "@prisma/client";
 
-type Resource = RouterOutputs["resource"]["listResources"][number];
-
-interface EditResourceSectionProps {
-  resource: Resource;
+interface EditNewsButtonProps {
+  news: News;
 }
 
-export function EditResourceSection({ resource }: EditResourceSectionProps) {
+export function EditNewsButton({ news }: EditNewsButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { editResource, isLoading } = useEditResource();
+  const { editNews, isLoading } = useEditNews();
 
   return (
     <>
@@ -25,14 +23,14 @@ export function EditResourceSection({ resource }: EditResourceSectionProps) {
         <RiEdit2Fill size={18} />
       </button>
 
-      <EditResourceModal
-        resource={resource}
+      <EditNewsModal
+        news={news}
         isOpen={isOpen}
         onClose={() => {
           setIsOpen(false);
         }}
         onSubmit={(data) => {
-          editResource(data);
+          editNews(data);
           setIsOpen(false);
         }}
       />

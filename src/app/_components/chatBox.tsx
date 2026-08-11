@@ -27,6 +27,7 @@ export default function ChatBox({
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   const [newsletter, setNewsletter] = useState<Newsletter | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const utils = api.useUtils();
   const { data: me } = api.user.me.useQuery();
 
@@ -35,6 +36,15 @@ export default function ChatBox({
       setNewMessage(suggestion);
     }
   }, [suggestion]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 250)}px`;
+  }, [newMessage]);
 
   const { data: messages, isLoading } = api.message.listMessages.useQuery({
     conversationId: conversationId,
@@ -145,8 +155,9 @@ export default function ChatBox({
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Skriv ett meddelande..."
-          rows={6}
+          rows={3}
           className="input flex-1 resize-none rounded-lg p-3 text-sm"
+          ref={textareaRef}
         />
         <button onClick={handleSend} className="submit-button">
           Skicka

@@ -2,10 +2,9 @@
 
 import { api } from "~/trpc/react";
 import ChatBox from "~/app/_components/chatBox";
-import { InviteSection } from "~/app/_components/modals/invite-user/inviteSection";
+import { InviteButton } from "~/app/_components/modals/invite-user/inviteUserButton";
 import { TiDocumentText } from "react-icons/ti";
 import { use, useState } from "react";
-import { PickSection } from "~/app/_components/modals/handler-picker/pickSection";
 import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
 import { FaSearchPlus, FaTrash } from "react-icons/fa";
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
@@ -253,7 +252,7 @@ export default function TicketPage({
               {/* Verktyg */}
               <div className="mt-5 flex flex-wrap gap-3 border-t border-white/10 pt-5">
                 {ticket.conversation?.id && (
-                  <InviteSection
+                  <InviteButton
                     ticketId={ticket.id}
                     conversationId={ticket.conversation.id}
                   />

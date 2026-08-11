@@ -2,7 +2,7 @@
 
 import { api } from "~/trpc/react";
 import { FaUsers, FaTicketAlt, FaPlus } from "react-icons/fa";
-import { UserSection } from "~/app/_components/modals/create-user/userSection";
+import { CreateUserButton } from "~/app/_components/modals/create-user/createUserButton";
 import Link from "next/link";
 
 export default function AdminHome() {
@@ -46,7 +46,7 @@ export default function AdminHome() {
           <h2 className="mb-6 text-xl font-semibold">Snabbåtgärder</h2>
 
           <div className="flex flex-wrap gap-4">
-            <UserSection />
+            <CreateUserButton />
 
             <Link
               href={"/dashboard/admin/tickets"}

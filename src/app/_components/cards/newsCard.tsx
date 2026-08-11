@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { api } from "~/trpc/react";
-import { FaTrashAlt } from "react-icons/fa";
-import { EditSection } from "../modals/edit-news/editSection";
 import type { RouterOutputs } from "~/trpc/react";
 import { formatNewsCategory } from "~/app/utils/formatNotification";
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import CreateTicketModal from "./createTicketModal";
 import { useCreateTicket } from "./useCreateTicket";
 
-export function TicketSection() {
+export function CreateTicketButton() {
   const [isOpen, setIsOpen] = useState(false);
   const { createTicket, isLoading } = useCreateTicket();
 

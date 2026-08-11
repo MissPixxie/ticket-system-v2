@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import { api, type RouterOutputs } from "~/trpc/react";
-import TicketCard from "./cards/ticketCard";
 import { useSocket } from "../socketProvider";
-import { TicketSection } from "./modals/create-ticket/ticketSection";
-import { PickSection } from "./modals/handler-picker/pickSection";
 import { FaTrashAlt } from "react-icons/fa";
 import ChatBox from "./chatBox";
 import CustomSelect from "./customSelect";

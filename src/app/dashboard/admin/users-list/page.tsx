@@ -5,7 +5,7 @@ import { api } from "~/trpc/react";
 import { RiEdit2Fill } from "react-icons/ri";
 import { FaTrashAlt } from "react-icons/fa";
 import { toast } from "sonner";
-import { UserSection } from "~/app/_components/modals/create-user/userSection";
+import { CreateUserButton } from "~/app/_components/modals/create-user/createUserButton";
 import { FiSearch } from "react-icons/fi";
 import CustomSelect from "~/app/_components/customSelect";
 
@@ -133,7 +133,7 @@ export default function ListUsersPage() {
               </p>
             </div>
 
-            <UserSection />
+            <CreateUserButton />
           </div>
 
           {/* SEARCH */}

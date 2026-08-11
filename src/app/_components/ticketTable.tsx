@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { api } from "~/trpc/react";
-import TicketCard from "./cards/ticketCard";
 import { useSocket } from "../socketProvider";
-import { TicketSection } from "./modals/create-ticket/ticketSection";
-import { PickSection } from "./modals/handler-picker/pickSection";
+import { CreateTicketButton } from "./modals/create-ticket/createTicketButton";
+import { PickHandlerButton } from "./modals/handler-picker/pickHandlerButton";
 import Link from "next/link";
 import CustomSelect from "./customSelect";
 import SkeletonTickets from "./skeletonComponents/pages/skeletonTickets";
@@ -112,7 +111,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
     return (
       <div className="flex justify-between">
         <p>Inga tickets hittades</p>
-        <TicketSection />
+        <CreateTicketButton />
       </div>
     );
 
@@ -190,7 +189,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
           />
         </div>
 
-        <TicketSection />
+        <CreateTicketButton />
       </div>
 
       {/* TABLE HEADER */}
@@ -268,7 +267,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
 
                       case "ADMIN":
                         return (
-                          <PickSection
+                          <PickHandlerButton
                             ticketId={ticket.id}
                             onClick={(e) => {
                               e.preventDefault();

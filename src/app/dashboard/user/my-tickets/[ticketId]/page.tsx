@@ -2,7 +2,7 @@
 
 import { api } from "~/trpc/react";
 import ChatBox from "~/app/_components/chatBox";
-import { InviteSection } from "~/app/_components/modals/invite-user/inviteSection";
+import { InviteSection } from "~/app/_components/modals/invite-user/inviteUserButton";
 import { TiDocumentText } from "react-icons/ti";
 import { use, useState } from "react";
 import { CldImage } from "next-cloudinary";

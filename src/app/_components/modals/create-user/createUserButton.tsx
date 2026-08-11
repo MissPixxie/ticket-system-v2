@@ -5,7 +5,7 @@ import { useCreateUser } from "./useCreateUser";
 import CreateUserModal from "./createUserModal";
 import { FaUserPlus } from "react-icons/fa6";
 
-export function UserSection() {
+export function CreateUserButton() {
   const [isOpen, setIsOpen] = useState(false);
   const { createUser, isLoading } = useCreateUser();
 

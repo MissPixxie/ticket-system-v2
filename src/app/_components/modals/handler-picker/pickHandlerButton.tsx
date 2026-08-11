@@ -5,12 +5,15 @@ import PickHandlerModal from "./pickHandlerModal";
 import { usePickHandler } from "./usePickHandler";
 import { FaUserPlus } from "react-icons/fa6";
 
-interface PickSectionProps {
+interface PickHandlerButtonProps {
   ticketId: string;
   onClick?: (e: React.MouseEvent) => void;
 }
 
-export function PickSection({ ticketId, onClick }: PickSectionProps) {
+export function PickHandlerButton({
+  ticketId,
+  onClick,
+}: PickHandlerButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { pickHandler, isLoading } = usePickHandler();
 

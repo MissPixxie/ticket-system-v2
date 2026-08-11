@@ -1,9 +1,6 @@
 "use client";
 
 import { api } from "~/trpc/react";
-import ChatBox from "~/app/_components/chatBox";
-import { InviteSection } from "~/app/_components/modals/invite-user/inviteSection";
-import { TiDocumentText } from "react-icons/ti";
 import { use, useEffect, useState } from "react";
 import { GenerateTagsButton } from "~/app/_components/ai/generateTags";
 import { toast } from "sonner";
@@ -14,8 +11,6 @@ import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 import CustomSelect from "~/app/_components/customSelect";
-
-//import { useSocket } from "~/app/_components/socketProvider";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
