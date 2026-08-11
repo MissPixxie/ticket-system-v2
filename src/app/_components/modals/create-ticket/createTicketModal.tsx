@@ -207,66 +207,72 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               </div>
             </div>
           )}
-          <div className="flex items-center gap-2 text-sm text-white">
-            <label
-              className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-all duration-200 ${
-                isAnonymous
-                  ? "border-blue-500 bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/10"
-                  : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="sr-only"
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">Prioritet</label>
+              <CustomSelect
+                value={priority}
+                onChange={(value) => setPriority(value as Priority)}
+                options={[
+                  {
+                    value: "LOW",
+                    label: "Låg",
+                  },
+                  {
+                    value: "MEDIUM",
+                    label: "Medium",
+                  },
+                  {
+                    value: "URGENT",
+                    label: "Hög",
+                  },
+                ]}
+                size="sm"
+                className="w-32"
               />
-
-              <span
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200 ${
+            </div>
+            <div className="mt-6 flex items-center gap-2 text-sm text-white">
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 transition-all duration-200 ${
                   isAnonymous
-                    ? "border-blue-400 bg-blue-500 text-white"
-                    : "border-white/20 bg-white/5"
+                    ? "border-blue-500 bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/10"
+                    : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
                 }`}
               >
-                {isAnonymous && (
-                  <svg viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5">
-                    <path
-                      d="M4 10.5L8 14L16 6"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
-              </span>
+                <input
+                  type="checkbox"
+                  checked={isAnonymous}
+                  onChange={(e) => setIsAnonymous(e.target.checked)}
+                  className="sr-only"
+                />
 
-              <span className="text-sm font-medium">Skicka anonymt</span>
-            </label>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold">Prioritet</label>
-            <CustomSelect
-              value={priority}
-              onChange={(value) => setPriority(value as Priority)}
-              options={[
-                {
-                  value: "LOW",
-                  label: "Låg",
-                },
-                {
-                  value: "MEDIUM",
-                  label: "Medium",
-                },
-                {
-                  value: "URGENT",
-                  label: "Hög",
-                },
-              ]}
-              size="sm"
-              className="w-32"
-            />
+                <span
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200 ${
+                    isAnonymous
+                      ? "border-blue-400 bg-blue-500 text-white"
+                      : "border-white/20 bg-white/5"
+                  }`}
+                >
+                  {isAnonymous && (
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      className="h-3.5 w-3.5"
+                    >
+                      <path
+                        d="M4 10.5L8 14L16 6"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </span>
+
+                <span className="text-sm font-medium">Skicka anonymt</span>
+              </label>
+            </div>
           </div>
           <div className="flex justify-end space-x-2 pt-4">
             <button type="button" onClick={onClose} className="abort-button">

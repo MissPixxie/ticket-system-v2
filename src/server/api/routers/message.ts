@@ -92,7 +92,7 @@ export const messageRouter = createTRPCRouter({
         conversationId: z.string().min(1),
         content: z.string().min(1),
         type: z.nativeEnum(MessageType).optional(),
-        context: z.enum(["TICKET", "QUESTION", "RESOURCE", "NEWS", "EMAIL"]),
+        context: z.nativeEnum(ConversationContext),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -233,8 +233,19 @@ export const messageRouter = createTRPCRouter({
           break;
         }
 
-        case "EMAIL":
+        case "EMAIL": {
+          await prismaEventService.createEvent({
+            type: "EMAIL_MESSAGE_SENT",
+            originId: input.conversationId,
+            originType: "EMAIL",
+            actorId: ctx.session.user.id,
+            metadata: {
+              messagePreview: message.content.slice(0, 80),
+            },
+          });
+
           break;
+        }
       }
 
       return message;

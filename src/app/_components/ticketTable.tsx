@@ -8,6 +8,12 @@ import { PickHandlerButton } from "./modals/handler-picker/pickHandlerButton";
 import Link from "next/link";
 import CustomSelect from "./customSelect";
 import SkeletonTickets from "./skeletonComponents/pages/skeletonTickets";
+import {
+  formatPriority,
+  formatStatus,
+  getPriorityClass,
+  getStatusClass,
+} from "../utils/formatNotification";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -215,21 +221,17 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
 
               <div>
                 <span
-                  className={`rounded-md px-2 py-1 text-xs ${
-                    statusClasses[ticket.status]
-                  }`}
+                  className={`rounded-md px-2 py-1 text-xs ${getStatusClass(ticket.status)}`}
                 >
-                  {ticket.status.replace("_", " ")}
+                  {formatStatus(ticket.status)}
                 </span>
               </div>
 
               <div>
                 <span
-                  className={`rounded-md px-2 py-1 text-xs ${
-                    priorityClasses[ticket.priority]
-                  }`}
+                  className={`rounded-md px-2 py-1 text-xs ${getPriorityClass(ticket.priority)}`}
                 >
-                  {ticket.priority}
+                  {formatPriority(ticket.priority)}
                 </span>
               </div>
 

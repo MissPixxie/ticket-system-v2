@@ -25,6 +25,9 @@ export async function resolveNotificationPath(
     case "RESOURCE":
       return `/resources/${originId}`;
 
+    case "EMAIL":
+      return `/messages`;
+
     default:
       return undefined;
   }

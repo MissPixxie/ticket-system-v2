@@ -31,6 +31,13 @@ export async function resolveRecipients(params: {
         actorId,
       });
 
+    case "EMAIL":
+      return resolveEmailRecipients({
+        type,
+        conversationId: originId,
+        actorId,
+      });
+
     default:
       return [];
   }
@@ -193,6 +200,46 @@ async function resolveNewsRecipients(params: {
           news.conversation?.participants
             .map((participant) => participant.userId)
             .filter((userId) => userId !== actorId) ?? [],
+        ),
+      ];
+
+      return recipients;
+    }
+
+    default:
+      return [];
+  }
+}
+
+async function resolveEmailRecipients(params: {
+  type: EventType;
+  conversationId: string;
+  actorId: string;
+}) {
+  const { type, conversationId, actorId } = params;
+
+  const email = await db.conversation.findUnique({
+    where: {
+      id: conversationId,
+    },
+    include: {
+      participants: {
+        select: {
+          userId: true,
+        },
+      },
+    },
+  });
+
+  if (!email) return [];
+
+  switch (type) {
+    case "EMAIL_MESSAGE_SENT": {
+      const recipients = [
+        ...new Set(
+          email.participants
+            .map((participant) => participant.userId)
+            .filter((userId) => userId !== actorId),
         ),
       ];
 

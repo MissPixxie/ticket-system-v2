@@ -69,6 +69,8 @@ enum EventType {
   RESOURCE_CREATED
   RESOURCE_CHANGED
   RESOURCE_MESSAGE_SENT
+
+  EMAIL_MESSAGE_SENT
 }
 
 enum EventOrigin {
@@ -77,6 +79,7 @@ enum EventOrigin {
   NEWS
   QUESTION
   RESOURCE
+  EMAIL
 }
 
 model Event {
