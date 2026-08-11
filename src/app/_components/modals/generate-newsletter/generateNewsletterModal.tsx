@@ -70,7 +70,7 @@ export default function GenerateNewsletterModal({
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full input rounded-xl px-4 py-300"
+              className="input w-full rounded-xl px-4 py-300"
             />
           </div>
 
@@ -93,33 +93,22 @@ export default function GenerateNewsletterModal({
               <label className="text-sm font-semibold text-white/60">
                 Kategori
               </label>
-              <select
-                value={newsletter.category}
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) => setCategory(e.target.value as NewsCategory)}
-                className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white backdrop-blur-sm transition-all outline-none hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
-              >
-                <option>OPEN</option>
-                <option value="IN_PROGRESS">IN PROGRESS</option>
-                <option>CLOSED</option>
-              </select>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-white/60">
                 Prioritet
               </label>
-              <select
-                value={newsletter.priority}
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) => setPriority(e.target.value as Priority)}
-                className="cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white backdrop-blur-sm transition-all outline-none hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
-              >
-                <option>LOW</option>
-                <option>MEDIUM</option>
-                <option>HIGH</option>
-                <option>URGENT</option>
-              </select>
+              {priorities.map((priority) => (
+                <option key={priority} value={priority}>
+                  {priority}
+                </option>
+              ))}
             </div>
           </div>
         </div>

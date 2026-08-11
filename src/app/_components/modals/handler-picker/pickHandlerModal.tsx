@@ -60,11 +60,7 @@ const PickHandlerModal: React.FC<PickHandlerModalProps> = ({
       >
         <UserTable />
         <div className="flex justify-end space-x-2 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="cursor-pointer rounded-lg border px-4 py-2 hover:bg-white/20"
-          >
+          <button type="button" onClick={onClose} className="abort-button">
             Avbryt
           </button>
           <button type="submit" className="submit-button">

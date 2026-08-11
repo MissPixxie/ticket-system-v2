@@ -17,8 +17,8 @@ Regler:
 
 Format:
 {
-  "subject": "Rubrik",
-  "body": "Nyhetsbrevets innehåll"
+  "title": "Rubrik",
+  "content": "Nyhetsbrevets innehåll"
 }
 
 Konversation:

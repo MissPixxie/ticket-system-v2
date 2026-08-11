@@ -31,8 +31,8 @@ export function GenerateNewsletterButton({
     });
 
     setNewsletter({
-      title: result.newsletter.subject,
-      content: result.newsletter.body,
+      title: result.newsletter.title,
+      content: result.newsletter.content,
       category: "NEWS",
       priority: "LOW",
     });
