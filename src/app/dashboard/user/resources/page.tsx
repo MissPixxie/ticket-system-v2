@@ -7,12 +7,15 @@ import Link from "next/link";
 import { FiExternalLink, FiSearch } from "react-icons/fi";
 import { useState } from "react";
 import { ImBooks } from "react-icons/im";
+import { LuSearch } from "react-icons/lu";
+import CustomSelect from "~/app/_components/customSelect";
 
 export default function ResourcesPage() {
   const { data: resources, isLoading } = api.resource.listResources.useQuery({
     limit: 5,
   });
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
 
   const filteredResources = resources?.filter((n) => {
     const searchText = search.toLowerCase();
@@ -25,7 +28,10 @@ export default function ResourcesPage() {
       tag.name.toLowerCase().includes(searchText),
     );
 
-    return titleMatch || contentMatch || tagMatch;
+    const categoryMatch =
+      categoryFilter === "ALL" || n.category === categoryFilter;
+
+    return (titleMatch || contentMatch || tagMatch) && categoryMatch;
   });
 
   return (
@@ -36,19 +42,46 @@ export default function ResourcesPage() {
             <ImBooks className="text-purple-400" size={36} />
             <h1 className="page-header">Resurser & dokumentation</h1>
           </div>
-          <div className="relative mt-6">
-            <FiSearch
-              className="absolute top-1/2 left-4 -translate-y-1/2 text-white/40"
-              size={18}
+          <div className="mt-8 flex gap-5">
+            <CustomSelect
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+              options={[
+                {
+                  value: "ALL",
+                  label: "Alla typer",
+                },
+                {
+                  value: "CAMPAIGN",
+                  label: "Kampanj",
+                },
+                {
+                  value: "STORE_MANUAL",
+                  label: "Butiksmanual",
+                },
+                {
+                  value: "PRODUCT_INFORMATION",
+                  label: "Produktinformation",
+                },
+                {
+                  value: "NEWS",
+                  label: "Nyhet",
+                },
+              ]}
+              size="md"
+              className="w-40"
             />
+            <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 transition-all focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-500/10">
+              <LuSearch className="shrink-0 text-white/40" size={18} />
 
-            <input
-              type="text"
-              placeholder="Sök bland resurser..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="input w-full rounded-xl py-3 pr-4 pl-11"
-            />
+              <input
+                type="text"
+                placeholder="Sök bland nyheter..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-transparent text-white outline-none placeholder:text-white/40"
+              />
+            </div>
           </div>
           {isLoading && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

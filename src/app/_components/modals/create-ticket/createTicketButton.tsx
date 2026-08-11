@@ -3,6 +3,8 @@
 import { useState } from "react";
 import CreateTicketModal from "./createTicketModal";
 import { useCreateTicket } from "./useCreateTicket";
+import CustomButton from "../../customButton";
+import { LuTicketPlus } from "react-icons/lu";
 
 export function CreateTicketButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,12 +12,17 @@ export function CreateTicketButton() {
 
   return (
     <>
-      <button
+      <CustomButton
+        title="Skapa ticket"
+        icon={<LuTicketPlus size={22} />}
+        onClick={() => setIsOpen(true)}
+      />
+      {/* <button
         onClick={() => setIsOpen(true)}
         className="ml-auto cursor-pointer rounded-md bg-linear-to-r from-purple-700 to-indigo-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
       >
         Nytt ärende
-      </button>
+      </button> */}
 
       <CreateTicketModal
         isOpen={isOpen}

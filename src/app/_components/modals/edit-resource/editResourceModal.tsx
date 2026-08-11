@@ -7,6 +7,7 @@ import { ImInfo } from "react-icons/im";
 import { MdCampaign } from "react-icons/md";
 import type { RouterOutputs } from "~/trpc/react";
 import { GenerateTagsButton } from "../../ai/generateTags";
+import { formatResourceCategory } from "~/app/utils/formatNotification";
 
 type Resource = RouterOutputs["resource"]["listResources"][number];
 
@@ -123,7 +124,9 @@ const EditResourceModal: React.FC<EditResourceModalProps> = ({
                   {cat.icon}
                 </div>
 
-                <span className="text-sm font-medium">{cat.label}</span>
+                <span className="text-sm font-medium">
+                  {formatResourceCategory(cat.label)}
+                </span>
               </button>
             );
           })}

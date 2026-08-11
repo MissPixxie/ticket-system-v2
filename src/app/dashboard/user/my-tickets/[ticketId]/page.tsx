@@ -2,8 +2,6 @@
 
 import { api } from "~/trpc/react";
 import ChatBox from "~/app/_components/chatBox";
-import { InviteSection } from "~/app/_components/modals/invite-user/inviteUserButton";
-import { TiDocumentText } from "react-icons/ti";
 import { use, useState } from "react";
 import { CldImage } from "next-cloudinary";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
@@ -12,11 +10,10 @@ import { FaSearchPlus, FaTrash } from "react-icons/fa";
 import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
 import { formatPriority, formatStatus } from "~/app/utils/formatNotification";
 
-//import { useSocket } from "~/app/_components/socketProvider";
-
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
   MEDIUM: "bg-yellow-500 text-black",
+  HIGH: "bg-orange-500 text-white",
   URGENT: "bg-red-600 text-white",
 };
 
@@ -47,20 +44,6 @@ export default function TicketPage({
       utils.ticket.listAllTickets.invalidate();
     },
   });
-
-  const handleSetStatus = (ticketId: string, status: string) => {
-    updateTicket.mutate({
-      id: ticketId,
-      status: status as "OPEN" | "IN_PROGRESS" | "CLOSED",
-    });
-  };
-
-  const handleSetPriority = (ticketId: string, priority: string) => {
-    updateTicket.mutate({
-      id: ticketId,
-      priority: priority as "LOW" | "MEDIUM" | "HIGH" | "URGENT",
-    });
-  };
 
   if (isLoading || !ticket) {
     return (

@@ -109,6 +109,21 @@ export function formatPriority(priority?: string) {
   }
 }
 
+export function getPriorityClass(priority?: string) {
+  switch (priority) {
+    case "LOW":
+      return "bg-green-500 text-white";
+    case "MEDIUM":
+      return "bg-yellow-500 text-black";
+    case "HIGH":
+      return "bg-orange-500 text-white";
+    case "URGENT":
+      return "bg-red-600 text-white";
+    default:
+      return "";
+  }
+}
+
 export function formatSuggestionStatus(status?: string) {
   switch (status) {
     case "SENT":
@@ -123,6 +138,19 @@ export function formatSuggestionStatus(status?: string) {
       return "Avslagen";
     default:
       return status;
+  }
+}
+
+export function getStatusClass(status?: string) {
+  switch (status) {
+    case "OPEN":
+      return "bg-blue-500 text-white";
+    case "IN_PROGRESS":
+      return "bg-amber-400 text-black";
+    case "CLOSED":
+      return "bg-gray-600 text-white";
+    default:
+      return "";
   }
 }
 

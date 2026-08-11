@@ -10,25 +10,15 @@ import { FaSearchPlus, FaTrash } from "react-icons/fa";
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 import { CldImage } from "next-cloudinary";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
-import { formatPriority, formatStatus } from "~/app/utils/formatNotification";
+import {
+  formatPriority,
+  formatStatus,
+  getPriorityClass,
+  getStatusClass,
+} from "~/app/utils/formatNotification";
 import SkeletonTicketDetails from "~/app/_components/skeletonComponents/pages/skeletonTicketDetails";
 import CustomSelect from "~/app/_components/customSelect";
 import TicketReplyAssistant from "~/app/_components/ticketReplyAssistant";
-
-//import { useSocket } from "~/app/_components/socketProvider";
-
-const priorityClasses: Record<string, string> = {
-  LOW: "bg-green-500 text-white",
-  MEDIUM: "bg-yellow-500 text-black",
-  HIGH: "bg-orange-500 text-white",
-  URGENT: "bg-red-600 text-white",
-};
-
-const statusClasses: Record<string, string> = {
-  OPEN: "bg-blue-500 text-white",
-  IN_PROGRESS: "bg-amber-400 text-black",
-  CLOSED: "bg-gray-600 text-white",
-};
 
 export default function TicketPage({
   params,
@@ -103,17 +93,17 @@ export default function TicketPage({
 
           <div className="flex gap-2">
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                statusClasses[ticket.status]
-              }`}
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClass(
+                ticket.status,
+              )}`}
             >
               {formatStatus(ticket.status)}
             </span>
 
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                priorityClasses[ticket.priority]
-              }`}
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${getPriorityClass(
+                ticket.priority,
+              )}`}
             >
               {formatPriority(ticket.priority)}
             </span>

@@ -3,6 +3,7 @@
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import { authClient } from "~/server/better-auth/client";
+import { PiSignOut } from "react-icons/pi";
 
 export function SignOutButton() {
   const router = useRouter();
@@ -21,8 +22,9 @@ export function SignOutButton() {
   return (
     <button
       onClick={logout}
-      className="cursor-pointer rounded-lg bg-blue-500/20 px-4 py-2 text-lg text-blue-300 hover:bg-blue-500/30"
+      className="submit-button flex items-center justify-center gap-2"
     >
+      <PiSignOut size={20} />
       Logga ut
     </button>
   );

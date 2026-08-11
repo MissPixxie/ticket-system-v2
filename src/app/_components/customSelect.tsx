@@ -14,7 +14,7 @@ interface CustomSelectProps {
   options: SelectOption[];
   placeholder?: string;
   className?: string;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 }
 
 export default function CustomSelect({
@@ -69,6 +69,7 @@ export default function CustomSelect({
   const sizeClasses = {
     sm: "px-3 py-2 text-sm",
     md: "px-4 py-3 text-base",
+    lg: "px-4 py-3.5 text-base",
   };
 
   return (

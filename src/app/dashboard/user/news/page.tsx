@@ -7,7 +7,8 @@ import Link from "next/link";
 import { MdCampaign } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
 import SkeletonNewsPage from "~/app/_components/skeletonComponents/pages/skeletonNewsPage";
-//import SkeletonCard from "./skeletonComponents/cards/skeletonCampaignCard";
+import CustomSelect from "~/app/_components/customSelect";
+import { LuSearch } from "react-icons/lu";
 
 export default function CampaignList() {
   const { data: news, isLoading } = api.news.listNews.useQuery({ limit: 5 });
@@ -21,6 +22,7 @@ export default function CampaignList() {
   const [search, setSearch] = useState("");
   const [messageInput, setMessageInput] = useState<Record<string, string>>({});
   const [showAll, setShowAll] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
   const utils = api.useUtils();
 
   const campaignNews = news?.filter((n) => n.category === "CAMPAIGN") ?? [];
@@ -48,7 +50,10 @@ export default function CampaignList() {
       tag.name.toLowerCase().includes(searchText),
     );
 
-    return titleMatch || contentMatch || tagMatch;
+    const categoryMatch =
+      categoryFilter === "ALL" || n.category === categoryFilter;
+
+    return (titleMatch || contentMatch || tagMatch) && categoryMatch;
   });
 
   return (
@@ -58,19 +63,46 @@ export default function CampaignList() {
           <MdCampaign className="text-purple-400" size={36} />
           <h1 className="page-header">Nyheter & information</h1>
         </div>
-        <div className="relative mt-6">
-          <FiSearch
-            className="absolute top-1/2 left-4 -translate-y-1/2 text-white/40"
-            size={18}
+        <div className="mt-8 flex gap-5">
+          <CustomSelect
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            options={[
+              {
+                value: "ALL",
+                label: "Alla typer",
+              },
+              {
+                value: "CAMPAIGN",
+                label: "Kampanj",
+              },
+              {
+                value: "STORE_MANUAL",
+                label: "Butiksmanual",
+              },
+              {
+                value: "PRODUCT_INFORMATION",
+                label: "Produktinformation",
+              },
+              {
+                value: "NEWS",
+                label: "Nyhet",
+              },
+            ]}
+            size="md"
+            className="w-40"
           />
+          <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 transition-all focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-500/10">
+            <LuSearch className="shrink-0 text-white/40" size={18} />
 
-          <input
-            type="text"
-            placeholder="Sök bland nyheter..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input w-full rounded-xl py-3 pr-4 pl-11"
-          />
+            <input
+              type="text"
+              placeholder="Sök bland nyheter..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-transparent text-white outline-none placeholder:text-white/40"
+            />
+          </div>
         </div>
         <div className="mt-4 space-y-3">
           {filteredNews &&

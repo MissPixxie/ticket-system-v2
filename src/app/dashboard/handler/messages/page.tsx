@@ -362,7 +362,7 @@ export default function MessagePage() {
                 <button
                   onClick={handleSend}
                   disabled={createConversation.isPending}
-                  className="submit-button rounded-2xl px-6 py-3 font-medium hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="submit-button rounded-2xl px-6 py-3 font-medium disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {createConversation.isPending
                     ? "Skickar..."

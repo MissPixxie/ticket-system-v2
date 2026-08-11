@@ -1,5 +1,6 @@
 "use client";
 
+import { FaWandMagicSparkles } from "react-icons/fa6";
 import { api } from "~/trpc/react";
 
 type GenerateTagsButtonProps = {
@@ -24,8 +25,9 @@ export function GenerateTagsButton({
       type="button"
       onClick={handleClick}
       disabled={generateTags.isPending || text.trim().length === 0}
-      className="rounded-lg bg-purple-600 px-4 py-2 text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+      className="ai-button"
     >
+      <FaWandMagicSparkles size={18} />
       {generateTags.isPending ? "Genererar..." : "Generera taggar"}
     </button>
   );
