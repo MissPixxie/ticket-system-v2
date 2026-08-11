@@ -111,5 +111,3 @@ export async function seedSuggestions() {
 
   console.log("❓ Seeded suggestions");
 }
-
-void seedSuggestions();

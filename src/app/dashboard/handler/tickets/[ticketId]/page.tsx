@@ -14,6 +14,7 @@ import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImag
 import { formatPriority, formatStatus } from "~/app/utils/formatNotification";
 import SkeletonTicketDetails from "~/app/_components/skeletonComponents/pages/skeletonTicketDetails";
 import CustomSelect from "~/app/_components/customSelect";
+import TicketReplyAssistant from "~/app/_components/ticketReplyAssistant";
 
 //import { useSocket } from "~/app/_components/socketProvider";
 
@@ -41,6 +42,7 @@ export default function TicketPage({
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
   const { data: me } = api.user.me.useQuery();
   const utils = api.useUtils();
+  const [suggestion, setSuggestion] = useState("");
   //const { socket } = useSocket();
 
   const updateTicket = api.ticket.updateTicket.useMutation({
@@ -118,7 +120,7 @@ export default function TicketPage({
             </div>
 
             {/* Chatt */}
-            <div className="flex min-h-125 flex-1 flex-col rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+            <div className="flex flex-col rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
               <h2 className="mb-4 text-lg font-semibold">Meddelanden</h2>
 
               <div className="min-h-0 flex-1">
@@ -126,8 +128,12 @@ export default function TicketPage({
                   <ChatBox
                     conversationId={ticket.conversation.id}
                     context="TICKET"
+                    suggestion={suggestion}
                   />
                 )}
+              </div>
+              <div className="mt-4">
+                <TicketReplyAssistant onSuggestion={setSuggestion} />
               </div>
             </div>
           </div>

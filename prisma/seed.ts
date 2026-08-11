@@ -4,6 +4,7 @@ import { seedNews } from "./seeds/seedNews";
 import { seedSuggestions } from "./seeds/seedSuggestions";
 import { seedQuestions } from "./seeds/seedQuestions";
 import { seedResources } from "./seeds/seedResources";
+import { seedTickets } from "./seeds/seedTickets";
 
 async function main() {
   await db.user.deleteMany();
@@ -14,6 +15,7 @@ async function main() {
   await db.news.deleteMany();
   await db.suggestion.deleteMany();
   await db.conversation.deleteMany();
+  await db.ticket.deleteMany();
 
   await db.permission.createMany({
     data: [
@@ -54,10 +56,14 @@ async function main() {
     },
   });
 
+  console.log("✅ ADMIN SKAPAD:", createdUserOne.user);
+
   await db.user.update({
     where: { id: createdUserOne.user.id },
     data: { role: { connect: { name: "ADMIN" } } },
   });
+
+  console.log("✅ Admin skapad:", createdUserOne.user.email);
 
   const createdUserTwo = await auth.api.signUpEmail({
     body: {
@@ -90,10 +96,19 @@ async function main() {
     await db.suggestionBox.create({});
   }
 
+  const checkAdmin = await db.user.findUnique({
+    where: {
+      email: "admin@example.com",
+    },
+  });
+
+  console.log("🔎 ADMIN FÖRE SEEDS:", checkAdmin);
+
   await seedNews();
   await seedSuggestions();
   await seedQuestions();
   await seedResources();
+  await seedTickets();
 
   console.log("✅ Seed klar!");
 }

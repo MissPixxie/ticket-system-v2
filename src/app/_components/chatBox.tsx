@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { api, type RouterOutputs } from "~/trpc/react";
+import { api } from "~/trpc/react";
 import { useSocket } from "../socketProvider";
 import FeedbackBubble from "./feedbackBubble";
 import { GenerateNewsletterButton } from "./modals/generate-newsletter/generateNewsletterButton";
@@ -9,6 +9,7 @@ import { GenerateNewsletterButton } from "./modals/generate-newsletter/generateN
 interface ChatBoxProps {
   conversationId: string;
   context: "TICKET" | "RESOURCE" | "NEWS" | "QUESTION" | "EMAIL";
+  suggestion?: string;
 }
 
 interface Newsletter {
@@ -16,15 +17,24 @@ interface Newsletter {
   body: string;
 }
 
-export default function ChatBox({ conversationId, context }: ChatBoxProps) {
+export default function ChatBox({
+  conversationId,
+  context,
+  suggestion,
+}: ChatBoxProps) {
   const { socket } = useSocket();
   const [newMessage, setNewMessage] = useState("");
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   const [newsletter, setNewsletter] = useState<Newsletter | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
   const utils = api.useUtils();
   const { data: me } = api.user.me.useQuery();
+
+  useEffect(() => {
+    if (suggestion) {
+      setNewMessage(suggestion);
+    }
+  }, [suggestion]);
 
   const { data: messages, isLoading } = api.message.listMessages.useQuery({
     conversationId: conversationId,
