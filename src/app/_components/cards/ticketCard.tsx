@@ -5,7 +5,7 @@ import { api } from "~/trpc/react";
 import { TiDocumentText } from "react-icons/ti";
 import type { RouterOutputs } from "~/trpc/react";
 import ChatBox from "../chatBox";
-import { InviteSection } from "../modals/invite-user/inviteUserButton";
+import { InviteUserButton } from "../modals/invite-user/inviteUserButton";
 
 type TicketList = RouterOutputs["ticket"]["listAllTickets"];
 type Ticket = TicketList["tickets"][number];
@@ -97,7 +97,7 @@ export default function TicketCard({ ...ticketProps }: TicketCardProps) {
             </div>
             <div className="ml-auto flex flex-row gap-5 self-end">
               {ticketProps.conversation?.id && (
-                <InviteSection
+                <InviteUserButton
                   ticketId={ticketProps.id}
                   conversationId={ticketProps.conversation.id}
                 />
