@@ -30,6 +30,10 @@ export function GenerateNewsletterButton({
       conversationId,
     });
 
+    console.log("📰 RESULT FRÅN FRONTEND:", result);
+    console.log("📝 TITLE:", result.newsletter.title);
+    console.log("📄 CONTENT:", result.newsletter.content);
+
     setNewsletter({
       title: result.newsletter.title,
       content: result.newsletter.content,

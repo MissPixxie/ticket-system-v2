@@ -5,6 +5,11 @@ import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { IoSparklesSharp } from "react-icons/io5";
 import type { Prisma } from "@prisma/client";
+import {
+  formatNewsCategory,
+  formatPriority,
+} from "~/app/utils/formatNotification";
+import CustomSelect from "../../customSelect";
 
 const categories: NewsCategory[] = [
   "NEWS",
@@ -40,12 +45,14 @@ export default function GenerateNewsletterModal({
 
   useEffect(() => {
     if (newsletter) {
+
       setTitle(newsletter.title);
       setContent(newsletter.content);
       setCategory(newsletter.category ?? "NEWS");
       setPriority(newsletter.priority ?? "LOW");
     }
   }, [newsletter]);
+
 
   if (!open || !newsletter) return null;
 
@@ -62,7 +69,6 @@ export default function GenerateNewsletterModal({
           <IoSparklesSharp size={18} />
           AI-genererat nyhetsbrev
         </h2>
-
         <div className="flex flex-col gap-4">
           <div>
             <label className="mb-2 block text-sm text-white/60">Ämne</label>
@@ -70,7 +76,7 @@ export default function GenerateNewsletterModal({
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="input w-full rounded-xl px-4 py-300"
+              className="input w-full rounded-xl px-4 py-3"
             />
           </div>
 
@@ -93,22 +99,31 @@ export default function GenerateNewsletterModal({
               <label className="text-sm font-semibold text-white/60">
                 Kategori
               </label>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
+              <CustomSelect
+                value={category}
+                onChange={(value) => setCategory(value as NewsCategory)}
+                options={categories.map((category) => ({
+                  value: category,
+                  label: formatNewsCategory(category) ?? category,
+                }))}
+                size="sm"
+              />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-white/60">
                 Prioritet
               </label>
-              {priorities.map((priority) => (
-                <option key={priority} value={priority}>
-                  {priority}
-                </option>
-              ))}
+
+              <CustomSelect
+                value={priority}
+                onChange={(value) => setPriority(value as Priority)}
+                options={priorities.map((priority) => ({
+                  value: priority,
+                  label: formatPriority(priority) ?? priority,
+                }))}
+                size="sm"
+              />
             </div>
           </div>
         </div>
