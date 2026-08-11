@@ -112,13 +112,13 @@ export function formatPriority(priority?: string) {
 export function getPriorityClass(priority?: string) {
   switch (priority) {
     case "LOW":
-      return "bg-green-500 text-white";
+      return "bg-green-500/20 text-green-300";
     case "MEDIUM":
-      return "bg-yellow-500 text-black";
+      return "bg-yellow-500/20 text-yellow-300";
     case "HIGH":
-      return "bg-orange-500 text-white";
+      return "bg-orange-500/20 text-orange-300";
     case "URGENT":
-      return "bg-red-600 text-white";
+      return "bg-red-500/20 text-red-300";
     default:
       return "";
   }
@@ -144,11 +144,11 @@ export function formatSuggestionStatus(status?: string) {
 export function getStatusClass(status?: string) {
   switch (status) {
     case "OPEN":
-      return "bg-blue-500 text-white";
+      return "bg-blue-500/20 text-blue-300";
     case "IN_PROGRESS":
-      return "bg-amber-400 text-black";
+      return "bg-yellow-500/20 text-yellow-300";
     case "CLOSED":
-      return "bg-gray-600 text-white";
+      return "bg-gray-500/20 text-gray-300";
     default:
       return "";
   }

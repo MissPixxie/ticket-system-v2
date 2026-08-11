@@ -8,7 +8,12 @@ import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImag
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 import { FaSearchPlus, FaTrash } from "react-icons/fa";
 import { ImagePreviewModal } from "~/app/_components/modals/imagePreviewModal";
-import { formatPriority, formatStatus } from "~/app/utils/formatNotification";
+import {
+  formatPriority,
+  formatStatus,
+  getPriorityClass,
+  getStatusClass,
+} from "~/app/utils/formatNotification";
 
 const priorityClasses: Record<string, string> = {
   LOW: "bg-green-500 text-white",
@@ -73,17 +78,13 @@ export default function TicketPage({
 
             <div className="flex gap-2">
               <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  statusClasses[ticket.status]
-                }`}
+                className={`rounded-lg px-3 py-1 text-xs font-medium ${getStatusClass(ticket.status)}`}
               >
                 {formatStatus(ticket.status)}
               </span>
 
               <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  priorityClasses[ticket.priority]
-                }`}
+                className={`rounded-lg px-3 py-1 text-xs font-medium ${getPriorityClass(ticket.priority)}`}
               >
                 {formatPriority(ticket.priority)}
               </span>

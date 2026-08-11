@@ -221,7 +221,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
 
               <div>
                 <span
-                  className={`rounded-md px-2 py-1 text-xs ${getStatusClass(ticket.status)}`}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium ${getStatusClass(ticket.status)}`}
                 >
                   {formatStatus(ticket.status)}
                 </span>
@@ -229,7 +229,7 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
 
               <div>
                 <span
-                  className={`rounded-md px-2 py-1 text-xs ${getPriorityClass(ticket.priority)}`}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium ${getPriorityClass(ticket.priority)}`}
                 >
                   {formatPriority(ticket.priority)}
                 </span>

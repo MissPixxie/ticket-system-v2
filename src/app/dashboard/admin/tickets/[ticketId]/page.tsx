@@ -10,7 +10,12 @@ import { FaSearchPlus, FaTrash } from "react-icons/fa";
 import { EditImageButton } from "~/app/_components/cloudinaryUpload/feEdit";
 import { CldImage } from "next-cloudinary";
 import { UploadImageButton } from "~/app/_components/cloudinaryUpload/uploadImageButton";
-import { formatPriority, formatStatus } from "~/app/utils/formatNotification";
+import {
+  formatPriority,
+  formatStatus,
+  getPriorityClass,
+  getStatusClass,
+} from "~/app/utils/formatNotification";
 import SkeletonTicketDetails from "~/app/_components/skeletonComponents/pages/skeletonTicketDetails";
 import CustomSelect from "~/app/_components/customSelect";
 
@@ -89,17 +94,13 @@ export default function TicketPage({
 
           <div className="flex gap-2">
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                statusClasses[ticket.status]
-              }`}
+              className={`rounded-lg px-3 py-1 text-xs font-medium ${getStatusClass(ticket.status)}`}
             >
               {formatStatus(ticket.status)}
             </span>
 
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                priorityClasses[ticket.priority]
-              }`}
+              className={`rounded-lg px-3 py-1 text-xs font-medium ${getPriorityClass(ticket.priority)}`}
             >
               {formatPriority(ticket.priority)}
             </span>
