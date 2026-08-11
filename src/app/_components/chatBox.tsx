@@ -93,8 +93,6 @@ export default function ChatBox({ conversationId, context }: ChatBoxProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-lg font-semibold">Meddelanden</h3>
-
       <div className="flex max-h-64 flex-col gap-3 overflow-y-auto rounded-lg bg-black/30 p-4">
         {isLoading ? (
           <p className="animate-pulse text-sm opacity-60">

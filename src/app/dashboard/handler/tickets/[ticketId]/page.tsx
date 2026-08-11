@@ -108,48 +108,69 @@ export default function TicketPage({
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
+          {/* VÄNSTER - Huvudarbete */}
+          <div className="flex min-h-150 flex-col gap-6 lg:col-span-2">
+            {/* Beskrivning */}
             <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
               <h2 className="mb-3 text-lg font-semibold">Beskrivning</h2>
+
               <p className="text-white/80">{ticket.issue}</p>
             </div>
 
-            <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+            {/* Chatt */}
+            <div className="flex min-h-125 flex-1 flex-col rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+              <h2 className="mb-4 text-lg font-semibold">Meddelanden</h2>
+
+              <div className="min-h-0 flex-1">
+                {ticket.conversation?.id && (
+                  <ChatBox
+                    conversationId={ticket.conversation.id}
+                    context="TICKET"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* HÖGER - Information och verktyg */}
+          <div className="flex flex-col gap-5">
+            {/* Information */}
+            <div className="rounded-2xl bg-white/5 p-5 shadow-lg/15 backdrop-blur-lg">
               <h2 className="mb-4 text-lg font-semibold">Information</h2>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-white/60">Skapad av</p>
+                  <p className="text-sm text-white/50">Skapad av</p>
                   <p>{ticket.createdBy?.name}</p>
                 </div>
 
                 <div>
-                  <p className="mb-1 text-sm text-white/60">Tilldelad:</p>
-                  <div>
-                    {ticket.assignedTo ? (
-                      <span>{ticket.assignedTo.name}</span>
-                    ) : (
-                      <button
-                        disabled={ticket.createdById === me?.id}
-                        onClick={() => handleSetStatus(ticket.id)}
-                        title={
-                          ticket.createdById === me?.id
-                            ? "Du kan inte acceptera en ticket som du själv har skapat."
-                            : "Acceptera ticket"
-                        }
-                        className={`submit-button ${
-                          ticket.createdById === me?.id
-                            ? "cursor-not-allowed opacity-50"
-                            : ""
-                        }`}
-                      >
-                        Acceptera
-                      </button>
-                    )}
-                  </div>
+                  <p className="mb-1 text-sm text-white/50">Tilldelad</p>
+
+                  {ticket.assignedTo ? (
+                    <span>{ticket.assignedTo.name}</span>
+                  ) : (
+                    <button
+                      disabled={ticket.createdById === me?.id}
+                      onClick={() => handleSetStatus(ticket.id)}
+                      title={
+                        ticket.createdById === me?.id
+                          ? "Du kan inte acceptera en ticket som du själv har skapat."
+                          : "Acceptera ticket"
+                      }
+                      className={`submit-button ${
+                        ticket.createdById === me?.id
+                          ? "cursor-not-allowed opacity-50"
+                          : ""
+                      }`}
+                    >
+                      Acceptera
+                    </button>
+                  )}
                 </div>
+
                 <div>
-                  <p className="text-sm text-white/60">Deltagare</p>
+                  <p className="text-sm text-white/50">Deltagare</p>
 
                   <p>
                     {ticket.conversation?.participants
@@ -159,17 +180,17 @@ export default function TicketPage({
                 </div>
 
                 <div>
-                  <p className="text-sm text-white/60">Skapad</p>
-                  {new Date(ticket.createdAt).toLocaleDateString()} ·{" "}
-                  {new Date(ticket.createdAt).toLocaleTimeString()}
-                </div>
+                  <p className="text-sm text-white/50">Skapad</p>
 
-                <div>
-                  <p className="text-sm text-white/60">Status</p>
-                  <p>{formatStatus(ticket.status)}</p>
+                  <p>
+                    {new Date(ticket.createdAt).toLocaleDateString()} ·{" "}
+                    {new Date(ticket.createdAt).toLocaleTimeString()}
+                  </p>
                 </div>
               </div>
-              <div className="mt-4 flex flex-row gap-4">
+
+              {/* Status + prioritet */}
+              <div className="mt-5 flex flex-wrap justify-center gap-10 border-t border-white/10 pt-5">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-semibold">Status</label>
 
@@ -227,27 +248,30 @@ export default function TicketPage({
                     />
                   </div>
                 </div>
-                <div className="ml-auto flex flex-row gap-5 self-end">
-                  {ticket.conversation?.id && (
-                    <InviteSection
-                      ticketId={ticket.id}
-                      conversationId={ticket.conversation.id}
-                    />
-                  )}
-                  <button
-                    disabled
-                    title="Kommer snart"
-                    className="flex cursor-not-allowed items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-4 py-2.5 text-white/40 opacity-50"
-                  >
-                    Ticket History
-                    <TiDocumentText className="self-center" size={22} />
-                  </button>
-                </div>
+              </div>
+
+              {/* Verktyg */}
+              <div className="mt-5 flex flex-wrap gap-3 border-t border-white/10 pt-5">
+                {ticket.conversation?.id && (
+                  <InviteSection
+                    ticketId={ticket.id}
+                    conversationId={ticket.conversation.id}
+                  />
+                )}
+
+                <button
+                  disabled
+                  title="Kommer snart"
+                  className="flex cursor-not-allowed items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-4 py-2.5 text-white/40 opacity-50"
+                >
+                  Ticket History
+                  <TiDocumentText className="self-center" size={22} />
+                </button>
               </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-5">
-            <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
+
+            {/* Bilaga */}
+            <div className="rounded-2xl bg-white/5 p-5 shadow-lg/15 backdrop-blur-lg">
               <h2 className="mb-4 text-lg font-semibold">Bilaga</h2>
 
               {!ticket.imagePublicId ? (
@@ -272,6 +296,7 @@ export default function TicketPage({
                       alt="Förhandsvisning"
                       className="w-full cursor-pointer object-cover transition duration-300 group-hover:scale-105"
                     />
+
                     <div className="absolute top-3 right-3 z-20 flex gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                       <EditImageButton
                         onUpload={(publicId) => {
@@ -287,6 +312,7 @@ export default function TicketPage({
                         className="rounded-full bg-black/50 p-2 text-white transition hover:bg-red-500"
                         onClick={(e) => {
                           e.stopPropagation();
+
                           updateTicket.mutate({
                             id: ticket.id,
                             imagePublicId: null,
@@ -296,6 +322,7 @@ export default function TicketPage({
                         <FaTrash size={16} />
                       </button>
                     </div>
+
                     <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
                       <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white opacity-0 backdrop-blur-sm transition duration-300 group-hover:opacity-100">
                         <FaSearchPlus size={22} />
@@ -303,14 +330,6 @@ export default function TicketPage({
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
-            <div className="rounded-2xl bg-white/5 p-6 shadow-lg/15 backdrop-blur-lg">
-              {ticket.conversation?.id && (
-                <ChatBox
-                  conversationId={ticket.conversation?.id ?? null}
-                  context="TICKET"
-                />
               )}
             </div>
           </div>
