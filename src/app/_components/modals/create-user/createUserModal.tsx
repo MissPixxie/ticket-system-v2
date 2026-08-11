@@ -97,7 +97,7 @@ export default function CreateUserModal({
 
   return ReactDOM.createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs dark:bg-black/60"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto backdrop-blur-xs dark:bg-black/60"
       onClick={onClose}
     >
       <div
