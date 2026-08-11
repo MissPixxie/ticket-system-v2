@@ -35,14 +35,25 @@ export default function TicketPage({
 }: {
   params: Promise<{ ticketId: string }>;
 }) {
+  const [suggestion, setSuggestion] = useState("");
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
+
   const { ticketId } = use(params);
   const { data: ticket, isLoading } = api.ticket.getTicketById.useQuery({
     id: ticketId,
   });
-  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
+  const { data: messages = [] } = api.message.listMessages.useQuery(
+    {
+      conversationId: ticket?.conversation?.id ?? "",
+    },
+    {
+      enabled: !!ticket?.conversation?.id,
+    },
+  );
+
   const { data: me } = api.user.me.useQuery();
   const utils = api.useUtils();
-  const [suggestion, setSuggestion] = useState("");
+
   //const { socket } = useSocket();
 
   const updateTicket = api.ticket.updateTicket.useMutation({
@@ -133,7 +144,15 @@ export default function TicketPage({
                 )}
               </div>
               <div className="mt-4">
-                <TicketReplyAssistant onSuggestion={setSuggestion} />
+                <TicketReplyAssistant
+                  title={ticket.title}
+                  issue={ticket.issue}
+                  messages={messages.map((message) => ({
+                    senderName: message.sender?.name ?? "Användare",
+                    content: message.content,
+                  }))}
+                  onSuggestion={setSuggestion}
+                />
               </div>
             </div>
           </div>

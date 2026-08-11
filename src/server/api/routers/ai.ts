@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { generateTags } from "~/server/ai/generateTags";
 import { generateNewsletter } from "~/server/ai/generateNewsletter";
+import { generateTicketReply } from "~/server/ai/generateTicketReply";
 
 export const aiRouter = createTRPCRouter({
   generateTags: protectedProcedure
@@ -44,5 +45,26 @@ export const aiRouter = createTRPCRouter({
       const newsletter = await generateNewsletter(conversationText);
 
       return { newsletter };
+    }),
+
+  generateTicketReply: protectedProcedure
+    .input(
+      z.object({
+        title: z.string(),
+        issue: z.string(),
+        messages: z.array(
+          z.object({
+            senderName: z.string(),
+            content: z.string(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      return generateTicketReply({
+        title: input.title,
+        issue: input.issue,
+        messages: input.messages,
+      });
     }),
 });

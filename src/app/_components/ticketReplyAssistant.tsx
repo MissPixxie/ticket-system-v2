@@ -1,31 +1,36 @@
 "use client";
 
-import { useState } from "react";
 import { FaMagic } from "react-icons/fa";
+import { api } from "~/trpc/react";
 
 interface TicketReplyAssistantProps {
+  title: string;
+  issue: string;
+  messages: {
+    senderName: string;
+    content: string;
+  }[];
   onSuggestion: (suggestion: string) => void;
 }
 
 export default function TicketReplyAssistant({
+  title,
+  issue,
+  messages,
   onSuggestion,
 }: TicketReplyAssistantProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const generateReply = api.ai.generateTicketReply.useMutation({
+    onSuccess: (data) => {
+      onSuggestion(data.reply);
+    },
+  });
 
-  const handleSuggest = async () => {
-    setIsLoading(true);
-
-    try {
-      // Tillfälligt test
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const suggestion =
-        "Hej! Tack för att du hör av dig. Vi ska undersöka problemet och återkomma så snart vi har mer information.";
-
-      onSuggestion(suggestion);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSuggest = () => {
+    generateReply.mutate({
+      title,
+      issue,
+      messages,
+    });
   };
 
   return (
@@ -47,12 +52,12 @@ export default function TicketReplyAssistant({
       <button
         type="button"
         onClick={handleSuggest}
-        disabled={isLoading}
+        disabled={generateReply.isPending}
         className="flex items-center gap-2 rounded-xl bg-purple-500/20 px-4 py-2 text-sm font-medium text-purple-200 transition hover:bg-purple-500/30 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <FaMagic size={13} />
 
-        {isLoading ? "Tänker..." : "Föreslå svar"}
+        {generateReply.isPending ? "Tänker..." : "Föreslå svar"}
       </button>
     </div>
   );
