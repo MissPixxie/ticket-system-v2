@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { HiQuestionMarkCircle } from "react-icons/hi";
 import QuestionCard from "~/app/_components/cards/questionCard";
+import SkeletonQuestionCard from "~/app/_components/skeletonComponents/cards/skeletonQuestionCard";
 import { api } from "~/trpc/react";
 import { FaChevronDown } from "react-icons/fa6";
 import { FiSearch } from "react-icons/fi";
@@ -93,22 +94,6 @@ export default function QuestionPage() {
     });
   }, [questionId, questions]);
 
-  if (isLoading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center text-white/70">
-        Laddar frågor...
-      </main>
-    );
-  }
-
-  if (questions.length === 0) {
-    return (
-      <main className="flex min-h-screen items-center justify-center text-white/70">
-        Inga frågor hittades
-      </main>
-    );
-  }
-
   const filteredQuestions = questions.filter((question) =>
     question.question.toLowerCase().includes(search.toLowerCase()),
   );
@@ -124,6 +109,7 @@ export default function QuestionPage() {
             <h1 className="text-3xl font-bold tracking-tight">Frågor & Svar</h1>
           </div>
         </div>
+
         <div className="relative mt-4 w-100">
           <FiSearch
             className="absolute top-1/2 left-4 -translate-y-1/2 text-white/40"
@@ -138,53 +124,76 @@ export default function QuestionPage() {
             className="input w-full rounded-xl py-3 pr-4 pl-11"
           />
         </div>
+
         {/* QUESTIONS */}
         <div className="mt-4 space-y-4">
-          {filteredQuestions.map((question) => {
-            const isOpen = selectedQuestionId === question.id;
+          {isLoading ? (
+            <>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <SkeletonQuestionCard key={index} />
+              ))}
+            </>
+          ) : questions.length === 0 ? (
+            <div className="py-10 text-center text-white/70">
+              Inga frågor hittades
+            </div>
+          ) : (
+            <>
+              {filteredQuestions.map((question) => {
+                const isOpen = selectedQuestionId === question.id;
 
-            return (
-              <div
-                key={question.id}
-                ref={(el) => {
-                  questionRefs.current[question.id] = el;
-                }}
-                className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 shadow-xl backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.07]"
-              >
-                <button
-                  onClick={() => toggleQuestions(question.id)}
-                  className="w-full p-5 text-left transition"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-base font-semibold text-white">
-                        {question.question}
-                      </h2>
-
-                      <div className="mt-2 self-start text-xs text-white/40">
-                        {question.createdBy?.name
-                          ? `${question.createdBy.name} · `
-                          : "Anonym · "}
-                        {new Date(question.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-
-                    <div
-                      className={`mt-1 text-white/40 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} `}
+                return (
+                  <div
+                    key={question.id}
+                    ref={(el) => {
+                      questionRefs.current[question.id] = el;
+                    }}
+                    className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 shadow-xl backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.07]"
+                  >
+                    <button
+                      onClick={() => toggleQuestions(question.id)}
+                      className="w-full p-5 text-left transition"
                     >
-                      <FaChevronDown size={20} />
-                    </div>
-                  </div>
-                </button>
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h2 className="text-base font-semibold text-white">
+                            {question.question}
+                          </h2>
 
-                {isOpen && (
-                  <div className="border-t border-white/5 p-5">
-                    <QuestionCard selectedQuestionId={selectedQuestionId} />
+                          <div className="mt-2 self-start text-xs text-white/40">
+                            {question.createdBy?.name
+                              ? `${question.createdBy.name} · `
+                              : "Anonym · "}
+                            {new Date(question.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+
+                        <div
+                          className={`mt-1 text-white/40 transition-transform duration-200 ${
+                            isOpen ? "rotate-180" : ""
+                          }`}
+                        >
+                          <FaChevronDown size={20} />
+                        </div>
+                      </div>
+                    </button>
+
+                    {isOpen && (
+                      <div className="border-t border-white/5 p-5">
+                        <QuestionCard selectedQuestionId={selectedQuestionId} />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+              {isFetching && !isLoading && (
+                <>
+                  <SkeletonQuestionCard />
+                  <SkeletonQuestionCard />
+                </>
+              )}
+            </>
+          )}
         </div>
 
         {/* PAGINATION */}
@@ -207,6 +216,7 @@ export default function QuestionPage() {
             </button>
           )}
         </div>
+
         {isFetching && (
           <p className="text-center text-sm text-white/50">
             Laddar fler frågor...

@@ -215,7 +215,11 @@ export function TicketTable({ currentUserRole }: TicketTableProps) {
         <div key={ticket.id} className="border-t border-white/5">
           <div className="grid cursor-pointer grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] items-center px-5 py-4 hover:bg-white/5">
             <Link href={getTicketUrl(ticket.id)} className="contents">
-              <div>{ticket.title}</div>
+              <div>
+                {ticket.title.length > 15
+                  ? `${ticket.title.slice(0, 20)}...`
+                  : ticket.title}
+              </div>
 
               <div>{ticket.department}</div>
 

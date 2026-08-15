@@ -149,7 +149,7 @@ export default function MessagePage() {
         </div>
 
         {/* MAIN GRID */}
-        <div className="grid gap-8 xl:grid-cols-[1fr_0.9fr]">
+        <div className="grid items-stretch gap-8 xl:grid-cols-[1fr_0.9fr]">
           {/* LEFT SIDE */}
           <div className="rounded-2xl bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
             <div className="space-y-8">

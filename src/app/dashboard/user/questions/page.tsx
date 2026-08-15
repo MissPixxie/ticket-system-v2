@@ -7,6 +7,7 @@ import { api } from "~/trpc/react";
 import { FaChevronDown } from "react-icons/fa6";
 import { useSearchParams } from "next/navigation";
 import SkeletonQuestionPage from "~/app/_components/skeletonComponents/pages/skeletonQuestionPage";
+import SkeletonQuestionCard from "~/app/_components/skeletonComponents/cards/skeletonQuestionCard";
 
 const PAGE_SIZE = 5;
 
@@ -98,22 +99,6 @@ export default function QuestionPage() {
     });
   }, [questionId, questions]);
 
-  if (isLoading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center text-white/70">
-        <SkeletonQuestionPage />;
-      </main>
-    );
-  }
-
-  if (questions.length === 0) {
-    return (
-      <main className="flex min-h-screen items-center justify-center text-white/70">
-        Inga frågor hittades
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen px-6 py-10 text-white">
       <div className="mx-auto max-w-5xl">
@@ -179,52 +164,73 @@ export default function QuestionPage() {
 
         {/* QUESTIONS */}
         <div className="space-y-4">
-          {questions.map((question) => {
-            const isOpen = selectedQuestionId === question.id;
+          {isLoading ? (
+            <>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <SkeletonQuestionCard key={index} />
+              ))}
+            </>
+          ) : questions.length === 0 ? (
+            <div className="py-10 text-center text-white/70">
+              Inga frågor hittades
+            </div>
+          ) : (
+            <>
+              {questions.map((question) => {
+                const isOpen = selectedQuestionId === question.id;
 
-            return (
-              <div
-                id={`question-${question.id}`}
-                key={question.id}
-                ref={(el) => {
-                  questionRefs.current[question.id] = el;
-                }}
-                className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 shadow-xl backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.07]"
-              >
-                <button
-                  onClick={() => toggleQuestions(question.id)}
-                  className="w-full p-5 text-left transition"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-base font-semibold text-white">
-                        {question.question}
-                      </h2>
-
-                      <div className="mt-2 self-start text-xs text-white/40">
-                        {question.createdBy?.name
-                          ? `${question.createdBy.name} · `
-                          : "Anonym · "}
-                        {new Date(question.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-
-                    <div
-                      className={`mt-1 text-white/40 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} `}
+                return (
+                  <div
+                    id={`question-${question.id}`}
+                    key={question.id}
+                    ref={(el) => {
+                      questionRefs.current[question.id] = el;
+                    }}
+                    className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 shadow-xl backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.07]"
+                  >
+                    <button
+                      onClick={() => toggleQuestions(question.id)}
+                      className="w-full p-5 text-left transition"
                     >
-                      <FaChevronDown size={20} />
-                    </div>
-                  </div>
-                </button>
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h2 className="text-base font-semibold text-white">
+                            {question.question}
+                          </h2>
 
-                {isOpen && selectedQuestionId && (
-                  <div className="border-t border-white/5 p-5">
-                    <QuestionCard selectedQuestionId={selectedQuestionId} />
+                          <div className="mt-2 self-start text-xs text-white/40">
+                            {question.createdBy?.name
+                              ? `${question.createdBy.name} · `
+                              : "Anonym · "}
+                            {new Date(question.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+
+                        <div
+                          className={`mt-1 text-white/40 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} `}
+                        >
+                          <FaChevronDown size={20} />
+                        </div>
+                      </div>
+                    </button>
+
+                    {isOpen && selectedQuestionId && (
+                      <div className="border-t border-white/5 p-5">
+                        <QuestionCard selectedQuestionId={selectedQuestionId} />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+
+              {isFetching && !isLoading && (
+                <>
+                  <SkeletonQuestionCard />
+                  <SkeletonQuestionCard />
+                </>
+              )}
+            </>
+          )}
         </div>
 
         {/* PAGINATION */}

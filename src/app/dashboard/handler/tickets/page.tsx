@@ -34,7 +34,7 @@ export default function TicketsPage() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center text-white/70">
+      <main>
         <SkeletonTicketOverview />
       </main>
     );

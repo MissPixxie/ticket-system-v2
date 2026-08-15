@@ -1,14 +1,15 @@
 "use client";
 
+import { TiTicket } from "react-icons/ti";
+
 export default function SkeletonTicketOverview() {
   return (
     <main className="main-page-layout">
       <div className="container">
         {/* HEADER */}
-        <div className="mb-10 flex items-center gap-4">
-          <div className="h-9 w-9 animate-pulse rounded-lg bg-white/10" />
-
-          <div className="h-8 w-52 animate-pulse rounded-lg bg-white/10" />
+        <div className="header-container">
+          <TiTicket className="text-purple-400" size={36} />
+          <h1 className="page-header">Tickets översikt</h1>
         </div>
 
         {/* STATISTICS */}

@@ -1,10 +1,23 @@
 "use client";
 
+import { HiQuestionMarkCircle } from "react-icons/hi";
+
 export default function SkeletonQuestionPage() {
   return (
     <main className="main-page-layout">
       <div className="container">
-        {/* HEADER */}
+        {/* HEADER */}{" "}
+        <div className="mb-8 flex items-center gap-4">
+          <HiQuestionMarkCircle className="text-purple-400" size={26} />
+
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Frågor & Svar</h1>
+
+            <p className="mt-1 text-sm text-white/50">
+              Ställ frågor och ta del av svar från teamet.
+            </p>
+          </div>
+        </div>
         <div className="mb-8 flex items-center gap-4">
           {/* Icon */}
           <div className="h-9 w-9 animate-pulse rounded-full bg-white/10" />
@@ -17,7 +30,6 @@ export default function SkeletonQuestionPage() {
             <div className="mt-2 h-4 w-72 animate-pulse rounded bg-white/10" />
           </div>
         </div>
-
         {/* CREATE QUESTION */}
         <div className="mb-8 rounded-3xl border border-white/5 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
           {/* Heading */}
@@ -35,7 +47,6 @@ export default function SkeletonQuestionPage() {
             <div className="h-10 w-28 animate-pulse rounded-xl bg-white/10" />
           </div>
         </div>
-
         {/* QUESTIONS */}
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, index) => (
@@ -60,7 +71,6 @@ export default function SkeletonQuestionPage() {
             </div>
           ))}
         </div>
-
         {/* PAGINATION */}
         <div className="mt-8 flex justify-center gap-3">
           <div className="h-9 w-24 animate-pulse rounded-xl bg-white/10" />
