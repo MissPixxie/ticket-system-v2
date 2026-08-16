@@ -10,9 +10,9 @@ import { FiSearch } from "react-icons/fi";
 import CustomSelect from "~/app/_components/customSelect";
 
 const ROLE_MAP = {
-  USER: "cmmqzjj6l0006k0u9lwzfyu3l",
-  HANDLER: "cmmqzjj6f0005k0u9itc44n56",
-  ADMIN: "ADMIN_ROLE_ID_HÄR",
+  USER: "cmsohafz90006cgu9rupoaxlw",
+  HANDLER: "cmsohafvc0005cgu9rib8dlgl",
+  ADMIN: "cmsohafqr0004cgu9pw6zhcud",
 } as const;
 
 const ROLE_PERMISSIONS: Record<RoleKey, string[]> = {
@@ -279,7 +279,7 @@ export default function ListUsersPage() {
                                     );
                                   }
                                 }}
-                                className="cursor-pointer rounded-lg border border-white/10 bg-white/5 p-2 text-white/70 transition-all hover:border-blue-500/40 hover:bg-blue-500/20 hover:text-blue-300"
+                                className="edit-button"
                               >
                                 <RiEdit2Fill size={18} />
                               </button>
@@ -288,7 +288,7 @@ export default function ListUsersPage() {
                               {!isAdmin && (
                                 <button
                                   onClick={() => setUserToDelete(user.id)}
-                                  className="cursor-pointer rounded-lg border border-white/10 bg-white/5 p-2 text-white/70 transition-all hover:border-red-500/40 hover:bg-red-500/20 hover:text-red-300"
+                                  className="delete-button"
                                 >
                                   <FaTrashAlt size={18} />
                                 </button>
@@ -316,7 +316,7 @@ export default function ListUsersPage() {
                                           onChange={(e) =>
                                             setEditName(e.target.value)
                                           }
-                                          className="input rounded-xl px-4 py-2.5"
+                                          className="input rounded-lg px-4 py-3 pr-4"
                                           placeholder="Namn"
                                         />
                                       </div>
@@ -326,41 +326,22 @@ export default function ListUsersPage() {
                                           Roll
                                         </label>
 
-                                        <select
+                                        <CustomSelect
                                           value={editRole}
-                                          onChange={(e) =>
-                                            setEditRole(
-                                              e.target.value as RoleKey,
-                                            )
+                                          onChange={(value) =>
+                                            setEditRole(value as RoleKey)
                                           }
-                                          disabled={isAdmin}
-                                          className={`cursor-pointer rounded-xl border border-white/10 px-4 py-2.5 text-white transition-all outline-none ${
-                                            isAdmin
-                                              ? "cursor-not-allowed bg-white/5 text-white/30"
-                                              : "bg-white/5 hover:bg-white/10 focus:border-purple-500 focus:bg-white/10"
-                                          }`}
-                                        >
-                                          <option
-                                            value="USER"
-                                            className="text-black"
-                                          >
-                                            Användare
-                                          </option>
-
-                                          <option
-                                            value="HANDLER"
-                                            className="text-black"
-                                          >
-                                            Handläggare
-                                          </option>
-
-                                          <option
-                                            value="ADMIN"
-                                            className="text-black"
-                                          >
-                                            Admin
-                                          </option>
-                                        </select>
+                                          options={[
+                                            {
+                                              value: "USER",
+                                              label: "Användare",
+                                            },
+                                            {
+                                              value: "HANDLER",
+                                              label: "Handläggare",
+                                            },
+                                          ]}
+                                        />
                                       </div>
                                     </div>
 

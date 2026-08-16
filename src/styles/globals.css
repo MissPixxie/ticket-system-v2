@@ -209,6 +209,40 @@
   .ai-button:hover {
     background: rgba(168, 85, 247, 0.4);
   }
+
+  .edit-button {
+  cursor: pointer;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.05);
+  padding: 0.5rem;
+  color: rgb(255 255 255 / 0.7);
+  transition: all 0.15s ease;
+}
+
+.edit-button:hover {
+  border-color: rgb(34 197 94 / 0.4);
+  background: rgb(34 197 94 / 0.3);
+  color: rgb(134 239 172);
+}
+
+
+.delete-button {
+  cursor: pointer;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.05);
+  padding: 0.5rem;
+  color: rgb(255 255 255 / 0.7);
+  transition: all 0.15s ease;
+}
+
+.delete-button:hover {
+  border-color: rgb(239 68 68 / 0.4);
+  background: rgb(239 68 68 / 0.2);
+  color: rgb(252 165 165);
+}
+
 }
 
 /* Blue interactive button */

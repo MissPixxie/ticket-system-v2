@@ -3,7 +3,7 @@ import Link from "next/link";
 import Header from "~/app/_components/header";
 import { IoMdHome } from "react-icons/io";
 import { TiTicket } from "react-icons/ti";
-import { LuLogs } from "react-icons/lu";
+import { LuLogs, LuMessageSquareText } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { getSession } from "~/server/better-auth/server";
@@ -34,6 +34,12 @@ export default async function AdminLayout({
       label: "Hem",
       route: "/dashboard/admin/",
       icon: <IoMdHome />,
+    },
+    {
+      id: "messages",
+      label: "Meddelanden",
+      route: "/dashboard/admin/messages",
+      icon: <LuMessageSquareText size={20} />,
     },
     {
       id: "tickets",
